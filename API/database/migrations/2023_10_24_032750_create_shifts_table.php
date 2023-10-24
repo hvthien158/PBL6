@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration 
+{
     /**
      * Run the migrations.
      */
@@ -14,8 +15,8 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('amount');
-            $table->dateTime('time_valid_check_in');
-            $table->dateTime('time_valid_check_out');
+            $table->time('time_valid_check_in');
+            $table->time('time_valid_check_out');
         });
     }
 
