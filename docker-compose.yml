@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  api:
+    image: travanthien/laravel
+    volumes:
+      - ./API/:/var/www/html
+    ports:
+      - 8000:8000
+    restart: unless-stopped
+    depends_on:
+      - db
+    links:
+      - db
+  db:
+    image: mysql:8.0
+    volumes:
+      - ./API/.docker/data/db:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=attendance_management
+      - MYSQL_ROOT_PASSWORD=thienvan
+    restart: unless-stopped
+  app:
+    image: travanthien/vuejs
+    volumes:
+      - ./Frontend/src:/app/src
+      - ./Frontend/src/index.html:/app/src/index.html
+    ports:
+      - 5173:5173
+    restart: unless-stopped
+    environment:
+      - CHOKIDAR_USEPOLLING=true
