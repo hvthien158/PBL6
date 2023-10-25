@@ -2,15 +2,37 @@
 import logo from "../assets/image/logo.png";
 import schedule from "../assets/image/schedule.png";
 import { reactive } from "vue";
+import axios from "axios";
+import router from "../router";
+// localStorage.removeItem('user')
+// localStorage.removeItem('token')
 const props = defineProps({
   user: {
     type: Object,
-    required: true
-  }
-})
-let checkLanding = reactive({
-  isMenuOpen: false
+    required: true,
+  },
 });
+let checkLanding = reactive({
+  isMenuOpen: false,
+});
+const logout = async () => {
+  try {
+    console.log(`Bearer ${localStorage.token}`);
+    await axios
+      .post("http://127.0.0.1:8000/api/logout", null, {
+        headers: { Authorization: `Bearer ${localStorage.token}` },
+      })
+      .then(function (response) {
+        if (response.status == 200) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          router.push({ path: "/login" });
+        }
+      });
+  } catch (e) {
+    console.log(e);
+  }
+};
 </script>
 
 <template>
@@ -24,12 +46,15 @@ let checkLanding = reactive({
       </router-link>
     </div>
     <div class="user-info">
-      <div class="user" @click="checkLanding.isMenuOpen = !checkLanding.isMenuOpen">
+      <div
+        class="user"
+        @click="checkLanding.isMenuOpen = !checkLanding.isMenuOpen"
+      >
         <p class="username">{{ props.user.name }}</p>
       </div>
       <div v-if="checkLanding.isMenuOpen" class="dropdown">
         <div class="dropdown-item">Cài đặt tài khoản</div>
-        <div class="dropdown-item logout">Đăng xuất</div>
+        <div class="dropdown-item logout" @click="logout">Đăng xuất</div>
       </div>
     </div>
   </header>
@@ -97,7 +122,6 @@ header {
   background-color: #000;
   color: #ffffff;
 }
-
 
 .dropdown-content {
   display: none;
