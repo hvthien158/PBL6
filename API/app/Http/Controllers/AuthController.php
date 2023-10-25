@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -14,22 +15,14 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'username' => 'required',
-            'password' => 'required|string|min:6',
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'email' => 'required|email',
+        //     'password' => 'required|string|min:6',
+        // ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        //Nếu user nhập vào là email thì đổi key username thành email
-        $info = $validator->validated();
-        if(filter_var($info['username'], FILTER_VALIDATE_EMAIL)){
-            $info = array_merge(['email' => $info['username']], ['password' => $info['password']]);
-        }
+        $info = array_merge(['email' => $request->email], ['password' => $request->password]);
 
         if (!$token = auth()->attempt($info)) {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -51,10 +44,12 @@ class AuthController extends Controller
             return response()->json($validator->errors()->toJson(), 422);
         }
 
-        $user = User::create(array_merge(
-            $validator->validated(),
-            ['password' => bcrypt($request->password)]
-        ));
+        $user = User::create(
+            array_merge(
+                $validator->validated(),
+                ['password' => bcrypt($request->password)]
+            )
+        );
 
         return response()->json([
             'message' => 'User successfully registered',
