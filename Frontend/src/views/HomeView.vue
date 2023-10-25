@@ -1,131 +1,44 @@
-<script setup>
-import { ref } from "vue";
-
-let isCheckedIn = false;
-let isCheckedOut = false;
-const currentDate = ref(getCurrentDate());
-const currentTime = ref(getCurrentTime());
-
-function getCurrentDate() {
-  const now = new Date();
-  const options = {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  };
-  return now.toLocaleString("en-US", options);
-}
-
-function getCurrentTime() {
-  const now = new Date();
-  const options = {
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-    hour12: false,
-  };
-
-  let hours = now.getHours();
-  let minutes = now.getMinutes();
-  let seconds = now.getSeconds();
-
-  if (hours === 23 && minutes === 59 && seconds === 59) {
-    hours = 0;
-    minutes = 0;
-    seconds = 0;
-  }
-
-  const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-
-  return formattedTime;
-}
-
-function updateDateAndButton() {
-  currentDate.value = getCurrentDate();
-
-  const checkInButton = document.getElementById("check-in-button");
-  const checkOutButton = document.getElementById("check-out-button");
-
-  if (!isCheckedIn) {
-    checkInButton.style.backgroundColor = "#007bff";
-    checkInButton.style.color = "white";
-    checkInButton.disabled = false;
-  } else {
-    checkInButton.style.backgroundColor = "";
-    checkInButton.style.color = "";
-    checkInButton.disabled = true;
-  }
-
-  if (isCheckedIn && !isCheckedOut) {
-    checkOutButton.style.backgroundColor = "#007bff";
-    checkOutButton.style.color = "white";
-    checkOutButton.disabled = false;
-  } else {
-    checkOutButton.style.backgroundColor = "";
-    checkOutButton.style.color = "";
-    checkOutButton.disabled = true;
-  }
-}
-
-function handleCheckIn() {
-  isCheckedIn = true;
-  updateDateAndButton();
-}
-
-function handleCheckOut() {
-  isCheckedOut = true;
-  updateDateAndButton();
-  alert("Hoàn tất ca làm!");
-}
-
-setInterval(() => {
-  currentTime.value = getCurrentTime();
-  updateDateAndButton();
-}, 1000);
-</script>
 <template>
-    <main>
-  <div class="container">
-    <div class="checkin-container">
-      <h2>Hoàng Nguyên</h2>
-      <div class="date">
-        <span class="date-span">{{ currentDate }}</span>
-      </div>
-      <div class="time">
-        <span id="time-span">{{ currentTime }}</span>
-      </div>
-      <div class="button-check">
-        <button
-          id="check-in-button"
-          class="square-button"
-          @click="handleCheckIn"
-        >
-          Check In
-        </button>
-        <button
-          id="check-out-button"
-          class="square-button"
-          @click="handleCheckOut"
-        >
-          Check Out
-        </button>
+  <main>
+    <div class="container">
+      <div class="checkin-container">
+        <h2>{{ user.name }}</h2>
+        <div class="date">
+          <span class="date-span">{{ currentDate }}</span>
+        </div>
+        <div class="time">
+          <span id="time-span">{{ currentTime }}</span>
+        </div>
+        <div class="button-check">
+          <button
+            id="check-in-button"
+            class="square-button"
+            @click="handleCheckIn"
+          >
+            Check In
+          </button>
+          <button
+            id="check-out-button"
+            class="square-button"
+            @click="handleCheckOut"
+          >
+            Check Out
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-</main>
+  </main>
 </template>
 <style scoped>
 main {
-    max-width: 100vw;
-    min-height: 80vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 100px;
-    background-color: #f2f2f2;
-  }
+  max-width: 100vw;
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 100px;
+  background-color: #f2f2f2;
+}
 .container {
   display: flex;
   justify-content: center;
@@ -179,3 +92,101 @@ main {
   font-size: 30px;
 }
 </style>
+
+<script setup>
+import { ref , reactive} from "vue";
+import router from "../router";
+let user = reactive({})
+// localStorage.removeItem('user')
+// localStorage.removeItem('token')
+if (!localStorage.user) {
+  router.push({ path: "/login" });
+} else {
+  user = JSON.parse(localStorage.user)
+  console.log(localStorage.user)
+}
+
+let isCheckedIn = false;
+let isCheckedOut = false;
+const currentDate = ref(getCurrentDate());
+const currentTime = ref(getCurrentTime());
+
+function getCurrentDate() {
+  const now = new Date();
+  const options = {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  };
+  return now.toLocaleString("en-US", options);
+}
+
+function getCurrentTime() {
+  const now = new Date();
+  const options = {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: false,
+  };
+
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+  let seconds = now.getSeconds();
+
+  if (hours === 23 && minutes === 59 && seconds === 59) {
+    hours = 0;
+    minutes = 0;
+    seconds = 0;
+  }
+
+  const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+  return formattedTime;
+}
+
+function updateDateAndButton() {
+  currentDate.value = getCurrentDate();
+
+  const checkInButton = document.getElementById("check-in-button");
+  const checkOutButton = document.getElementById("check-out-button");
+
+  if (!isCheckedIn) {
+    checkInButton.style.backgroundColor = "#007bff";
+    checkInButton.style.color = "white";
+    checkInButton.disabled = false;
+  } else {
+    checkInButton.style.backgroundColor = "";
+    checkInButton.style.color = "";
+    checkInButton.disabled = true;
+  }
+
+  if (isCheckedIn && !isCheckedOut) {
+    checkOutButton.style.backgroundColor = "#007bff";
+    checkOutButton.style.color = "white";
+    checkOutButton.disabled = false;
+  } else {
+    checkOutButton.style.backgroundColor = "";
+    checkOutButton.style.color = "";
+    checkOutButton.disabled = true;
+  }
+}
+
+function handleCheckIn() {
+  isCheckedIn = true;
+  updateDateAndButton();
+}
+
+function handleCheckOut() {
+  isCheckedOut = true;
+  updateDateAndButton();
+  alert("Hoàn tất ca làm!");
+}
+
+setInterval(() => {
+  currentTime.value = getCurrentTime();
+  updateDateAndButton();
+}, 1000);
+</script>

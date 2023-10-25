@@ -6,6 +6,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -15,25 +16,17 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'username' => 'required',
-            'password' => 'required|string|min:6',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        //Nếu user nhập vào là email thì đổi key username thành email
-        $info = $validator->validated();
-        if(filter_var($info['username'], FILTER_VALIDATE_EMAIL)){
-            $info = array_merge(['email' => $info['username']], ['password' => $info['password']]);
-        }
+        $info = array_merge(['email' => $request->email], ['password' => $request->password]);
 
         if (!$token = auth()->attempt($info)) {
             return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        if (!auth()->user()->hasVerifiedEmail()) {
+            auth()->user()->sendEmailVerificationNotification();
+            return response()->json(['verify_quest' => 'Please verify email'],);
         }
 
         return $this->createNewToken($token);
@@ -63,7 +56,8 @@ class AuthController extends Controller
         $user = User::create(array_merge(
             $validator->validated(),
             ['password' => bcrypt($request->password)]
-        ))->sendEmailVerificationNotification();
+        ));
+
 
         return response()->json([
             'message' => 'User successfully registered',

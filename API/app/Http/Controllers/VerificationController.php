@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\Redirect;
 
 class VerificationController extends Controller
 {
@@ -18,8 +19,7 @@ class VerificationController extends Controller
         if (!$user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
         }
-
-        return redirect()->to('/');
+        return Redirect::to('http://localhost:5173/login');
     }
 
     public function resend() {

@@ -11,7 +11,7 @@ class LoginRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,17 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'email' => 'required|email',
+            'password' => 'required|min:6'
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Vui lòng không để trống email',
+            'email.email' => 'Vui lòng nhập đúng định dạng',
+            'password.required' => 'Vui lòng không để trống mật khẩu',
+            'password.min:6' => 'Mật khẩu có ít nhất 6 kí tự trở lên'
         ];
     }
 }
