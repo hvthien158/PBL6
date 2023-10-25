@@ -8,6 +8,8 @@
       <sourceFolder url="file://$MODULE_DIR$/API/tests" isTestSource="true" packagePrefix="Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/API/tests/Feature" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/API/tests/Unit" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/brick/math" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/dflydev/dot-access-data" />
@@ -119,6 +121,9 @@
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/vlucas/phpdotenv" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/voku/portable-ascii" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/webmozart/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/lcobucci/clock" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/lcobucci/jwt" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/tymon/jwt-auth" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
