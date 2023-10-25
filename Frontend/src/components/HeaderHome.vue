@@ -2,7 +2,12 @@
 import logo from "../assets/image/logo.png";
 import schedule from "../assets/image/schedule.png";
 import { reactive } from "vue";
-
+const props = defineProps({
+  user: {
+    type: Object,
+    required: true
+  }
+})
 let checkLanding = reactive({
   isMenuOpen: false
 });
@@ -20,7 +25,7 @@ let checkLanding = reactive({
     </div>
     <div class="user-info">
       <div class="user" @click="checkLanding.isMenuOpen = !checkLanding.isMenuOpen">
-        <p class="username">Hoàng Nguyên</p>
+        <p class="username">{{ props.user.name }}</p>
       </div>
       <div v-if="checkLanding.isMenuOpen" class="dropdown">
         <div class="dropdown-item">Cài đặt tài khoản</div>

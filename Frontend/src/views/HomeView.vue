@@ -1,5 +1,15 @@
 <script setup>
-import { ref } from "vue";
+import { ref , reactive} from "vue";
+import router from "../router";
+let user = reactive({})
+// localStorage.removeItem('user')
+// localStorage.removeItem('token')
+if (!localStorage.user) {
+  router.push({ path: "/login" });
+} else {
+    user = JSON.parse(localStorage.user)
+    console.log(localStorage.user)
+}
 
 let isCheckedIn = false;
 let isCheckedOut = false;
@@ -89,7 +99,7 @@ setInterval(() => {
   <main>
     <div class="container">
       <div class="checkin-container">
-        <h2>Hoàng Nguyên</h2>
+        <h2>{{ user.name }}</h2>
         <div class="date">
           <span class="date-span">{{ currentDate }}</span>
         </div>

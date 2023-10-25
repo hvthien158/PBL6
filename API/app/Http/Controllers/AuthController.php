@@ -17,17 +17,11 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'email' => 'required|email',
-        //     'password' => 'required|string|min:6',
-        // ]);
-
         $info = array_merge(['email' => $request->email], ['password' => $request->password]);
 
         if (!$token = auth()->attempt($info)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
         return $this->createNewToken($token);
     }
 

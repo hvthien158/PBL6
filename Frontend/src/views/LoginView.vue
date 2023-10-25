@@ -1,12 +1,15 @@
 <script setup>
 import { reactive, computed } from "vue";
+import axios from "axios";
 import router from "../router";
 
+if(localStorage.user){
+  router.push({path : '/'})
+}
 let info = reactive({
   email: "",
   password: "",
 });
-
 const checkEmail = computed(() => {
   if (!isEmail(info.email)) {
     return "Email không đúng định dạng";
@@ -14,7 +17,6 @@ const checkEmail = computed(() => {
     return "";
   }
 });
-
 const checkPassword = computed(() => {
   if (info.password.length === 0) {
     return "Vui lòng nhập mật khẩu";
@@ -22,22 +24,37 @@ const checkPassword = computed(() => {
     return "";
   }
 });
-
 const isEmail = (email) => {
   let filter =
     /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return filter.test(email);
 };
+const login = async () => {
+  if (info.email && info.password) {
+    try {
+      await axios
+        .post('http://127.0.0.1:8000/api/login', {
+          email: info.email,
+          password: info.password,
+        })
+        .then(function (response) {
+          console.log(response.data);
+          localStorage.user = JSON.stringify(response.data.user)
+          localStorage.token = response.data.access_token
+        });
 
-const login = () => {
-  router.push({ path: "/" });
+      router.push({ path: "/" });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 };
 </script>
 
 <template>
   <main>
     <div class="container">
-      <form class="form-container">
+      <div class="form-container">
         <div class="form-input">
           <div class="form-info">
             <div class="label-info">
@@ -64,7 +81,7 @@ const login = () => {
         <div class="additional-content">
           <p>Quên mật khẩu?</p>
         </div>
-      </form>
+      </div>
     </div>
   </main>
 </template>
