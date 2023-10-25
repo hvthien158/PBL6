@@ -1,5 +1,15 @@
 <script setup>
-import { ref } from "vue";
+import { ref , reactive} from "vue";
+import router from "../router";
+let user = reactive({})
+// localStorage.removeItem('user')
+// localStorage.removeItem('token')
+if (!localStorage.user) {
+  router.push({ path: "/login" });
+} else {
+    user = JSON.parse(localStorage.user)
+    console.log(localStorage.user)
+}
 
 let isCheckedIn = false;
 let isCheckedOut = false;
@@ -86,46 +96,46 @@ setInterval(() => {
 }, 1000);
 </script>
 <template>
-    <main>
-  <div class="container">
-    <div class="checkin-container">
-      <h2>Hoàng Nguyên</h2>
-      <div class="date">
-        <span class="date-span">{{ currentDate }}</span>
-      </div>
-      <div class="time">
-        <span id="time-span">{{ currentTime }}</span>
-      </div>
-      <div class="button-check">
-        <button
-          id="check-in-button"
-          class="square-button"
-          @click="handleCheckIn"
-        >
-          Check In
-        </button>
-        <button
-          id="check-out-button"
-          class="square-button"
-          @click="handleCheckOut"
-        >
-          Check Out
-        </button>
+  <main>
+    <div class="container">
+      <div class="checkin-container">
+        <h2>{{ user.name }}</h2>
+        <div class="date">
+          <span class="date-span">{{ currentDate }}</span>
+        </div>
+        <div class="time">
+          <span id="time-span">{{ currentTime }}</span>
+        </div>
+        <div class="button-check">
+          <button
+            id="check-in-button"
+            class="square-button"
+            @click="handleCheckIn"
+          >
+            Check In
+          </button>
+          <button
+            id="check-out-button"
+            class="square-button"
+            @click="handleCheckOut"
+          >
+            Check Out
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-</main>
+  </main>
 </template>
 <style scoped>
 main {
-    max-width: 100vw;
-    min-height: 80vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 100px;
-    background-color: #f2f2f2;
-  }
+  max-width: 100vw;
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 100px;
+  background-color: #f2f2f2;
+}
 .container {
   display: flex;
   justify-content: center;

@@ -1,12 +1,15 @@
 <script setup>
 import { reactive, computed } from "vue";
+import axios from "axios";
 import router from "../router";
 
+if(localStorage.user){
+  router.push({path : '/'})
+}
 let info = reactive({
   email: "",
   password: "",
 });
-
 const checkEmail = computed(() => {
   if (!isEmail(info.email)) {
     return "Email không đúng định dạng";
@@ -14,7 +17,6 @@ const checkEmail = computed(() => {
     return "";
   }
 });
-
 const checkPassword = computed(() => {
   if (info.password.length === 0) {
     return "Vui lòng nhập mật khẩu";
@@ -22,70 +24,86 @@ const checkPassword = computed(() => {
     return "";
   }
 });
-
 const isEmail = (email) => {
-  let filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  let filter =
+    /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return filter.test(email);
 };
+const login = async () => {
+  if (info.email && info.password) {
+    try {
+      await axios
+        .post('http://127.0.0.1:8000/api/login', {
+          email: info.email,
+          password: info.password,
+        })
+        .then(function (response) {
+          console.log(response.data);
+          localStorage.user = JSON.stringify(response.data.user)
+          localStorage.token = response.data.access_token
+        });
 
-const login = () => {
-  router.push({ path: "/" });
+      router.push({ path: "/" });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 };
 </script>
 
 <template>
   <main>
-  <div class="container">
-  <form class="form-container">
-    <div class="form-input">
-      <div class="form-info">
-        <div class="label-info">
-          <label>Email</label>
+    <div class="container">
+      <div class="form-container">
+        <div class="form-input">
+          <div class="form-info">
+            <div class="label-info">
+              <label>Email</label>
+            </div>
+            <div class="input-info">
+              <input v-model="info.email" type="text" />
+              <h5>{{ checkEmail }}</h5>
+            </div>
+          </div>
+          <div class="form-info">
+            <div class="label-info">
+              <label>Mật khẩu</label>
+            </div>
+            <div class="input-info">
+              <input v-model="info.password" type="password" />
+              <h5>{{ checkPassword }}</h5>
+            </div>
+          </div>
+          <div class="btn-submit">
+            <button type="submit" @click="login">Đăng nhập</button>
+          </div>
         </div>
-        <div class="input-info">
-          <input v-model="info.email" type="text" />
-          <h5>{{ checkEmail }}</h5>
+        <div class="additional-content">
+          <p>Quên mật khẩu?</p>
         </div>
-      </div>
-      <div class="form-info">
-        <div class="label-info">
-          <label>Mật khẩu</label>
-        </div>
-        <div class="input-info">
-          <input v-model="info.password" type="password" />
-          <h5>{{ checkPassword }}</h5>
-        </div>
-      </div>
-      <div class="btn-submit">
-        <button type="submit" @click="login">Đăng nhập</button>
       </div>
     </div>
-    <div class="additional-content">
-      <p>Quên mật khẩu?</p>
-    </div>
-  </form>
-</div>
   </main>
 </template>
 <style>
-  main {
-    max-width: 100vw;
-    min-height: 100vh;
-  }
-  .container{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 80vh;
-        min-height: 80vh;
-        background-color: #f2f2f2;
+main {
+  max-width: 100vw;
+  min-height: 100vh;
+}
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  min-height: 80vh;
+  background-color: #f2f2f2;
 }
 .form-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 100px
+  margin-bottom: 100px;
 }
 .additional-content {
   text-align: center;
@@ -98,7 +116,6 @@ const login = () => {
 .additional-content p {
   margin-bottom: 10px;
 }
-
 
 .form-input {
   display: block;
