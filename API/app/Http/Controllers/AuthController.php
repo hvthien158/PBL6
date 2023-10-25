@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -41,10 +42,18 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|alpha_dash|between:2,100|unique:users',
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|confirmed|min:6',
+            'department_id' => 'required',
+            'address' => 'string|nullable',
+            'DOB' => 'nullable|date',
+            'phone_number' => 'nullable',
+            'avatar' => 'nullable',
+            'salary' => 'nullable',
+            'position' => 'nullable',
+            'role' => 'nullable',
+
         ]);
 
         if ($validator->fails()) {
@@ -54,7 +63,7 @@ class AuthController extends Controller
         $user = User::create(array_merge(
             $validator->validated(),
             ['password' => bcrypt($request->password)]
-        ));
+        ))->sendEmailVerificationNotification();
 
         return response()->json([
             'message' => 'User successfully registered',
