@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('time_keepings', function (Blueprint $table) {
             $table->id();
             $table->dateTime('time_check_in');
-            $table->dateTime('time_check_out');
-            $table->text('note');
+            $table->dateTime('time_check_out')->nullable();
+            $table->text('note')->nullable();
             $table->foreignId('user_id')->references('id')->on('users');
-            $table->foreignId('shift_id')->references('id')->on('shifts');
+            $table->foreignId('shift_id')->references('id')->on('shifts')->nullable();
         });
     }
 
