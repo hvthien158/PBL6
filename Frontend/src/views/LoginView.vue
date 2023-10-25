@@ -1,60 +1,10 @@
-<script setup>
-import { reactive, computed } from "vue";
-import axios from "axios";
-import router from "../router";
-
-if(localStorage.user){
-  router.push({path : '/'})
-}
-let info = reactive({
-  email: "",
-  password: "",
-});
-const checkEmail = computed(() => {
-  if (!isEmail(info.email)) {
-    return "Email không đúng định dạng";
-  } else {
-    return "";
-  }
-});
-const checkPassword = computed(() => {
-  if (info.password.length === 0) {
-    return "Vui lòng nhập mật khẩu";
-  } else {
-    return "";
-  }
-});
-const isEmail = (email) => {
-  let filter =
-    /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-  return filter.test(email);
-};
-const login = async () => {
-  if (info.email && info.password) {
-    try {
-      await axios
-        .post('http://127.0.0.1:8000/api/login', {
-          email: info.email,
-          password: info.password,
-        })
-        .then(function (response) {
-          console.log(response.data);
-          localStorage.user = JSON.stringify(response.data.user)
-          localStorage.token = response.data.access_token
-        });
-
-      router.push({ path: "/" });
-    } catch (e) {
-      console.log(e);
-    }
-  }
-};
-</script>
-
 <template>
   <main>
     <div class="container">
-      <div class="form-container">
+      <div v-if="verifyQuest">
+        <p style="font-weight: bold">Thư xác nhận đã được gửi đến email của bạn, vui lòng xác nhận để tiếp tục...</p>
+      </div>
+      <div class="form-container" v-else>
         <div class="form-input">
           <div class="form-info">
             <div class="label-info">
@@ -85,7 +35,8 @@ const login = async () => {
     </div>
   </main>
 </template>
-<style>
+
+<style scoped>
 main {
   max-width: 100vw;
   min-height: 100vh;
@@ -181,4 +132,68 @@ h5 {
   color: rgb(214, 34, 34);
   font-size: 14px;
 }
+
+#register:hover {
+  color: rgba(0, 0, 255, 0.74);
+  cursor: pointer;
+}
 </style>
+
+<script setup>
+import { reactive, computed } from "vue";
+import axios from "axios";
+import router from "../router";
+import {ref} from "vue";
+
+const verifyQuest = ref(false)
+
+if(localStorage.user){
+  router.push({path : '/'})
+}
+let info = reactive({
+  email: "",
+  password: "",
+});
+const checkEmail = computed(() => {
+  if (!isEmail(info.email)) {
+    return "Email không đúng định dạng";
+  } else {
+    return "";
+  }
+});
+const checkPassword = computed(() => {
+  if (info.password.length === 0) {
+    return "Vui lòng nhập mật khẩu";
+  } else {
+    return "";
+  }
+});
+const isEmail = (email) => {
+  let filter =
+      /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  return filter.test(email);
+};
+const login = async () => {
+  if (info.email && info.password) {
+    try {
+      await axios
+          .post('http://127.0.0.1:8000/api/login', {
+            email: info.email,
+            password: info.password,
+          })
+          .then(function (response) {
+            console.log(response.data);
+            if(response.data.verify_quest){
+              verifyQuest.value = true
+            } else {
+              localStorage.user = JSON.stringify(response.data.user)
+              localStorage.token = response.data.access_token
+              router.push({ path: "/" });
+            }
+          });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+};
+</script>
