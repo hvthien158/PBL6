@@ -27,6 +27,7 @@ services:
     volumes:
       - ./Frontend/src:/app/src
       - ./Frontend/index.html:/app/index.html
+      - ./Frontend/package.json:/app/package.json
     ports:
       - 5173:5173
     restart: unless-stopped

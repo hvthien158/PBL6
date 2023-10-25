@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Validator;
@@ -22,28 +23,41 @@ class AuthController extends Controller
         if (!$token = auth()->attempt($info)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        if (!auth()->user()->hasVerifiedEmail()) {
+            auth()->user()->sendEmailVerificationNotification();
+            return response()->json(['verify_quest' => 'Please verify email'],);
+        }
+
         return $this->createNewToken($token);
     }
 
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|alpha_dash|between:2,100|unique:users',
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|confirmed|min:6',
+            'department_id' => 'required',
+            'address' => 'string|nullable',
+            'DOB' => 'nullable|date',
+            'phone_number' => 'nullable',
+            'avatar' => 'nullable',
+            'salary' => 'nullable',
+            'position' => 'nullable',
+            'role' => 'nullable',
+
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 422);
         }
 
-        $user = User::create(
-            array_merge(
-                $validator->validated(),
-                ['password' => bcrypt($request->password)]
-            )
-        );
+        $user = User::create(array_merge(
+            $validator->validated(),
+            ['password' => bcrypt($request->password)]
+        ));
+
 
         return response()->json([
             'message' => 'User successfully registered',
