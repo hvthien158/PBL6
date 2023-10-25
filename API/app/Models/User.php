@@ -47,6 +47,18 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function getJWTIdentifier() {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims() {
+        return [];
+    }
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'user_id');
@@ -60,13 +72,5 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->hasMany(TimeKeeping::class, 'user_id');
     }
 
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
+    
 }
