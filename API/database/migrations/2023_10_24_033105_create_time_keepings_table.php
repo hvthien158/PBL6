@@ -17,7 +17,7 @@ return new class extends Migration
             $table->dateTime('time_check_out')->nullable();
             $table->text('note')->nullable();
             $table->foreignId('user_id')->references('id')->on('users');
-            $table->foreignId('shift_id')->references('id')->on('shifts')->nullable();
+            $table->unsignedBigInteger('shift_id')->nullable();
         });
     }
 

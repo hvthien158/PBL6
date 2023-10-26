@@ -94,20 +94,24 @@ main {
 </style>
 
 <script setup>
-import { ref , reactive} from "vue";
+import { ref, reactive, onMounted } from "vue";
 import router from "../router";
-let user = reactive({})
-// localStorage.removeItem('user')
-// localStorage.removeItem('token')
+import moment from "moment";
+import axios from "axios";
+let user = reactive({});
 if (!localStorage.user) {
   router.push({ path: "/login" });
 } else {
-  user = JSON.parse(localStorage.user)
-  console.log(localStorage.user)
+  user = JSON.parse(localStorage.user);
+  console.log(localStorage.user);
 }
 
-let isCheckedIn = false;
-let isCheckedOut = false;
+// localStorage.removeItem('user')
+// localStorage.removeItem('token')
+let checkLanding = reactive({
+  isCheckedIn: true,
+  isCheckedOut: true,
+});
 const currentDate = ref(getCurrentDate());
 const currentTime = ref(getCurrentTime());
 
@@ -118,7 +122,7 @@ function getCurrentDate() {
     month: "short",
     year: "numeric",
   };
-  return now.toLocaleString("en-US", options);
+  return now.toLocaleString("vi-VN", options);
 }
 
 function getCurrentTime() {
@@ -141,19 +145,50 @@ function getCurrentTime() {
   }
 
   const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    .toString()
+    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
   return formattedTime;
 }
-
+onMounted(() => {
+  getTimeKeeping();
+});
+const getTimeKeeping = async () => {
+  try {
+    await axios
+      .get("http://127.0.0.1:8000/api/time-keeping", {
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`
+        },
+      })
+      .then(function (response) {
+        if (response.status == 200) {
+          if (response.data.time_check_in) {
+            if (response.data.time_check_out) {
+              checkLanding.isCheckedIn = true;
+              checkLanding.isCheckedOut = true;
+            } else {
+              checkLanding.isCheckedIn = true;
+              checkLanding.isCheckedOut = false;
+            }
+          } else {
+            checkLanding.isCheckedIn = false;
+            checkLanding.isCheckedOut = true;
+          }
+          updateDateAndButton();
+        }
+      });
+  } catch (e) {
+    console.log(e);
+  }
+};
 function updateDateAndButton() {
   currentDate.value = getCurrentDate();
 
   const checkInButton = document.getElementById("check-in-button");
   const checkOutButton = document.getElementById("check-out-button");
 
-  if (!isCheckedIn) {
+  if (!checkLanding.isCheckedIn) {
     checkInButton.style.backgroundColor = "#007bff";
     checkInButton.style.color = "white";
     checkInButton.disabled = false;
@@ -163,7 +198,7 @@ function updateDateAndButton() {
     checkInButton.disabled = true;
   }
 
-  if (isCheckedIn && !isCheckedOut) {
+  if (checkLanding.isCheckedIn && !checkLanding.isCheckedOut) {
     checkOutButton.style.backgroundColor = "#007bff";
     checkOutButton.style.color = "white";
     checkOutButton.disabled = false;
@@ -174,15 +209,49 @@ function updateDateAndButton() {
   }
 }
 
-function handleCheckIn() {
-  isCheckedIn = true;
-  updateDateAndButton();
-}
+const handleCheckIn = async () => {
+  try {
+    await axios
+      .post(
+        "http://127.0.0.1:8000/api/check-in",
+        {
+          time: moment().format("YYYY-MM-DD HH:mm:ss"),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.token}`,
+          },
+        }
+      )
+      .then(function (response) {
+        getTimeKeeping();
+      });
+  } catch (e) {
+    console.log(e);
+  }
+};
 
-function handleCheckOut() {
-  isCheckedOut = true;
-  updateDateAndButton();
-  alert("Hoàn tất ca làm!");
+const handleCheckOut = async () => {
+    try {
+      await axios
+        .put(
+          `http://127.0.0.1:8000/api/check-out/`,
+          {
+            time: moment().format("YYYY-MM-DD HH:mm:ss"),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.token}`,
+            },
+          }
+        )
+        .then(function (response) {
+          console.log(response)
+          getTimeKeeping();
+        });
+    } catch (e) {
+      console.log(e);
+    }
 }
 
 setInterval(() => {
