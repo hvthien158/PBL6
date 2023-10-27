@@ -15,6 +15,7 @@ class TimeKeeping extends Model
         'time_check_in',
         'user_id'
     ];
+    public $timestamps = false;
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
