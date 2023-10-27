@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DateTimeRequest;
 use App\Models\TimeKeeping;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Shift;
 
 class TimeKeepingController extends Controller
 {
@@ -26,17 +28,30 @@ class TimeKeepingController extends Controller
             return response()->json(['message' => $e->getMessage()]);
         }
     }
-    public function checkOut(DateTimeRequest $request, TimeKeeping $timeKeeping)
+    public function checkOut(Request $request, TimeKeeping $timeKeeping)
     {
         try {
             if ($this->authorize('update', $timeKeeping)) {
                 $timezone = 'Asia/Ho_Chi_Minh';
                 $currentDate = Carbon::now()->setTimezone($timezone)->toDateString();
-                $checkout = TimeKeeping::where('user_id', auth()->id())
+                $checkTimeKeeping = TimeKeeping::where('user_id', auth()->id())
                     ->whereDate('time_check_in', $currentDate)->first();
-                if ($checkout && Carbon::createFromFormat('Y-m-d H:i:s', $request->time, $timezone)->isAfter($checkout->time_check_in)) {
-                    $checkout->time_check_out = $request->time;
-                    $checkout->save();
+                if ($checkTimeKeeping && Carbon::createFromFormat('Y-m-d H:i:s', $request->time, $timezone)->isAfter($checkTimeKeeping->time_check_in)) {
+                    $checkTimeKeeping->time_check_out = $request->time;
+                    $checkTimeKeeping->save();
+                    $shift = Shift::orderBy('amount', 'desc')->get();
+                    $timeCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_in, $timezone);
+                    $timeCheckOut = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_out, $timezone);
+                    foreach ($shift as $shift) {
+                        if (
+                            $timeCheckIn->isBefore($shift->time_valid_check_in)
+                            && $timeCheckOut->isAfter($shift->time_valid_check_out)
+                        ) {
+                            $checkTimeKeeping->shift_id = $shift->id;
+                            $checkTimeKeeping->save();
+                            break;
+                        }
+                    }
                     return response()->json(['message' => 'Check Out Thành Công']);
                 } else {
                     return response()->json(['message' => 'Thời gian checkout không hợp lệ']);
