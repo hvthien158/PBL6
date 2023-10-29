@@ -185,7 +185,6 @@ const login = async () => {
             password: info.password,
           })
           .then(function (response) {
-            console.log(response.data);
             if(response.data.verify_quest){
               verifyQuest.value = true
             } else {

@@ -46,16 +46,16 @@
 import { ref , reactive} from "vue";
 import router from "../../router";
 import axios from "axios";
+import {useUserStore} from "../../stores/user";
 
-let user = reactive({})
 const avatar = ref(undefined)
 const formData = new FormData()
+const user = useUserStore().user
 
-if (!localStorage.user) {
+if (user.token === '') {
   router.push({ path: "/login" });
-} else {
-  user = JSON.parse(localStorage.user)
 }
+
 const address = ref(user.address)
 const DOB = ref(user.DOB)
 const phone_number = ref(user.phone_number)
@@ -77,12 +77,8 @@ function updateProfile(){
   axios.post('http://127.0.0.1:8000/api/update-profile', formData,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.token}`,
+          Authorization: `Bearer ${user.token}`,
         },
-      })
-      .then((response) => {
-        localStorage.user = JSON.stringify(response.data.user)
-        console.log(response.data.user)
       })
       .catch((e) => {
         console.log(e)

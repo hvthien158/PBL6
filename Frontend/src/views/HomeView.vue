@@ -155,7 +155,7 @@ const getTimeKeeping = async () => {
     await axios
       .get("http://127.0.0.1:8000/api/time-keeping", {
         headers: {
-          Authorization: `Bearer ${localStorage.token}`
+          Authorization: `Bearer ${user.token}`
         },
       })
       .then(function (response) {
@@ -216,7 +216,7 @@ const handleCheckIn = async () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.token}`,
+            Authorization: `Bearer ${user.token}`,
           },
         }
       )
@@ -238,7 +238,7 @@ const handleCheckOut = async () => {
           },
           {
             headers: {
-              Authorization: `Bearer ${localStorage.token}`,
+              Authorization: `Bearer ${user.token}`,
             },
           }
         )
