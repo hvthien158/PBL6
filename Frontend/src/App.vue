@@ -1,27 +1,15 @@
 <template>
-  <Header v-if="!checkLanding.isUser"></Header>
-  <HeaderHome v-else :user="checkLanding.user"></HeaderHome>
+  <Header v-if="user.token === ''"></Header>
+  <HeaderHome v-else></HeaderHome>
   <router-view :key="$route.fullPath"></router-view>
   <Footer></Footer>
 </template>
 <script setup>
 import { RouterView } from "vue-router";
-import { reactive, onUpdated} from 'vue';
 import Header from "./components/Header.vue";
 import HeaderHome from "./components/HeaderHome.vue";
 import Footer from "./components/Footer.vue";
+import {useUserStore} from "./stores/user";
 
-let checkLanding = reactive({
-  isUser: false,
-  user: null
-})
-onUpdated(() => {
-  if (localStorage.user) {
-    checkLanding.user = JSON.parse(localStorage.user);
-    checkLanding.isUser = true
-  } else {
-    checkLanding.user = null
-    checkLanding.isUser = false
-  }
-});
+const user = useUserStore().user
 </script>

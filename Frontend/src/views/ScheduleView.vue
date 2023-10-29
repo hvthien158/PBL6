@@ -137,7 +137,9 @@ table {
 import { saveAs } from "file-saver";
 import { read, utils, write } from "xlsx";
 import { ref, reactive, onMounted } from "vue";
+import {useUserStore} from "../stores/user";
 import axios from "axios";
+const user = useUserStore().user
 let dataSearch = reactive({
   startTime: null,
   endTime: null,
@@ -174,7 +176,7 @@ const getListTimeKeeping = async () => {
   await axios
     .get("http://127.0.0.1:8000/api/get-list-timekeeping", {
       headers: {
-        Authorization: `Bearer ${localStorage.token}`,
+        Authorization: `Bearer ${user.token}`
       },
     })
     .then(function (response) {
@@ -194,7 +196,7 @@ const findTimeKeeping = async () => {
           },
           {
             headers: {
-              Authorization: `Bearer ${localStorage.token}`,
+              Authorization: `Bearer ${user.token}`
             },
           }
         )
@@ -216,7 +218,7 @@ const findTimeKeeping = async () => {
           },
           {
             headers: {
-              Authorization: `Bearer ${localStorage.token}`,
+              Authorization: `Bearer ${user.token}`
             },
           }
         )

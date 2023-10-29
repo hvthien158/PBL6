@@ -1,9 +1,6 @@
-<script setup>
-import logo from '../assets/image/logo.png'
-</script>
 <template>
   <footer>
-    <img class="logo" :src="logo" alt="">
+    <p>Copyright Thien, Nguyen</p>
   </footer>
 </template>
 <style scoped>
@@ -15,10 +12,8 @@ import logo from '../assets/image/logo.png'
     max-width: 100vw;
     height: 10vh;
     background-color: #ffffff;
-    display: flex;
-    justify-content: center;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 30px 10px;
+    border-top: #9ca3af 1px solid;
     box-sizing: border-box;
   }
   .logo {
@@ -26,3 +21,7 @@ import logo from '../assets/image/logo.png'
 
   }
 </style>
+
+<script setup>
+import logo from '../assets/image/logo.png'
+</script>

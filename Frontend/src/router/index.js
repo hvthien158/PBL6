@@ -4,6 +4,8 @@ import HomeView from '../views/HomeView.vue'
 import ScheduleView from '../views/ScheduleView.vue'
 import UpdateAvatar from '../views/User/UpdateAvatar.vue'
 import RegisterView from "../views/RegisterView.vue";
+import UpdateProfile from "../views/User/UpdateProfile.vue";
+import {useUserStore} from "../stores/user";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,8 +33,20 @@ const router = createRouter({
       path: '/update-avatar',
       name: 'UpdateAvatar',
       component: UpdateAvatar
+    },
+    {
+      path: '/update-profile',
+      name: 'update-profile',
+      component: UpdateProfile,
     }
   ]
+})
+
+router.beforeEach(async () => {
+  const user = await useUserStore()
+  if(user.isExpired()){
+    user.logout()
+  }
 })
 
 export default router

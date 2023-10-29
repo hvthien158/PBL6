@@ -97,14 +97,11 @@ main {
 import { ref, reactive, onMounted } from "vue";
 import router from "../router";
 import axios from "axios";
-// localStorage.removeItem('user')
-// localStorage.removeItem('token')
-let user = reactive({});
-if (!localStorage.user) {
+import {useUserStore} from "../stores/user";
+
+const user = useUserStore().user
+if (user.token === '') {
   router.push({ path: "/login" });
-} else {
-  user = JSON.parse(localStorage.user);
-  console.log(localStorage.user);
 }
 let checkLanding = reactive({
   isCheckedIn: true,
@@ -156,7 +153,7 @@ const getTimeKeeping = async () => {
     await axios
       .get("http://127.0.0.1:8000/api/time-keeping", {
         headers: {
-          Authorization: `Bearer ${localStorage.token}`,
+          Authorization: `Bearer ${user.token}`
         },
       })
       .then(function (response) {
@@ -210,11 +207,13 @@ function updateDateAndButton() {
 const handleCheckIn = async () => {
   try {
     await axios
-      .post("http://127.0.0.1:8000/api/check-in", {
-        headers: {
-          Authorization: `Bearer ${localStorage.token}`,
-        },
-      })
+      .post("http://127.0.0.1:8000/api/check-in", 
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      )
       .then(function (response) {
         getTimeKeeping();
       });
@@ -224,21 +223,27 @@ const handleCheckIn = async () => {
 };
 
 const handleCheckOut = async () => {
-  try {
-    await axios
-      .put(`http://127.0.0.1:8000/api/check-out/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.token}`,
-        },
-      })
-      .then(function (response) {
-        console.log(response);
-        getTimeKeeping();
-      });
-  } catch (e) {
-    console.log(e);
-  }
-};
+    try {
+      await axios
+        .put(
+          `http://127.0.0.1:8000/api/check-out/`,
+          {
+            time: moment().format("YYYY-MM-DD HH:mm:ss"),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        )
+        .then(function (response) {
+          console.log(response)
+          getTimeKeeping();
+        });
+    } catch (e) {
+      console.log(e);
+    }
+}
 
 setInterval(() => {
   currentTime.value = getCurrentTime();
