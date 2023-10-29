@@ -1,7 +1,7 @@
 <template>
   <Header v-if="!user"></Header>
   <HeaderHome v-else :user="user"></HeaderHome>
-  <router-view :key="$route.fullPath"></router-view>
+  <router-view style="padding: 20px 100px" :key="$route.fullPath"></router-view>
   <Footer></Footer>
 </template>
 <script setup>

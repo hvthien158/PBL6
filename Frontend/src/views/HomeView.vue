@@ -96,14 +96,12 @@ main {
 <script setup>
 import { ref , reactive} from "vue";
 import router from "../router";
-let user = reactive({})
-// localStorage.removeItem('user')
-// localStorage.removeItem('token')
-if (!localStorage.user) {
+import {useUserStore} from "../stores/user";
+
+const user = useUserStore().user
+
+if (user.token === '') {
   router.push({ path: "/login" });
-} else {
-  user = JSON.parse(localStorage.user)
-  console.log(localStorage.user)
 }
 
 let isCheckedIn = false;

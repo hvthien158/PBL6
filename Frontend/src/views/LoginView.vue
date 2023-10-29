@@ -144,10 +144,13 @@ import { reactive, computed } from "vue";
 import axios from "axios";
 import router from "../router";
 import {ref} from "vue";
+import {useUserStore} from "../stores/user";
 
 const verifyQuest = ref(false)
 
-if(localStorage.user){
+const user = useUserStore().user
+
+if(user.token !== ''){
   router.push({path : '/'})
 }
 let info = reactive({
@@ -186,8 +189,12 @@ const login = async () => {
             if(response.data.verify_quest){
               verifyQuest.value = true
             } else {
-              localStorage.user = JSON.stringify(response.data.user)
-              localStorage.token = response.data.access_token
+              user.id = response.data.user.id
+              user.token = response.data.access_token
+              user.name = response.data.user.name
+              user.email = response.data.user.email
+              user.password = response.data.user.password
+              user.expired = response.data.expires_at
               router.push({ path: "/" });
             }
           });

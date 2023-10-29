@@ -1,11 +1,9 @@
-<script setup>
-import logo from '../assets/image/logo.png'
-</script>
 <template>
   <header>
     <img class="logo" :src="logo" alt="">
   </header>
 </template>
+
 <style scoped>
 *{
     margin: 0;
@@ -26,3 +24,7 @@ import logo from '../assets/image/logo.png'
 
   }
 </style>
+
+<script setup>
+import logo from '../assets/image/logo.png'
+</script>
