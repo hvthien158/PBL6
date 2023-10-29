@@ -25,7 +25,14 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'name',
         'email',
         'password',
-        'department_id'
+        'department_id',
+        'address',
+        'DOB',
+        'phone_number',
+        'avatar',
+        'salary',
+        'position',
+        'role',
     ];
 
     /**
@@ -72,5 +79,5 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->hasMany(TimeKeeping::class, 'user_id');
     }
 
-    
+
 }

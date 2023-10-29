@@ -98,16 +98,13 @@ import { ref, reactive, onMounted } from "vue";
 import router from "../router";
 import moment from "moment";
 import axios from "axios";
-let user = reactive({});
-if (!localStorage.user) {
+import {useUserStore} from "../stores/user";
+
+const user = useUserStore().user
+if (user.token === '') {
   router.push({ path: "/login" });
-} else {
-  user = JSON.parse(localStorage.user);
-  console.log(localStorage.user);
 }
 
-// localStorage.removeItem('user')
-// localStorage.removeItem('token')
 let checkLanding = reactive({
   isCheckedIn: true,
   isCheckedOut: true,

@@ -25,9 +25,9 @@ services:
   app:
     image: travanthien202/attendance-manager-fe
     volumes:
-      - ./Frontend/src:/app/src
       - ./Frontend/index.html:/app/index.html
       - ./Frontend/package.json:/app/package.json
+      - ./Frontend/src:/app/src
     ports:
       - 5173:5173
     restart: unless-stopped

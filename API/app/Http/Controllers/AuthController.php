@@ -7,7 +7,10 @@ use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use function Laravel\Prompts\table;
 
 class AuthController extends Controller
 {
@@ -46,7 +49,6 @@ class AuthController extends Controller
             'salary' => 'nullable',
             'position' => 'nullable',
             'role' => 'nullable',
-
         ]);
 
         if ($validator->fails()) {
@@ -106,6 +108,33 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'User successfully changed password',
             'user' => $user,
+        ], 201);
+    }
+
+    public function updateProfile(Request $request){
+        $validator = Validator::make($request->all(), [
+            'address' => 'string|nullable',
+            'DOB' => 'nullable',
+            'phone_number' => 'nullable',
+            'avatar' => 'nullable|image',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 422);
+        }
+
+        $user = DB::table('users')->where('id', '=', auth()->id());
+        if($request->hasFile('avatar')) {
+            $avatar = $request->file('avatar');
+            $path = Storage::disk('public')->put('avatar/'.auth()->id(), $avatar);
+            $user->update(array_merge($validator->validated(), ['avatar' => $path]));
+        } else {
+            $user->update(array_merge($validator->validated()));
+        }
+
+        return response()->json([
+            'message' => 'Successfully updated profile',
+            'user' => $user->get()
         ], 201);
     }
 }
