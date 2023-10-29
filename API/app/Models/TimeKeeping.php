@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Shift;
 
 class TimeKeeping extends Model
 {
@@ -20,8 +21,8 @@ class TimeKeeping extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    public function time_keepings(): HasMany
+    public function shift(): BelongsTo
     {
-        return $this->hasMany(TimeKeeping::class, 'shift_id');
+        return $this->BelongsTo(Shift::class, 'shift_id');
     }
 }

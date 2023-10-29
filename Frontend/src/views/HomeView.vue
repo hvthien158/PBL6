@@ -96,8 +96,9 @@ main {
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import router from "../router";
-import moment from "moment";
 import axios from "axios";
+// localStorage.removeItem('user')
+// localStorage.removeItem('token')
 let user = reactive({});
 if (!localStorage.user) {
   router.push({ path: "/login" });
@@ -105,9 +106,6 @@ if (!localStorage.user) {
   user = JSON.parse(localStorage.user);
   console.log(localStorage.user);
 }
-
-// localStorage.removeItem('user')
-// localStorage.removeItem('token')
 let checkLanding = reactive({
   isCheckedIn: true,
   isCheckedOut: true,
@@ -158,7 +156,7 @@ const getTimeKeeping = async () => {
     await axios
       .get("http://127.0.0.1:8000/api/time-keeping", {
         headers: {
-          Authorization: `Bearer ${localStorage.token}`
+          Authorization: `Bearer ${localStorage.token}`,
         },
       })
       .then(function (response) {
@@ -175,12 +173,12 @@ const getTimeKeeping = async () => {
             checkLanding.isCheckedIn = false;
             checkLanding.isCheckedOut = true;
           }
-          updateDateAndButton();
         }
       });
   } catch (e) {
     console.log(e);
   }
+  updateDateAndButton();
 };
 function updateDateAndButton() {
   currentDate.value = getCurrentDate();
@@ -212,17 +210,11 @@ function updateDateAndButton() {
 const handleCheckIn = async () => {
   try {
     await axios
-      .post(
-        "http://127.0.0.1:8000/api/check-in",
-        {
-          time: moment().format("YYYY-MM-DD HH:mm:ss"),
+      .post("http://127.0.0.1:8000/api/check-in", {
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.token}`,
-          },
-        }
-      )
+      })
       .then(function (response) {
         getTimeKeeping();
       });
@@ -232,27 +224,21 @@ const handleCheckIn = async () => {
 };
 
 const handleCheckOut = async () => {
-    try {
-      await axios
-        .put(
-          `http://127.0.0.1:8000/api/check-out/`,
-          {
-            time: moment().format("YYYY-MM-DD HH:mm:ss"),
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.token}`,
-            },
-          }
-        )
-        .then(function (response) {
-          console.log(response)
-          getTimeKeeping();
-        });
-    } catch (e) {
-      console.log(e);
-    }
-}
+  try {
+    await axios
+      .put(`http://127.0.0.1:8000/api/check-out/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
+        },
+      })
+      .then(function (response) {
+        console.log(response);
+        getTimeKeeping();
+      });
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 setInterval(() => {
   currentTime.value = getCurrentTime();

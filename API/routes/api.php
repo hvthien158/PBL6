@@ -29,4 +29,7 @@ Route::get('email/resend', [VerificationController::class, 'resend'])->name('ver
 Route::post('check-in', [TimeKeepingController::class,'checkIn']);
 Route::put('check-out/', [TimeKeepingController::class,'checkOut']);
 Route::get('time-keeping', [TimeKeepingController::class, 'getTimeKeeping']);
+Route::get('get-list-timekeeping', [TimeKeepingController::class,'getListTimeKeeping']);
+Route::post('search-by-around-time', [TimeKeepingController::class,'searchByAroundTime']);
+Route::post('search-by-month-year', [TimeKeepingController::class,'searchByMonth']);
 

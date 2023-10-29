@@ -105,6 +105,13 @@ import schedule from "../assets/image/schedule.png";
 import { reactive } from "vue";
 import axios from "axios";
 import router from "../router";
+let user = reactive({});
+if (!localStorage.user) {
+  router.push({ path: "/login" });
+} else {
+  user = JSON.parse(localStorage.user);
+  console.log(localStorage.user);
+}
 const props = defineProps({
   user: {
     type: Object,

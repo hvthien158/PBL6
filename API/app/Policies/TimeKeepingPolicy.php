@@ -52,7 +52,6 @@ class TimeKeepingPolicy
             ->first();
         return $existingTimeKeeping ? true : false;
     }
-
     /**
      * Determine whether the user can delete the model.
      */
