@@ -68,15 +68,15 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
     public function department(): BelongsTo
     {
-        return $this->belongsTo(Department::class, 'user_id');
+        return $this->belongsTo(Department::class);
     }
     public function messages(): HasMany
     {
-        return $this->hasMany(Message::class, 'user_id');
+        return $this->hasMany(Message::class);
     }
     public function timeKeepings(): hasMany
     {
-        return $this->hasMany(TimeKeeping::class, 'user_id');
+        return $this->hasMany(TimeKeeping::class);
     }
 
 
