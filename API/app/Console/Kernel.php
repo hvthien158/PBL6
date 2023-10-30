@@ -13,6 +13,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+        //Xoá token reset password bị hết hạn trong db (trường hợp user không reset thì token vẫn còn trong db)
+        $schedule->command('auth:clear-resets')->everyFifteenMinutes();
     }
 
     /**

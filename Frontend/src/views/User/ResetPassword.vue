@@ -1,32 +1,29 @@
 <template>
   <main>
     <div class="container">
-      <div v-if="verifyQuest">
-        <p style="font-weight: bold">Thư xác nhận đã được gửi đến email của bạn, vui lòng xác nhận để tiếp tục...</p>
-      </div>
-      <div class="form-container" v-else>
-        <h3>Đăng nhập</h3>
+      <div class="form-container">
+        <h3>Đặt lại mật khẩu</h3>
         <div class="form-input">
           <div class="form-info">
             <div class="label-info">
-              <label>Email</label>
-            </div>
-            <div class="input-info">
-              <input v-model="info.email" type="text" />
-              <h5>{{ checkEmail }}</h5>
-            </div>
-          </div>
-          <div class="form-info">
-            <div class="label-info">
-              <label>Mật khẩu</label>
+              <label>Mật khẩu mới</label>
             </div>
             <div class="input-info">
               <input v-model="info.password" type="password" />
               <h5>{{ checkPassword }}</h5>
             </div>
           </div>
+          <div class="form-info">
+            <div class="label-info">
+              <label>Nhập lại mật khẩu</label>
+            </div>
+            <div class="input-info">
+              <input v-model="info.password_confirm" type="password" />
+              <h5>{{ checkPasswordConfirm }}</h5>
+            </div>
+          </div>
           <div class="btn-submit">
-            <button type="submit" @click="login">Đăng nhập</button>
+            <button type="submit" @click="login">Đặt lại</button>
           </div>
         </div>
       </div>
@@ -135,27 +132,22 @@ h5 {
 <script setup>
 import { reactive, computed } from "vue";
 import axios from "axios";
-import router from "../router";
+import router from "../../router";
 import {ref} from "vue";
-import {useUserStore} from "../stores/user";
-
-const verifyQuest = ref(false)
+import {useUserStore} from "../../stores/user";
+import {useRoute} from "vue-router";
 
 const user = useUserStore().user
+const route = useRoute()
 
 if(user.token !== ''){
   router.push({name : 'home'})
 }
 let info = reactive({
-  email: "",
+  token: route.query.token,
+  email: route.query.email,
   password: "",
-});
-const checkEmail = computed(() => {
-  if (!isEmail(info.email)) {
-    return "Email không đúng định dạng";
-  } else {
-    return "";
-  }
+  password_confirm: "",
 });
 const checkPassword = computed(() => {
   if (info.password.length === 0) {
@@ -164,31 +156,30 @@ const checkPassword = computed(() => {
     return "";
   }
 });
-const isEmail = (email) => {
-  let filter =
-      /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-  return filter.test(email);
-};
+const checkPasswordConfirm = computed(() => {
+  if (info.password_confirm.length === 0) {
+    return "Vui lòng nhập mật khẩu";
+  } else if (info.password_confirm !== info.password) {
+    return "Mật khẩu xác nhận không trùng khớp"
+  } else {
+    return "";
+  }
+});
 const login = async () => {
   if (info.email && info.password) {
     try {
       await axios
-          .post('http://127.0.0.1:8000/api/login', {
+          .post('http://127.0.0.1:8000/api/reset-password', {
+            token: info.token,
             email: info.email,
             password: info.password,
+            password_confirmation: info.password_confirm,
           })
-          .then(function (response) {
-            if(response.data.verify_quest){
-              verifyQuest.value = true
-            } else {
-              user.id = response.data.user.id
-              user.token = response.data.access_token
-              user.name = response.data.user.name
-              user.email = response.data.user.email
-              user.password = response.data.user.password
-              user.expired = response.data.expires_at
-              router.push({ path: "/" });
-            }
+          .then(function () {
+            //component alert success
+            router.push({
+              name: 'login'
+            })
           });
     } catch (e) {
       console.log(e);
