@@ -96,7 +96,6 @@ main {
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import router from "../router";
-import moment from "moment";
 import axios from "axios";
 import {useUserStore} from "../stores/user";
 
@@ -104,7 +103,6 @@ const user = useUserStore().user
 if (user.token === '') {
   router.push({ path: "/login" });
 }
-
 let checkLanding = reactive({
   isCheckedIn: true,
   isCheckedOut: true,
@@ -172,12 +170,12 @@ const getTimeKeeping = async () => {
             checkLanding.isCheckedIn = false;
             checkLanding.isCheckedOut = true;
           }
-          updateDateAndButton();
         }
       });
   } catch (e) {
     console.log(e);
   }
+  updateDateAndButton();
 };
 function updateDateAndButton() {
   currentDate.value = getCurrentDate();
@@ -209,11 +207,7 @@ function updateDateAndButton() {
 const handleCheckIn = async () => {
   try {
     await axios
-      .post(
-        "http://127.0.0.1:8000/api/check-in",
-        {
-          time: moment().format("YYYY-MM-DD HH:mm:ss"),
-        },
+      .post("http://127.0.0.1:8000/api/check-in", 
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
