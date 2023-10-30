@@ -18,6 +18,6 @@ class Shift extends Model
     ];
     public function timeKeeping(): BelongsTo
     {
-        return $this->belongsTo(Shift::class, 'shift_id');
+        return $this->belongsTo(TimeKeeping::class, 'shift_id');
     }
 }
