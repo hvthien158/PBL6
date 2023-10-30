@@ -16,7 +16,7 @@
         <p class="username">{{ user.name }}</p>
       </div>
       <div v-if="checkLanding.isMenuOpen" class="dropdown">
-        <div class="dropdown-item">Cài đặt tài khoản</div>
+        <div class="dropdown-item" @click="updateProfile">Cài đặt tài khoản</div>
         <div class="dropdown-item logout" @click="logout">Đăng xuất</div>
       </div>
     </div>
@@ -31,12 +31,18 @@
 }
 
 header {
-  max-width: 100vw;
+  width: 100vw;
   height: 10vh;
+  padding: 12px;
   background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: 0 4px 4px 0 rgb(0 0 0 / 30%);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
 .header-img {
@@ -46,8 +52,7 @@ header {
 }
 
 .header-img img {
-  max-height: 100%;
-  width: 80px;
+  max-height: 8vh;
   margin-left: 50px;
 }
 
@@ -106,11 +111,20 @@ import { reactive } from "vue";
 import axios from "axios";
 import router from "../router";
 import {useUserStore} from "../stores/user";
+import {useAlertStore} from "../stores/alert";
 
+const alertStore = useAlertStore()
 const user = useUserStore().user
 let checkLanding = reactive({
   isMenuOpen: false,
 });
+
+function updateProfile(){
+  router.push({
+    name: 'update-profile',
+  })
+}
+
 const logout = async () => {
   try {
     await axios
@@ -120,6 +134,12 @@ const logout = async () => {
       .then(function (response) {
         if (response.status === 200) {
           useUserStore().logout()
+
+          //alert success
+          alertStore.alert = true
+          alertStore.type = 'success'
+          alertStore.msg = 'Đã đăng xuất'
+
           router.push({ path: "/login" });
         }
       });

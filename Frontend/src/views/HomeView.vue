@@ -36,7 +36,6 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 100px;
   background-color: #f2f2f2;
 }
 .container {

@@ -1,6 +1,6 @@
 <template>
   <footer>
-    <p>Copyright Thien, Nguyen</p>
+    <p>Copyright © Kiaisoft Co.,Ltd</p>
   </footer>
 </template>
 <style scoped>
@@ -13,7 +13,7 @@
     height: 10vh;
     background-color: #ffffff;
     padding: 30px 10px;
-    border-top: #9ca3af 1px solid;
+    border-top: rgba(156, 163, 175, 0.6) 1px solid;
     box-sizing: border-box;
   }
   .logo {

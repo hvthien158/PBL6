@@ -29,6 +29,9 @@
             <button type="submit" @click="login">Đăng nhập</button>
           </div>
         </div>
+        <div v-if="fail_login">
+          <span style="color: red">Sai tài khoản hoặc mật khẩu</span>
+        </div>
       </div>
     </div>
   </main>
@@ -52,7 +55,6 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 100px;
 }
 .additional-content {
   text-align: center;
@@ -138,10 +140,12 @@ import axios from "axios";
 import router from "../router";
 import {ref} from "vue";
 import {useUserStore} from "../stores/user";
+import {useAlertStore} from "../stores/alert";
 
 const verifyQuest = ref(false)
-
+const alertStore = useAlertStore()
 const user = useUserStore().user
+const fail_login = ref(false)
 
 if(user.token !== ''){
   router.push({name : 'home'})
@@ -170,7 +174,7 @@ const isEmail = (email) => {
   return filter.test(email);
 };
 const login = async () => {
-  if (info.email && info.password) {
+  if (checkEmail.value === '' && checkPassword.value === '') {
     try {
       await axios
           .post('http://127.0.0.1:8000/api/login', {
@@ -187,10 +191,17 @@ const login = async () => {
               user.email = response.data.user.email
               user.password = response.data.user.password
               user.expired = response.data.expires_at
+
+              //alert success
+              alertStore.alert = true
+              alertStore.type = 'success'
+              alertStore.msg = 'Đăng nhập thành công'
+
               router.push({ path: "/" });
             }
           });
     } catch (e) {
+      fail_login.value = true
       console.log(e);
     }
   }
