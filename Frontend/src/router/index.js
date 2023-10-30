@@ -6,6 +6,8 @@ import UpdateAvatar from '../views/User/UpdateAvatar.vue'
 import RegisterView from "../views/RegisterView.vue";
 import UpdateProfile from "../views/User/UpdateProfile.vue";
 import {useUserStore} from "../stores/user";
+import ForgotPassword from "../views/User/ForgotPassword.vue";
+import ResetPassword from "../views/User/ResetPassword.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -38,6 +40,16 @@ const router = createRouter({
       path: '/update-profile',
       name: 'update-profile',
       component: UpdateProfile,
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPassword,
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: ResetPassword,
     }
   ]
 })
