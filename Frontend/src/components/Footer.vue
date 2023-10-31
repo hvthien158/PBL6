@@ -10,9 +10,10 @@
   }
   footer {
     max-width: 100vw;
-    height: 10vh;
-    background-color: #ffffff;
-    padding: 30px 10px;
+    height: 9vh;
+    background-color: #313335;
+    color: #f3952d;
+    padding: 20px 10px;
     border-top: rgba(156, 163, 175, 0.6) 1px solid;
     box-sizing: border-box;
   }

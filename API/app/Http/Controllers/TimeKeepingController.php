@@ -30,8 +30,9 @@ class TimeKeepingController extends Controller
                 ]);
                 return response()->json(['message' => 'Check In Thành Công']);
             }
+            return response()->json(['error' => 'No role'], 400);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     public function checkOut(TimeKeeping $timeKeeping)
@@ -60,7 +61,7 @@ class TimeKeepingController extends Controller
                     }
                     return response()->json(['message' => 'Check Out Thành Công']);
                 } else {
-                    return response()->json(['message' => 'Thời gian checkout không hợp lệ']);
+                    return response()->json(['message' => 'Thời gian checkout không hợp lệ'], 400);
                 }
             }
         } catch (\Exception $e) {

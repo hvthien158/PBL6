@@ -1,13 +1,16 @@
 <template>
 <div :class="[props.type]" class="alert-container">
-  <el-icon v-if="props.type === 'success'" style="font-weight: bold" size="30"><CircleCheckFilled/></el-icon>
+  <el-icon v-if="props.type === 'success'" style="font-weight: bold" size="30"><CircleCheckFilled /></el-icon>
   <el-icon v-if="props.type === 'warning'" style="font-weight: bold" size="30"><WarningFilled /></el-icon>
   <el-icon v-if="props.type === 'error'" style="font-weight: bold" size="30"><CircleCloseFilled /></el-icon>
-  <span style="font-weight: 600; margin-left: 6px">{{ props.msg }}</span>
+  <span style="font-weight: 600; margin-left: 6px;">{{ props.msg }}</span>
 </div>
 </template>
 
 <style scoped>
+*{
+  color: white;
+}
 .alert-container{
   height: 80px;
   width: 400px;
@@ -15,7 +18,6 @@
   z-index: 999;
   right: 2vw;
   bottom: 2vw;
-  color: white;
   border-radius: 10px;
   display: flex;
   align-items: center;

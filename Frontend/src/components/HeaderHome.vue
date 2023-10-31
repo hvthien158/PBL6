@@ -4,23 +4,21 @@
       <router-link to="/">
         <img class="logo" :src="logo" alt="Logo" />
       </router-link>
-      <router-link to="/schedule">
-        <img :src="schedule" alt="Schedule" />
-      </router-link>
     </div>
-    <div class="user-info">
-      <div
-        class="user"
-        @click="checkLanding.isMenuOpen = !checkLanding.isMenuOpen"
-      >
-        <p class="username">{{ user.name }}</p>
-      </div>
-      <div v-if="checkLanding.isMenuOpen" class="dropdown">
-        <div class="dropdown-item" @click="updateProfile">Thông tin cá nhân</div>
-        <div class="dropdown-item" @click="changePass">Đổi mật khẩu</div>
-        <div class="dropdown-item logout" @click="logout">Đăng xuất</div>
-      </div>
-    </div>
+    <span v-if="user.token" style="font-weight: bold; margin-right: 20px">
+      <el-dropdown>
+        <span class="el-dropdown-link" style="line-height: 44px; font-size: larger">
+          {{user.name}}
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="updateProfile">Thông tin cá nhân</el-dropdown-item>
+            <el-dropdown-item @click="changePass">Đổi mật khẩu</el-dropdown-item>
+            <el-dropdown-item @click="logout">Đăng xuất</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </span>
   </header>
 </template>
 
@@ -33,9 +31,9 @@
 
 header {
   width: 100vw;
-  height: 10vh;
+  height: 9vh;
   padding: 12px;
-  background-color: #ffffff;
+  background-color: #313335;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -56,53 +54,12 @@ header {
   max-height: 8vh;
   margin-left: 50px;
 }
-
-.user-info {
-  display: block;
-  margin-left: 10px;
-  height: 100%;
-}
-
-.user {
+.el-dropdown-link{
   cursor: pointer;
-  height: 100%;
-  display: flex;
-  align-items: center;
+  border: none;
 }
-
-.username {
-  margin-right: 20px;
-  cursor: pointer;
-}
-
-.dropdown {
-  position: relative;
-}
-
-.dropdown .dropdown-item {
-  color: #fff;
-  padding: 10px;
-  white-space: nowrap;
-  cursor: pointer;
-  background-color: #000;
-}
-
-.dropdown .dropdown-item.logout {
-  background-color: #000;
-  color: #ffffff;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #ffffff;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-  min-width: 160px;
-}
-
-.dropdown.open .dropdown-content {
-  display: block;
+.el-dropdown-link:hover{
+  color: #f3952d;
 }
 </style>
 <script setup>
@@ -116,9 +73,6 @@ import {useAlertStore} from "../stores/alert";
 
 const alertStore = useAlertStore()
 const user = useUserStore().user
-let checkLanding = reactive({
-  isMenuOpen: false,
-});
 
 function updateProfile(){
   router.push({

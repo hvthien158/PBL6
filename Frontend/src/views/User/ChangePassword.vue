@@ -32,7 +32,7 @@
             </div>
           </div>
           <div class="btn-submit">
-            <button type="submit" @click="login">Đăng nhập</button>
+            <button type="submit" @click="login">Đổi mật khẩu</button>
           </div>
         </div>
         <div v-if="fail_change">
@@ -54,7 +54,6 @@ main {
   align-items: center;
   height: 80vh;
   min-height: 80vh;
-  background-color: #f2f2f2;
 }
 .form-container {
   display: flex;
@@ -77,10 +76,10 @@ main {
 .form-input {
   display: block;
   padding: 20px;
-  background-color: #f2f2f2;
+  background-color: #313335;
   border-radius: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  width: 300px;
+  width: 400px;
 }
 
 .form-info {
@@ -91,7 +90,7 @@ main {
 .form-info .label-info {
   display: flex;
   align-items: center;
-  width: 80px;
+  width: 150px;
   padding-right: 5px;
   color: #333333;
   font-weight: bold;
@@ -163,7 +162,7 @@ let info = reactive({
 
 const checkOldPassword = computed(() => {
   if (info.old_password.length === 0) {
-    return "Vui lòng nhập mật khẩu";
+    return "Vui lòng nhập mật khẩu cũ";
   } else {
     return "";
   }
@@ -171,7 +170,7 @@ const checkOldPassword = computed(() => {
 
 const checkNewPassword = computed(() => {
   if (info.new_password.length === 0) {
-    return "Vui lòng nhập mật khẩu";
+    return "Vui lòng nhập mật khẩu mới";
   } else {
     return "";
   }
@@ -179,7 +178,7 @@ const checkNewPassword = computed(() => {
 
 const checkNewPasswordConfirm = computed(() => {
   if (info.new_password_confirm.length === 0) {
-    return "Vui lòng nhập mật khẩu";
+    return "Vui lòng nhập mật khẩu xác nhận";
   } else if(info.new_password_confirm !== info.new_password){
     return "Mật khẩu xác nhận không trùng khớp"
   } else {

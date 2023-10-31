@@ -1,7 +1,6 @@
 <template>
-  <Header v-if="user.token === ''"></Header>
-  <HeaderHome v-else></HeaderHome>
-  <router-view style="margin-top: 10vh" :key="$route.fullPath"></router-view>
+  <HeaderHome></HeaderHome>
+  <router-view style="margin-top: 9vh; background-color: #2b2b2b; min-height: 82vh" :key="$route.fullPath"></router-view>
   <Footer></Footer>
   <transition name="slide-fade">
     <AlertBox v-if="isAlert" :type="typeAlert" :msg="msgAlert"></AlertBox>
@@ -9,6 +8,12 @@
 </template>
 
 <style>
+* {
+  color: #a9a9a9;
+}
+input{
+  color: black;
+}
 .slide-fade-enter-active {
   transition: all 0.3s ease-out;
 }
@@ -26,15 +31,12 @@
 
 <script setup>
 import { RouterView } from "vue-router";
-import Header from "./components/Header.vue";
 import HeaderHome from "./components/HeaderHome.vue";
 import Footer from "./components/Footer.vue";
-import {useUserStore} from "./stores/user";
 import {useAlertStore} from "./stores/alert";
 import AlertBox from "./components/AlertBox.vue";
 import {ref, watch} from "vue";
 
-const user = useUserStore().user
 const isAlert = ref(false)
 const typeAlert = ref('')
 const msgAlert = ref('')

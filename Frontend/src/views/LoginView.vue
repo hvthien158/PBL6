@@ -12,7 +12,7 @@
               <label>Email</label>
             </div>
             <div class="input-info">
-              <input v-model="info.email" type="text" />
+              <input @keyup.enter="passwordInput.focus()" v-model="info.email" type="text" />
               <h5>{{ checkEmail }}</h5>
             </div>
           </div>
@@ -21,7 +21,7 @@
               <label>Mật khẩu</label>
             </div>
             <div class="input-info">
-              <input v-model="info.password" type="password" />
+              <input @keyup.enter="login" ref="passwordInput" v-model="info.password" type="password" />
               <h5>{{ checkPassword }}</h5>
             </div>
           </div>
@@ -31,6 +31,9 @@
         </div>
         <div v-if="fail_login">
           <span style="color: red">Sai tài khoản hoặc mật khẩu</span>
+        </div>
+        <div>
+          <span id="forgot" @click="goToForgot">Quên mật khẩu?</span>
         </div>
       </div>
     </div>
@@ -48,7 +51,6 @@ main {
   align-items: center;
   height: 80vh;
   min-height: 80vh;
-  background-color: #f2f2f2;
 }
 .form-container {
   display: flex;
@@ -71,10 +73,10 @@ main {
 .form-input {
   display: block;
   padding: 20px;
-  background-color: #f2f2f2;
+  background-color: #313335;
   border-radius: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  width: 300px;
+  width: 400px;
 }
 
 .form-info {
@@ -85,7 +87,7 @@ main {
 .form-info .label-info {
   display: flex;
   align-items: center;
-  width: 80px;
+  width: 150px;
   padding-right: 5px;
   color: #333333;
   font-weight: bold;
@@ -132,6 +134,10 @@ h5 {
   color: rgb(214, 34, 34);
   font-size: 14px;
 }
+#forgot:hover{
+  color: blue;
+  cursor: pointer;
+}
 </style>
 
 <script setup>
@@ -146,6 +152,7 @@ const verifyQuest = ref(false)
 const alertStore = useAlertStore()
 const user = useUserStore().user
 const fail_login = ref(false)
+const passwordInput = ref(null)
 
 if(user.token !== ''){
   router.push({name : 'home'})
@@ -206,4 +213,10 @@ const login = async () => {
     }
   }
 };
+
+function goToForgot(){
+  router.push({
+    name: 'forgot-password'
+  })
+}
 </script>
