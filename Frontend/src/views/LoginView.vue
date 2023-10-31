@@ -179,6 +179,7 @@ const isEmail = (email) => {
 const login = async () => {
   if (info.email && info.password) {
     try {
+    console.log(1)
       await axios
           .post('http://127.0.0.1:8000/api/login', {
             email: info.email,
@@ -188,12 +189,17 @@ const login = async () => {
             if(response.data.verify_quest){
               verifyQuest.value = true
             } else {
+              console.log(response)
               user.id = response.data.user.id
               user.token = response.data.access_token
               user.name = response.data.user.name
               user.email = response.data.user.email
               user.password = response.data.user.password
               user.expired = response.data.expires_at
+              user.role = response.data.user.role
+              if(user.role === 'admin')
+              router.push({ path: "/admin" });
+              else
               router.push({ path: "/" });
             }
           });

@@ -5,7 +5,12 @@ import ScheduleView from '../views/ScheduleView.vue'
 import UpdateAvatar from '../views/User/UpdateAvatar.vue'
 import RegisterView from "../views/RegisterView.vue";
 import UpdateProfile from "../views/User/UpdateProfile.vue";
-import {useUserStore} from "../stores/user";
+import { useUserStore } from "../stores/user";
+import ListUser from "../views/Admin/User/ListUser.vue"
+import ListTimeKeeping from '../views/Admin/TimeKeeping/ListTimeKeeping.vue'
+import EditUser from '../views/Admin/User/EditUser.vue'
+import ListDepartment from '../views/Admin/Department/ListDepartment.vue'
+import EditDepartment from '../views/Admin/Department/EditDepartment.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -25,7 +30,7 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/schedule',
+      path: '/schedule/',
       name: 'schedule',
       component: ScheduleView
     },
@@ -38,13 +43,50 @@ const router = createRouter({
       path: '/update-profile',
       name: 'update-profile',
       component: UpdateProfile,
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: ListUser,
+    },
+    {
+      path: '/admin/list-user',
+      name: 'listUser',
+      component: ListUser,
+    },
+    {
+      path: '/admin/create-user',
+      name: 'createUser',
+      component: EditUser,
+    },
+    {
+      path: '/admin/update-user/:id',
+      name: 'updateUser',
+      component: EditUser,
+    },
+    {
+      path: '/admin/list-timekeeping/:id',
+      name: 'list-timekeeping',
+      component: ListTimeKeeping
     }
+    ,
+    {
+      path: '/admin/list-department/',
+      name: 'list-department',
+      component: ListDepartment
+    },
+    {
+      path: '/admin/add-department/',
+      name: 'add-department',
+      component: EditDepartment
+    }
+    
   ]
 })
 
 router.beforeEach(async () => {
   const user = await useUserStore()
-  if(user.isExpired()){
+  if (user.isExpired()) {
     user.logout()
   }
 })

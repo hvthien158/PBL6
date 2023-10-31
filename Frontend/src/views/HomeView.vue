@@ -207,7 +207,7 @@ function updateDateAndButton() {
 const handleCheckIn = async () => {
   try {
     await axios
-      .post("http://127.0.0.1:8000/api/check-in", 
+      .post("http://127.0.0.1:8000/api/check-in", null,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -218,7 +218,7 @@ const handleCheckIn = async () => {
         getTimeKeeping();
       });
   } catch (e) {
-    console.log(e);
+    console.log(user.token);
   }
 };
 
@@ -226,10 +226,7 @@ const handleCheckOut = async () => {
     try {
       await axios
         .put(
-          `http://127.0.0.1:8000/api/check-out/`,
-          {
-            time: moment().format("YYYY-MM-DD HH:mm:ss"),
-          },
+          `http://127.0.0.1:8000/api/check-out/`, null,
           {
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -241,7 +238,7 @@ const handleCheckOut = async () => {
           getTimeKeeping();
         });
     } catch (e) {
-      console.log(e);
+      console.log(`Bearer ${user.token}`);
     }
 }
 

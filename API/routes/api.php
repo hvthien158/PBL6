@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\TimeKeepingController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,4 +40,9 @@ Route::get('time-keeping', [TimeKeepingController::class, 'getTimeKeeping']);
 Route::get('get-list-timekeeping', [TimeKeepingController::class,'getListTimeKeeping']);
 Route::post('search-by-around-time', [TimeKeepingController::class,'searchByAroundTime']);
 Route::post('search-by-month-year', [TimeKeepingController::class,'searchByMonth']);
-
+Route::get('user/{id}', [UserController::class, 'user']);
+Route::get('user/', [UserController::class, 'user']);
+Route::get('department', [DepartmentController::class,'index']);
+Route::post('create-user', [AdminController::class,'createUser']);
+Route::put('update-user/{id}', [AdminController::class,'updateUser']);
+Route::delete('delete-user/{id}', [AdminController::class,'deleteUser']);

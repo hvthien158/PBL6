@@ -9,6 +9,8 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\TimeKeeping;
 use App\Policies\TimeKeepingPolicy;
+use App\Models\User;
+use App\Policies\UserPolicy;
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -17,7 +19,8 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        TimeKeeping::class => TimeKeepingPolicy::class
+        TimeKeeping::class => TimeKeepingPolicy::class,
+        User::class => UserPolicy::class,
     ];
 
     /**
