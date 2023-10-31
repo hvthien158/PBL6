@@ -103,16 +103,25 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
+
+        if (!Hash::check($request->old_password, auth()->user()->getAuthPassword())){
+            return response()->json(['error' => 'Current password is incorrect'], 400);
+        }
+
         $userId = auth()->user()->id;
 
-        $user = User::where('id', $userId)->update(
+        $check = User::where('id', $userId)->update(
             ['password' => bcrypt($request->new_password)]
         );
 
+        if($check == 1){
+            return response()->json([
+                'message' => 'User successfully changed password',
+            ], 201);
+        }
         return response()->json([
-            'message' => 'User successfully changed password',
-            'user' => $user,
-        ], 201);
+        'error' => 'Error change password',
+    ], 400);
     }
 
     public function updateProfile(Request $request){

@@ -114,6 +114,7 @@ main {
   display: flex;
   justify-content: center;
   border: 0.1em solid black;
+  padding-top: 12px;
 }
 .container {
   display: flex;

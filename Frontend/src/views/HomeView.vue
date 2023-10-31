@@ -206,7 +206,7 @@ function updateDateAndButton() {
 const handleCheckIn = async () => {
   try {
     await axios
-      .post("http://127.0.0.1:8000/api/check-in", 
+      .post("http://127.0.0.1:8000/api/check-in",{} ,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,

@@ -16,7 +16,8 @@
         <p class="username">{{ user.name }}</p>
       </div>
       <div v-if="checkLanding.isMenuOpen" class="dropdown">
-        <div class="dropdown-item" @click="updateProfile">Cài đặt tài khoản</div>
+        <div class="dropdown-item" @click="updateProfile">Thông tin cá nhân</div>
+        <div class="dropdown-item" @click="changePass">Đổi mật khẩu</div>
         <div class="dropdown-item logout" @click="logout">Đăng xuất</div>
       </div>
     </div>
@@ -122,6 +123,12 @@ let checkLanding = reactive({
 function updateProfile(){
   router.push({
     name: 'update-profile',
+  })
+}
+
+function changePass(){
+  router.push({
+    name: 'change-password',
   })
 }
 
