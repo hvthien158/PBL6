@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,10 +31,22 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/update-profile', [AuthController::class, 'updateProfile']);
+Route::post('/change-password', [AuthController::class, 'changePassword']);
+
+//Forgot password
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
+    ->middleware('guest')->name('password.email');
+Route::get('/reset-password/{token}', function (string $token) {
+    return Redirect::to('http://localhost:5173/reset-pass')->with('token', $token);
+})->middleware('guest')->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+    ->middleware('guest')->name('password.update');
 
 //Email Verify
-Route::get('email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify'); // Make sure to keep this as your route name
+Route::get('email/verify/{id}', [VerificationController::class, 'verify'])->name('verification.verify');
 Route::get('email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
+
+//Time Keeping
 Route::post('check-in', [TimeKeepingController::class,'checkIn']);
 Route::put('check-out/', [TimeKeepingController::class,'checkOut']);
 Route::get('time-keeping', [TimeKeepingController::class, 'getTimeKeeping']);

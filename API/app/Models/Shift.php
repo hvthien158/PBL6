@@ -19,6 +19,6 @@ class Shift extends Model
     ];
     public function timeKeeping(): HasMany
     {
-        return $this->hasMany(TimeKeeping::class, 'shift_id');
+        return $this->hasMany(TimeKeeping::class);
     }
 }

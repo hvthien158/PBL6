@@ -11,6 +11,10 @@ import ListTimeKeeping from '../views/Admin/TimeKeeping/ListTimeKeeping.vue'
 import EditUser from '../views/Admin/User/EditUser.vue'
 import ListDepartment from '../views/Admin/Department/ListDepartment.vue'
 import EditDepartment from '../views/Admin/Department/EditDepartment.vue'
+import {useUserStore} from "../stores/user";
+import ForgotPassword from "../views/User/ForgotPassword.vue";
+import ResetPassword from "../views/User/ResetPassword.vue";
+import ChangePassword from "../views/User/ChangePassword.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -67,7 +71,22 @@ const router = createRouter({
     {
       path: '/admin/list-timekeeping/:id',
       name: 'list-timekeeping',
-      component: ListTimeKeeping
+      component: ListTimeKeeping  
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPassword,
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: ResetPassword,
+    },
+    {
+      path: '/change-password',
+      name: 'change-password',
+      component: ChangePassword,
     }
     ,
     {

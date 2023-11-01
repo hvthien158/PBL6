@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: 40px">
+  <div style="margin-top: 40px; padding: 0 100px">
     <h1>Cập nhật thông tin cá nhân:</h1>
     <div style="display: flex; align-items: center">
       <input type="file" name="file" id="file" class="inputfile" @input="onFileChange"/>
@@ -15,6 +15,7 @@
         <input v-model="phone_number" type="text" name="" id="">
       </div>
     </div>
+    <br>
     <button @click="updateProfile">Cập nhật</button>
   </div>
 </template>
@@ -47,6 +48,7 @@ import { ref , reactive} from "vue";
 import router from "../../router";
 import axios from "axios";
 import {useUserStore} from "../../stores/user";
+import {useAlertStore} from "../../stores/alert";
 
 const avatar = ref(undefined)
 const formData = new FormData()
@@ -56,6 +58,7 @@ if (user.token === '') {
   router.push({ path: "/login" });
 }
 
+const alertStore = useAlertStore()
 const address = ref(user.address)
 const DOB = ref(user.DOB)
 const phone_number = ref(user.phone_number)
@@ -79,6 +82,16 @@ function updateProfile(){
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
+      })
+      .then(() => {
+        //alert success
+        alertStore.alert = true
+        alertStore.type = 'success'
+        alertStore.msg = 'Thành công'
+
+        router.push({
+          name: 'home'
+        })
       })
       .catch((e) => {
         console.log(e)

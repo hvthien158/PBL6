@@ -4,19 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use function Laravel\Prompts\table;
 
 class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword']]);
     }
 
     public function login(LoginRequest $request)
@@ -99,16 +103,25 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
+
+        if (!Hash::check($request->old_password, auth()->user()->getAuthPassword())){
+            return response()->json(['error' => 'Current password is incorrect'], 400);
+        }
+
         $userId = auth()->user()->id;
 
-        $user = User::where('id', $userId)->update(
+        $check = User::where('id', $userId)->update(
             ['password' => bcrypt($request->new_password)]
         );
 
+        if($check == 1){
+            return response()->json([
+                'message' => 'User successfully changed password',
+            ], 201);
+        }
         return response()->json([
-            'message' => 'User successfully changed password',
-            'user' => $user,
-        ], 201);
+        'error' => 'Error change password',
+    ], 400);
     }
 
     public function updateProfile(Request $request){
@@ -136,5 +149,42 @@ class AuthController extends Controller
             'message' => 'Successfully updated profile',
             'user' => $user->get()
         ], 201);
+    }
+
+    public function forgotPassword(Request $request){
+        $request->validate(['email' => 'required|email']);
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => 'Reset link has been sent'])
+            : response()->json(['error' => $status], 400);
+    }
+
+    public function resetPassword(Request $request){
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? response()->json(['message' => 'Reset password successfully'])
+            : response()->json(['error' => $status], 400);
     }
 }

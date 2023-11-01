@@ -20,6 +20,6 @@ class Department extends Model
     public $timestamps = false;
     public function users(): HasMany
     {
-        return $this->hasMany(User::class, 'department_id');
+        return $this->hasMany(User::class);
     }
 }

@@ -2,29 +2,33 @@
   <main>
     <div class="container">
       <div class="checkin-container">
-        <h2>{{ user.name }}</h2>
-        <div class="date">
-          <span class="date-span">{{ currentDate }}</span>
-        </div>
         <div class="time">
           <span id="time-span">{{ currentTime }}</span>
+        </div>
+        <div class="date">
+          <span class="date-span">{{ currentDate }}</span>
         </div>
         <div class="button-check">
           <button
             id="check-in-button"
-            class="square-button"
+            :class="[checkin ? 'active-button' : 'disable-button']"
             @click="handleCheckIn"
+            :disabled="!checkin"
           >
             Check In
           </button>
           <button
             id="check-out-button"
-            class="square-button"
+            :class="[checkout ? 'active-button' : 'disable-button']"
             @click="handleCheckOut"
+            :disabled="!checkout"
           >
             Check Out
           </button>
         </div>
+        <router-link to="/schedule">
+          <button class="active-button" style="margin-top: 20px; height: 40px">Lịch sử</button>
+        </router-link>
       </div>
     </div>
   </main>
@@ -36,8 +40,6 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 100px;
-  background-color: #f2f2f2;
 }
 .container {
   display: flex;
@@ -46,10 +48,9 @@ main {
 }
 .checkin-container {
   min-height: 20px;
-  min-width: 30%;
-  background-color: rgb(255, 255, 255);
-  padding: 50px;
-  margin-bottom: 100px;
+  width: 100%;
+  background-color: #2b2b2b;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -62,12 +63,12 @@ main {
 
 .date-span {
   font-size: 18px;
+  font-family: "JetBrains Mono",monospace;
 }
 
 .time {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
 }
 
 .time img {
@@ -77,19 +78,81 @@ main {
 
 .button-check {
   display: flex;
+  margin-top: 32px;
 }
 
-.square-button {
+.active-button {
   width: 120px;
   height: 120px;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
   margin: 10px;
+  cursor: pointer;
+  align-items: center;
+  appearance: none;
+  background-image: radial-gradient(100% 100% at 100% 0, #f9ac38 0, #d95827 100%);
+  border: 0;
+  border-radius: 6px;
+  box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #fff;
+  display: inline-flex;
+  font-family: "JetBrains Mono",monospace;
+  justify-content: center;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding-left: 16px;
+  padding-right: 16px;
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow .15s,transform .15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  will-change: box-shadow,transform;
+  font-size: 18px;
 }
+.active-button:hover{
+  box-shadow: rgba(45, 35, 66, .4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, rgba(58, 65, 111, .5) 0 -3px 0 inset;
+  transform: translateY(-2px);
+}
+.disable-button{
+  width: 120px;
+  height: 120px;
+  margin: 10px;
+  align-items: center;
+  appearance: none;
+  background-image: radial-gradient(100% 100% at 100% 0, #FCFCFD 0, #9ca3af 100%);;
+  border-radius: 4px;
+  border-width: 0;
+  box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #36395A;
+  display: inline-flex;
+  font-family: "JetBrains Mono",monospace;
+  justify-content: center;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding-left: 16px;
+  padding-right: 16px;
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow .15s,transform .15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  will-change: box-shadow,transform;
+  font-size: 18px;
+}
+
 #time-span {
-  font-size: 30px;
+  color: white;
+  font-size: 100px;
+  font-family: 'alarm clock', sans-serif;
 }
 </style>
 
@@ -98,15 +161,15 @@ import { ref, reactive, onMounted } from "vue";
 import router from "../router";
 import axios from "axios";
 import {useUserStore} from "../stores/user";
+import moment from "moment";
+import schedule from "../assets/image/schedule.png";
 
 const user = useUserStore().user
 if (user.token === '') {
   router.push({ path: "/login" });
 }
-let checkLanding = reactive({
-  isCheckedIn: true,
-  isCheckedOut: true,
-});
+const checkin = ref(false)
+const checkout = ref(false)
 const currentDate = ref(getCurrentDate());
 const currentTime = ref(getCurrentTime());
 
@@ -160,54 +223,29 @@ const getTimeKeeping = async () => {
         if (response.status == 200) {
           if (response.data.time_check_in) {
             if (response.data.time_check_out) {
-              checkLanding.isCheckedIn = true;
-              checkLanding.isCheckedOut = true;
+              checkin.value = false;
+              checkout.value = false;
             } else {
-              checkLanding.isCheckedIn = true;
-              checkLanding.isCheckedOut = false;
+              checkin.value = false;
+              checkout.value = true;
             }
           } else {
-            checkLanding.isCheckedIn = false;
-            checkLanding.isCheckedOut = true;
+            checkin.value = true;
+            checkout.value = false;
           }
         }
       });
   } catch (e) {
     console.log(e);
   }
-  updateDateAndButton();
-};
-function updateDateAndButton() {
   currentDate.value = getCurrentDate();
-
-  const checkInButton = document.getElementById("check-in-button");
-  const checkOutButton = document.getElementById("check-out-button");
-
-  if (!checkLanding.isCheckedIn) {
-    checkInButton.style.backgroundColor = "#007bff";
-    checkInButton.style.color = "white";
-    checkInButton.disabled = false;
-  } else {
-    checkInButton.style.backgroundColor = "";
-    checkInButton.style.color = "";
-    checkInButton.disabled = true;
-  }
-
-  if (checkLanding.isCheckedIn && !checkLanding.isCheckedOut) {
-    checkOutButton.style.backgroundColor = "#007bff";
-    checkOutButton.style.color = "white";
-    checkOutButton.disabled = false;
-  } else {
-    checkOutButton.style.backgroundColor = "";
-    checkOutButton.style.color = "";
-    checkOutButton.disabled = true;
-  }
-}
+};
 
 const handleCheckIn = async () => {
   try {
     await axios
-      .post("http://127.0.0.1:8000/api/check-in", null,
+
+      .post("http://127.0.0.1:8000/api/check-in",{} ,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -244,6 +282,6 @@ const handleCheckOut = async () => {
 
 setInterval(() => {
   currentTime.value = getCurrentTime();
-  updateDateAndButton();
+  currentDate.value = getCurrentDate();
 }, 1000);
 </script>

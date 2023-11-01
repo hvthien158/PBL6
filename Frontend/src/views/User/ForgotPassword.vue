@@ -5,35 +5,20 @@
         <p style="font-weight: bold">Thư xác nhận đã được gửi đến email của bạn, vui lòng xác nhận để tiếp tục...</p>
       </div>
       <div class="form-container" v-else>
-        <h3>Đăng nhập</h3>
+        <h3>Quên mật khẩu</h3>
         <div class="form-input">
           <div class="form-info">
             <div class="label-info">
               <label>Email</label>
             </div>
             <div class="input-info">
-              <input @keyup.enter="passwordInput.focus()" v-model="info.email" type="text" />
+              <input v-model="email" type="text" />
               <h5>{{ checkEmail }}</h5>
             </div>
           </div>
-          <div class="form-info">
-            <div class="label-info">
-              <label>Mật khẩu</label>
-            </div>
-            <div class="input-info">
-              <input @keyup.enter="login" ref="passwordInput" v-model="info.password" type="password" />
-              <h5>{{ checkPassword }}</h5>
-            </div>
-          </div>
           <div class="btn-submit">
-            <button type="submit" @click="login">Đăng nhập</button>
+            <button type="submit" @click="forgot">Gửi</button>
           </div>
-        </div>
-        <div v-if="fail_login">
-          <span style="color: red">Sai tài khoản hoặc mật khẩu</span>
-        </div>
-        <div>
-          <span id="forgot" @click="goToForgot">Quên mật khẩu?</span>
         </div>
       </div>
     </div>
@@ -57,6 +42,7 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-bottom: 100px;
 }
 .additional-content {
   text-align: center;
@@ -134,92 +120,54 @@ h5 {
   color: rgb(214, 34, 34);
   font-size: 14px;
 }
-#forgot:hover{
-  color: blue;
-  cursor: pointer;
-}
 </style>
 
 <script setup>
-import { reactive, computed } from "vue";
+import { computed } from "vue";
 import axios from "axios";
-import router from "../router";
+import router from "../../router";
 import {ref} from "vue";
-import {useUserStore} from "../stores/user";
-import {useAlertStore} from "../stores/alert";
+import {useUserStore} from "../../stores/user";
 
 const verifyQuest = ref(false)
-const alertStore = useAlertStore()
+
 const user = useUserStore().user
-const fail_login = ref(false)
-const passwordInput = ref(null)
 
 if(user.token !== ''){
   router.push({name : 'home'})
 }
-let info = reactive({
-  email: "",
-  password: "",
-});
+
+const email = ref('')
+
 const checkEmail = computed(() => {
-  if (!isEmail(info.email)) {
+  if(email.value === ''){
+    return "Vui lòng nhập email"
+  } else if (!isEmail(email.value)) {
     return "Email không đúng định dạng";
   } else {
     return "";
   }
 });
-const checkPassword = computed(() => {
-  if (info.password.length === 0) {
-    return "Vui lòng nhập mật khẩu";
-  } else {
-    return "";
-  }
-});
+
 const isEmail = (email) => {
   let filter =
       /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return filter.test(email);
 };
-const login = async () => {
-  if (checkEmail.value === '' && checkPassword.value === '') {
+const forgot = async () => {
+  if (email.value !== '') {
     try {
-    console.log(1)
       await axios
-          .post('http://127.0.0.1:8000/api/login', {
-            email: info.email,
-            password: info.password,
+          .post('http://127.0.0.1:8000/api/forgot-password', {
+            email: email.value,
           })
-          .then(function (response) {
-            if(response.data.verify_quest){
-              verifyQuest.value = true
-            } else {
-              console.log(response)
-              user.id = response.data.user.id
-              user.token = response.data.access_token
-              user.name = response.data.user.name
-              user.email = response.data.user.email
-              user.password = response.data.user.password
-              user.expired = response.data.expires_at
-              user.role = response.data.user.role
-              
-              
-              //alert success
-              alertStore.alert = true
-              alertStore.type = 'success'
-              alertStore.msg = 'Đăng nhập thành công'
-              (user.role === 'admin') ? router.push({ path: "/admin" }):  router.push({ path: "/" });
-            }
+          .then(function () {
+            verifyQuest.value = true
           });
     } catch (e) {
-      fail_login.value = true
       console.log(e);
     }
   }
 };
 
-function goToForgot(){
-  router.push({
-    name: 'forgot-password'
-  })
-}
 </script>
