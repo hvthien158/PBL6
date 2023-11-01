@@ -43,6 +43,10 @@ Route::post('search-by-month-year', [TimeKeepingController::class,'searchByMonth
 Route::get('user/{id}', [UserController::class, 'user']);
 Route::get('user/', [UserController::class, 'user']);
 Route::get('department', [DepartmentController::class,'index']);
+Route::get('department/{id}', [DepartmentController::class,'index']);
 Route::post('create-user', [AdminController::class,'createUser']);
 Route::put('update-user/{id}', [AdminController::class,'updateUser']);
 Route::delete('delete-user/{id}', [AdminController::class,'deleteUser']);
+Route::post('create-department', [AdminController::class,'createDepartment']);
+Route::put('update-department/{id}', [AdminController::class,'updateDepartment']);
+Route::delete('delete-department/{id}', [AdminController::class,'deleteDepartment']);

@@ -72,12 +72,17 @@ const router = createRouter({
     ,
     {
       path: '/admin/list-department/',
-      name: 'list-department',
+      name: 'listDepartment',
       component: ListDepartment
     },
     {
       path: '/admin/add-department/',
-      name: 'add-department',
+      name: 'addDepartment',
+      component: EditDepartment
+    },
+    {
+      path: '/admin/update-department/:id',
+      name: 'updateDepartment',
       component: EditDepartment
     }
     

@@ -8,8 +8,9 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
-    public function index(){
-        $department = Department::all();
+    public function index($id = null)
+    {
+        $department = ($id == null) ? Department::all() : Department::where('id',$id)->get();
         return DepartmentResource::collection($department);
     }
 }

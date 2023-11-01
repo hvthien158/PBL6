@@ -8,8 +8,12 @@
 import { RouterView } from "vue-router";
 import Header from "./components/Header.vue";
 import HeaderHome from "./components/HeaderHome.vue";
+import router from "./router";
 import Footer from "./components/Footer.vue";
 import {useUserStore} from "./stores/user";
 
 const user = useUserStore().user
+if(user.expired == ''){
+  router.push({ path: "/login" });
+}
 </script>

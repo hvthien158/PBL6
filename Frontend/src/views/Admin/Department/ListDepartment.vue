@@ -13,6 +13,7 @@
                 <td>Địa chỉ</td>
                 <td>Số điện thoại</td>
                 <td>Email</td>
+                <td>Tổng số nhân viên</td>
                 <td>Quản lý nhân viên trong cơ quan</td>
                 <td>Chỉnh sửa thông tin</td>
                 <td>Xóa cơ quan</td>
@@ -23,11 +24,12 @@
                 <td scope="row">{{ item.id }}</td>
                 <td>{{ item.name }}</td>
                 <td>{{ item.address }}</td>
-                <td>{{ item.phone_number }}</td>
+                <td>{{ item.phoneNumber }}</td>
                 <td>{{ item.email }}</td>
-                <td>Xem danh sách</td>
-                <td>Chỉnh sửa</td>
-                <td>Xóa</td>
+                <td>{{ item.quantityUser }}</td>
+                <td><a>Xem danh sách</a></td>
+                <td><a @click="router.push({ path : `/admin/update-department/${item.id}`})">Chỉnh sửa</a></td>
+                <td><a @click="deleteDepartment(item.id)">Xóa</a></td>
               </tr>
             </tbody>
           </table>
@@ -54,11 +56,17 @@ main {
 .department h1 {
     text-align: center;
 }
+.table td a {
+  cursor: pointer;
+}
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import router from "../../../router";
+import { useUserStore } from "../../../stores/user";
+const user = useUserStore().user
 const department = ref()
 onMounted(() => {
     displayDepartment()
@@ -74,4 +82,16 @@ const displayDepartment = async () => {
     console.log(e);
   }
 };
+const deleteDepartment = async(id) => {
+  try {
+    await axios.delete(`http://127.0.0.1:8000/api/delete-department/${id}`,{
+      headers : { Authorization : `Bearer ${user.token}`}
+    })
+    .then(function(response){
+        displayDepartment()
+    })
+  } catch(e) {
+    console.log(e)
+  }
+}
 </script>
