@@ -22,7 +22,7 @@ class AuthController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword']]);
     }
-
+    
     public function login(LoginRequest $request)
     {
         $info = array_merge(['email' => $request->email], ['password' => $request->password]);

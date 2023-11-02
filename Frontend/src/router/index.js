@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import HomeView from '../views/HomeView.vue'
 import ScheduleView from '../views/ScheduleView.vue'
-import UpdateAvatar from '../views/User/UpdateAvatar.vue'
 import RegisterView from "../views/RegisterView.vue";
 import UpdateProfile from "../views/User/UpdateProfile.vue";
 import { useUserStore } from "../stores/user";
@@ -37,11 +36,6 @@ const router = createRouter({
       path: '/schedule/',
       name: 'schedule',
       component: ScheduleView
-    },
-    {
-      path: '/update-avatar',
-      name: 'UpdateAvatar',
-      component: UpdateAvatar
     },
     {
       path: '/update-profile',
