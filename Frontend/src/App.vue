@@ -32,10 +32,17 @@ input{
 <script setup>
 import { RouterView } from "vue-router";
 import HeaderHome from "./components/HeaderHome.vue";
+import router from "./router";
 import Footer from "./components/Footer.vue";
 import {useAlertStore} from "./stores/alert";
 import AlertBox from "./components/AlertBox.vue";
 import {ref, watch} from "vue";
+
+
+const user = useUserStore().user
+if(user.expired == ''){
+  router.push({ path: "/login" });
+}
 
 const isAlert = ref(false)
 const typeAlert = ref('')

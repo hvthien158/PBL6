@@ -10,7 +10,8 @@ export const useUserStore = defineStore('user', () => {
             name: '',
             email: '',
             password: '',
-            expired: ''
+            expired: '',
+            role: ''
         })
     )
 
@@ -21,6 +22,7 @@ export const useUserStore = defineStore('user', () => {
         user.value.email = ''
         user.value.password = ''
         user.value.expired = ''
+        user.value.role = ''
     }
 
     function isExpired(){

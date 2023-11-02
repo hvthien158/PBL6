@@ -183,6 +183,7 @@ const isEmail = (email) => {
 const login = async () => {
   if (checkEmail.value === '' && checkPassword.value === '') {
     try {
+    console.log(1)
       await axios
           .post('http://127.0.0.1:8000/api/login', {
             email: info.email,
@@ -192,19 +193,21 @@ const login = async () => {
             if(response.data.verify_quest){
               verifyQuest.value = true
             } else {
+              console.log(response)
               user.id = response.data.user.id
               user.token = response.data.access_token
               user.name = response.data.user.name
               user.email = response.data.user.email
               user.password = response.data.user.password
               user.expired = response.data.expires_at
-
+              user.role = response.data.user.role
+              
+              
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'
               alertStore.msg = 'Đăng nhập thành công'
-
-              router.push({ path: "/" });
+              (user.role === 'admin') ? router.push({ path: "/admin" }):  router.push({ path: "/" });
             }
           });
     } catch (e) {

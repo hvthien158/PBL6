@@ -5,6 +5,12 @@ import ScheduleView from '../views/ScheduleView.vue'
 import UpdateAvatar from '../views/User/UpdateAvatar.vue'
 import RegisterView from "../views/RegisterView.vue";
 import UpdateProfile from "../views/User/UpdateProfile.vue";
+import { useUserStore } from "../stores/user";
+import ListUser from "../views/Admin/User/ListUser.vue"
+import ListTimeKeeping from '../views/Admin/TimeKeeping/ListTimeKeeping.vue'
+import EditUser from '../views/Admin/User/EditUser.vue'
+import ListDepartment from '../views/Admin/Department/ListDepartment.vue'
+import EditDepartment from '../views/Admin/Department/EditDepartment.vue'
 import {useUserStore} from "../stores/user";
 import ForgotPassword from "../views/User/ForgotPassword.vue";
 import ResetPassword from "../views/User/ResetPassword.vue";
@@ -28,7 +34,7 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/schedule',
+      path: '/schedule/',
       name: 'schedule',
       component: ScheduleView
     },
@@ -41,6 +47,31 @@ const router = createRouter({
       path: '/update-profile',
       name: 'update-profile',
       component: UpdateProfile,
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: ListUser,
+    },
+    {
+      path: '/admin/list-user',
+      name: 'listUser',
+      component: ListUser,
+    },
+    {
+      path: '/admin/create-user',
+      name: 'createUser',
+      component: EditUser,
+    },
+    {
+      path: '/admin/update-user/:id',
+      name: 'updateUser',
+      component: EditUser,
+    },
+    {
+      path: '/admin/list-timekeeping/:id',
+      name: 'list-timekeeping',
+      component: ListTimeKeeping  
     },
     {
       path: '/forgot-password',
@@ -57,12 +88,29 @@ const router = createRouter({
       name: 'change-password',
       component: ChangePassword,
     }
+    ,
+    {
+      path: '/admin/list-department/',
+      name: 'listDepartment',
+      component: ListDepartment
+    },
+    {
+      path: '/admin/add-department/',
+      name: 'addDepartment',
+      component: EditDepartment
+    },
+    {
+      path: '/admin/update-department/:id',
+      name: 'updateDepartment',
+      component: EditDepartment
+    }
+    
   ]
 })
 
 router.beforeEach(async () => {
   const user = await useUserStore()
-  if(user.isExpired()){
+  if (user.isExpired()) {
     user.logout()
   }
 })

@@ -23,7 +23,6 @@
               <select
                 class="custom-select"
                 v-model="dataSearch.month"
-                placeholder="Tìm Theo tháng"
               >
                 <option v-for="options in month" :value="options.value">
                   {{ options.text }}
@@ -34,7 +33,6 @@
               <select
                 class="custom-select"
                 v-model="dataSearch.year"
-                placeholder="Tìm Theo Năm"
               >
                 <option v-for="options in years" :value="options.value">
                   {{ options.text }}
@@ -137,9 +135,10 @@ table {
 <script setup>
 import { saveAs } from "file-saver";
 import { read, utils, write } from "xlsx";
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, defineProps } from "vue";
 import {useUserStore} from "../stores/user";
 import axios from "axios";
+
 const user = useUserStore().user
 let dataSearch = reactive({
   startTime: null,
@@ -174,7 +173,8 @@ onMounted(() => {
   getListTimeKeeping();
 });
 const getListTimeKeeping = async () => {
-  await axios
+  try{
+    await axios
     .get("http://127.0.0.1:8000/api/get-list-timekeeping", {
       headers: {
         Authorization: `Bearer ${user.token}`
@@ -184,6 +184,10 @@ const getListTimeKeeping = async () => {
       data.value = response.data.data;
       console.log(data.value);
     });
+  } catch (e){
+    console.log(e)
+  }
+  
 };
 const findTimeKeeping = async () => {
   if (dataSearch.startTime && dataSearch.endTime) {
