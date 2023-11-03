@@ -23,6 +23,11 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword', 'checkEmail']]);
     }
 
+    /**
+     * @param LoginRequest $request
+     *
+     * @return object
+     */
     public function login(LoginRequest $request)
     {
         $info = array_merge(['email' => $request->email], ['password' => $request->password]);
@@ -39,6 +44,11 @@ class AuthController extends Controller
         return $this->createNewToken($token);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return object
+     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -71,6 +81,9 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * @return object
+     */
     public function logout()
     {
         auth()->logout();
@@ -78,11 +91,19 @@ class AuthController extends Controller
         return response()->json(['message' => 'User successfully signed out']);
     }
 
+    /**
+     * @return object
+     */
     public function refresh()
     {
         return $this->createNewToken(auth()->refresh());
     }
 
+    /**
+     * @param string $token
+     *
+     * @return object
+     */
     protected function createNewToken($token)
     {
         return response()->json([
@@ -93,6 +114,11 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return object
+     */
     public function changePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -124,6 +150,11 @@ class AuthController extends Controller
     ], 400);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return object
+     */
     public function updateProfile(Request $request){
         $validator = Validator::make($request->all(), [
             'address' => 'string|nullable',
@@ -151,6 +182,11 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return object
+     */
     public function forgotPassword(Request $request){
         $request->validate(['email' => 'required|email']);
 
@@ -174,6 +210,11 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return object
+     */
     public function resetPassword(Request $request){
         $request->validate([
             'token' => 'required',

@@ -3,8 +3,8 @@
     <SlideBar></SlideBar>
     <div class="add-department">
       <div class="input-container">
-        <h1 v-if="isUpdateDepartment">Add new department</h1>
-        <h1 v-else>Update department</h1>
+        <h1 v-if="!isUpdateDepartment">Add department</h1>
+        <h1 v-else>Edit department</h1>
         <div class="form-floating">
           <input
             v-model="dataDepartment.departmentName"
@@ -14,7 +14,7 @@
               'is-invalid': !dataDepartment.departmentName,
               'is-valid': dataDepartment.departmentName,
             }"
-            placeholder="Name"
+            placeholder="Department name"
             required
           />
         </div>
@@ -57,7 +57,7 @@
               'is-invalid': !checkPhoneNumber,
               'is-valid': checkPhoneNumber,
             }"
-            placeholder="Phone"
+            placeholder="Phone number"
             required
           />
         </div>
@@ -70,7 +70,7 @@
             type="button"
             class="btn btn-primary"
           >
-            Create
+            Add department
           </button>
         </div>
         <div class="btn-submit" v-else>
@@ -79,7 +79,7 @@
             type="button"
             class="btn btn-primary"
           >
-            Update
+            Edit department
           </button>
         </div>
       </div>
@@ -97,12 +97,18 @@ main {
   width: 85vw;
   display: flex;
   justify-content: center;
+  align-items: center;
+  margin-bottom: 100px;
+}
+.add-department h1 {
+  color: black;
 }
 .input-container {
   width: 40%;
 }
 .add-department h1 {
   text-align: center;
+  margin-bottom: 30px;
 }
 .input-group-text {
   width: 25%;
@@ -127,13 +133,16 @@ import { ref, reactive, onMounted, computed } from "vue";
 import { useUserStore } from "../../../stores/user";
 import { useRoute } from "vue-router";
 import router from "../../../router";
+import { useAlertStore } from "../../../stores/alert";
+const alertStore = useAlertStore();
 const user = useUserStore().user;
 const route = useRoute();
 let isUpdateDepartment = false;
 onMounted(() => {
-  isUpdateDepartment =
-    route.path === `/admin/update-department/${route.params.id}`;
-  displayDepartment();
+  if (route.path === `/admin/update-department/${route.params.id}`) {
+    isUpdateDepartment = true;
+    displayDepartment();
+  } else isUpdateDepartment = false;
 });
 const dataDepartment = reactive({
   departmentName: "",
@@ -182,8 +191,11 @@ const createDepartment = async () => {
           router.push({ path: "/admin/list-department" });
         });
     } catch (e) {
+      errorMessage('error',e.response.data.message)
       console.log(e);
     }
+  } else {
+    errorMessage('error','Please field all info')
   }
 };
 const displayDepartment = async () => {
@@ -206,21 +218,42 @@ const displayDepartment = async () => {
   }
 };
 const updateDepartment = async () => {
-  try {
-    await axios.put(
-      `http://127.0.0.1:8000/api/update-department/${route.params.id}`,
-      {
-        departmentName: dataDepartment.departmentName,
-        address: dataDepartment.address,
-        email: dataDepartment.email,
-        phoneNumber: dataDepartment.phoneNumber,
-      },{
-        headers : { Authorization : `Bearer ${user.token}`}
-      }).then(function(response){
-        response.status === 200 ? router.push({ path : '/admin/list-department'}) : console.log(response)
-      }) 
-  } catch (e) {
-    console.log(e);
+  if (
+    dataDepartment.departmentName &&
+    dataDepartment.address &&
+    dataDepartment.email &&
+    dataDepartment.phoneNumber
+  ) {
+    try {
+      await axios
+        .put(
+          `http://127.0.0.1:8000/api/update-department/${route.params.id}`,
+          {
+            departmentName: dataDepartment.departmentName,
+            address: dataDepartment.address,
+            email: dataDepartment.email,
+            phoneNumber: dataDepartment.phoneNumber,
+          },
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        )
+        .then(function (response) {
+          response.status === 200
+            ? router.push({ path: "/admin/list-department" })
+            : console.log(response);
+        });
+    } catch (e) {
+      errorMessage('error',e.message)
+      console.log(e);
+    }
+  } else {
+    errorMessage('error','Please enter all info')
   }
+};
+const errorMessage = (type,msg) => {
+  alertStore.alert = true;
+  alertStore.type = type;
+  alertStore.msg = msg;
 };
 </script>

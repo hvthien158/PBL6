@@ -26,8 +26,8 @@
             Check Out
           </button>
         </div>
-        <router-link style="text-decoration: none" to="/schedule">
-          <button class="active-button" style="margin-top: 20px; height: 40px">Data</button>
+        <router-link to="/schedule">
+          <button class="active-button" style="margin-top: 20px; height: 40px">History</button>
         </router-link>
       </div>
     </div>
@@ -36,7 +36,7 @@
 <style scoped>
 main {
   max-width: 100vw;
-  min-height: 80vh;
+  min-height: 82vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -48,7 +48,9 @@ main {
 }
 .checkin-container {
   min-height: 20px;
-  width: 100%;
+  padding: 30px;
+  min-width: 50%;
+  background-color: #2b2b2b;
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -149,6 +151,7 @@ main {
 }
 
 #time-span {
+  color: white;
   font-size: 100px;
   font-family: 'alarm clock', sans-serif;
 }
@@ -178,7 +181,7 @@ function getCurrentDate() {
     month: "short",
     year: "numeric",
   };
-  return now.toLocaleString("vi-VN", options);
+  return now.toLocaleString("us-EN", options);
 }
 
 function getCurrentTime() {

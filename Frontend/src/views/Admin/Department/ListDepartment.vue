@@ -9,14 +9,14 @@
             <thead style="background-color: #ef9400">
               <tr>
                 <td scope="col">ID</td>
-                <td>Name</td>
+                <td>Name department</td>
                 <td>Address</td>
-                <td>Phone</td>
+                <td>Phone number</td>
                 <td>Email</td>
-                <td>Employees</td>
-                <td>List employees</td>
-                <td>Update</td>
-                <td>Delete</td>
+                <td>Quantity staff</td>
+                <td>View list staff</td>
+                <td>Edit info</td>
+                <td>Delete department</td>
               </tr>
             </thead>
             <tbody>
@@ -27,9 +27,31 @@
                 <td>{{ item.phoneNumber }}</td>
                 <td>{{ item.email }}</td>
                 <td>{{ item.quantityUser }}</td>
-                <td><a>View list</a></td>
-                <td><a @click="router.push({ path : `/admin/update-department/${item.id}`})">Update</a></td>
-                <td><a @click="deleteDepartment(item.id)">Delete</a></td>
+                <td>
+                  <a
+                    @click="
+                      router.push({
+                        path: `/admin/list-user/${item.name}`,
+                      })
+                    "
+                    >View list</a
+                  >
+                </td>
+                <td>
+                  <a
+                    @click="
+                      router.push({
+                        path: `/admin/update-department/${item.id}`,
+                      })
+                    "
+                    >Edit</a
+                  >
+                </td>
+                <td>
+                  <a @click="deleteDepartment(item.id, item.quantityUser)"
+                    >Delete</a
+                  >
+                </td>
               </tr>
             </tbody>
           </table>
@@ -45,19 +67,16 @@ main {
   box-sizing: border-box;
   display: flex;
 }
-.department{
-    width: 85vw;
-    display: flex;
-    justify-content: center;
+.department {
+  width: 85vw;
+  display: flex;
+  justify-content: center;
 }
-.table{
-  background-color: white;
-}
-.table td{
-    border: 1px solid #dee2e6;
+.table td {
+  border: 1px solid #dee2e6;
 }
 .department h1 {
-    text-align: center;
+  text-align: center;
 }
 a:hover{
   cursor: pointer;
@@ -66,15 +85,17 @@ a:hover{
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, onMounted } from "vue";
+import axios from "axios";
 import router from "../../../router";
 import { useUserStore } from "../../../stores/user";
-const user = useUserStore().user
-const department = ref()
+import { useAlertStore } from "../../../stores/alert";
+const user = useUserStore().user;
+const alertStore = useAlertStore();
+const department = ref();
 onMounted(() => {
-    displayDepartment()
-})
+  displayDepartment();
+});
 const displayDepartment = async () => {
   try {
     await axios
@@ -86,16 +107,30 @@ const displayDepartment = async () => {
     console.log(e);
   }
 };
-const deleteDepartment = async(id) => {
-  try {
-    await axios.delete(`http://127.0.0.1:8000/api/delete-department/${id}`,{
-      headers : { Authorization : `Bearer ${user.token}`}
-    })
-    .then(function(response){
-        displayDepartment()
-    })
-  } catch(e) {
-    console.log(e)
+const deleteDepartment = async (id, isHasStaff) => {
+  if (isHasStaff === 0) {
+    try {
+      await axios
+        .delete(`http://127.0.0.1:8000/api/delete-department/${id}`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        })
+        .then(function (response) {
+          console.log(response);
+          if (response.status == 200) {
+            messages("success", response.data.message);
+            displayDepartment();
+          }
+        });
+    } catch (e) {
+      messages("error", e.data.message);
+    }
+  } else {
+    messages("error", "Please move staff to another department");
   }
-}
+};
+const messages = (type, msg) => {
+  alertStore.alert = true;
+  alertStore.type = type;
+  alertStore.msg = msg;
+};
 </script>

@@ -1,13 +1,34 @@
 <template>
-  <HeaderHome></HeaderHome>
-  <router-view style="margin-top: 60px; background-color: #f2f6fc; min-height: calc(100vh - 120px);" :key="$route.fullPath"></router-view>
-  <Footer></Footer>
-  <transition name="slide-fade">
-    <AlertBox v-if="isAlert" :type="typeAlert" :msg="msgAlert"></AlertBox>
-  </transition>
+  <div class="content">
+    <HeaderHome></HeaderHome>
+      <router-view class="main-view" :key="$route.fullPath"></router-view>
+    <Footer></Footer>
+    <transition name="slide-fade">
+      <AlertBox v-if="isAlert" :type="typeAlert" :msg="msgAlert"></AlertBox>
+    </transition>
+  </div>
 </template>
 
 <style>
+* {
+  color: #a9a9a9;
+}
+*.table tbody td {
+  color: black;
+}
+*.table thead td {
+  color: rgb(255, 255, 255);
+}
+
+.main-view {
+  margin-top: 60px;
+  background-color: rgb(255 255 255);
+  min-height: calc(100vh - 120px);
+  display: flex
+}
+input {
+  color: black;
+}
 .slide-fade-enter-active {
   transition: all 0.3s ease-out;
 }
@@ -27,24 +48,27 @@
 import { RouterView } from "vue-router";
 import HeaderHome from "./components/HeaderHome.vue";
 import Footer from "./components/Footer.vue";
-import {useAlertStore} from "./stores/alert";
+import { useAlertStore } from "./stores/alert";
 import AlertBox from "./components/AlertBox.vue";
-import {ref, watch} from "vue";
+import { ref, watch } from "vue";
 
-const isAlert = ref(false)
-const typeAlert = ref('')
-const msgAlert = ref('')
-const alertStore = useAlertStore()
+const isAlert = ref(false);
+const typeAlert = ref("");
+const msgAlert = ref("");
+const alertStore = useAlertStore();
 
-watch(() => alertStore.alert, () => {
-  if(alertStore.alert === true){
-    typeAlert.value = alertStore.type
-    msgAlert.value = alertStore.msg
-    isAlert.value = true
-    setTimeout(() => {
-      alertStore.clear()
-      isAlert.value = false
-    }, 3000)
+watch(
+  () => alertStore.alert,
+  () => {
+    if (alertStore.alert === true) {
+      typeAlert.value = alertStore.type;
+      msgAlert.value = alertStore.msg;
+      isAlert.value = true;
+      setTimeout(() => {
+        alertStore.clear();
+        isAlert.value = false;
+      }, 3000);
+    }
   }
-})
+);
 </script>

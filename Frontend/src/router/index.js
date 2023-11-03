@@ -14,6 +14,8 @@ import EditDepartment from '../views/Admin/Department/EditDepartment.vue'
 import ForgotPassword from "../views/User/ForgotPassword.vue";
 import ResetPassword from "../views/User/ResetPassword.vue";
 import ChangePassword from "../views/User/ChangePassword.vue";
+import ListShift from '../views/Admin/Shift/ListShift.vue';
+import EditShift from '../views/Admin/Shift/EditShift.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -89,6 +91,11 @@ const router = createRouter({
       component: ListDepartment
     },
     {
+      path: '/admin/list-user/:departmentName',
+      name: 'userDepartment',
+      component: ListUser
+    },
+    {
       path: '/admin/add-department/',
       name: 'addDepartment',
       component: EditDepartment
@@ -97,8 +104,22 @@ const router = createRouter({
       path: '/admin/update-department/:id',
       name: 'updateDepartment',
       component: EditDepartment
-    }
-
+    },
+    {
+      path: '/admin/list-shift/',
+      name: 'listShift',
+      component: ListShift
+    },
+    {
+      path: '/admin/add-shift/',
+      name: 'addShift',
+      component: EditShift
+    },
+    {
+      path: '/admin/update-shift/:id',
+      name: 'updateShift',
+      component: EditShift
+    },
   ]
 })
 

@@ -2,28 +2,27 @@
   <div class="container">
     <div class="sidebar">
       <ul class="sidebar-menu">
-        <li @click="selectedOption = (selectedOption === 'user' ? null : 'user') " :class="{ active: selectedOption === 'user' }">User</li>
+        <li @click="selectedOption = (selectedOption == 'user' ? null : 'user') " :class="{ active: selectedOption === 'user' }">Manager user</li>
         <div v-if="selectedOption === 'user'" class="sub-menu">
           <button @click="router.push({ path : '/admin/list-user'})">List user</button>
-          <button @click="router.push({ path : '/admin/create-user'})">Create new account</button>
+          <button @click="router.push({ path : '/admin/create-user'})">Add user</button>
         </div>
-        <li @click="selectedOption = (selectedOption === 'organization' ?  null : 'organization') " :class="{ active: selectedOption === 'organization' }">Department</li>
+        <li @click="selectedOption = (selectedOption == 'organization' ?  null : 'organization') " :class="{ active: selectedOption === 'organization' }">Manager department</li>
         <div v-if="selectedOption === 'organization'" class="sub-menu">
           <button @click="router.push({ path : '/admin/list-department'})">List department</button>
-          <button @click="router.push({ path : '/admin/add-department'})">Create new department</button>
+          <button @click="router.push({ path : '/admin/add-department'})">Add department</button>
         </div>
-<!--        <li @click="selectedOption = (selectedOption === 'attendance' ? null: 'attendance')" :class="{ active: selectedOption === 'attendance' }">Quản lý chấm công</li>-->
-<!--        <div v-if="selectedOption === 'attendance'" class="sub-menu">-->
-<!--          <button>Thêm chấm công</button>-->
-<!--          <button>Sửa chấm công</button>-->
-<!--          <button>Xóa chấm công</button>-->
-<!--        </div>-->
-<!--        <li @click="selectedOption =(selectedOption === 'shift' ? null : 'shift') " :class="{ active: selectedOption === 'shift' }">Quản lý ca làm</li>-->
-<!--        <div v-if="selectedOption === 'shift'" class="sub-menu">-->
-<!--          <button>Thêm ca làm</button>-->
-<!--          <button>Sửa ca làm</button>-->
-<!--          <button>Xóa ca làm</button>-->
-<!--        </div>-->
+        <li @click="selectedOption = (selectedOption == 'attendance' ? null: 'attendance')" :class="{ active: selectedOption === 'attendance' }">Manager timekeeping</li>
+        <div v-if="selectedOption === 'attendance'" class="sub-menu">
+          <button>Add timekeeping</button>
+          <button>Edit timekeeping</button>
+          <button>Delete timekeeping</button>
+        </div>
+        <li @click="selectedOption =(selectedOption == 'shift' ? null : 'shift') " :class="{ active: selectedOption === 'shift' }">Manager shift</li>
+        <div v-if="selectedOption === 'shift'" class="sub-menu">
+          <button @click="router.push({ path : '/admin/list-shift'})">List shift</button>
+          <button @click="router.push({ path : '/admin/add-shift'})">Add shift</button>
+        </div>
       </ul>
     </div>
   </div>

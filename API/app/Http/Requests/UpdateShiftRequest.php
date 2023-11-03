@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\TimeRule;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Rules\NameDepartmentUpdateRule;
-class UpdateDepartmentRequest extends FormRequest
+
+class UpdateShiftRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +23,10 @@ class UpdateDepartmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'departmentName' => ['required', 'string', new NameDepartmentUpdateRule],
-            'address'=> 'required|string',
-            'email' =>'required|email',
-            'phoneNumber' => 'required|string'
+            'name' => 'required|string',
+            'amount' => 'required',
+            'timeValidCheckIn' => ['required', new TimeRule()],
+            'timeValidCheckOut' => ['required',new TimeRule()]
         ];
     }
 }

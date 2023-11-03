@@ -58,6 +58,10 @@ main {
   justify-content: center;
   align-items: center;
 }
+.form-container h3 {
+  color: #e06230;
+  margin-bottom: 20px
+}
 .additional-content {
   text-align: center;
   margin-top: 20px;
@@ -104,7 +108,7 @@ main {
 
 .form-input input:focus {
   outline: none;
-  border-color: #62d58c;
+  background-image: radial-gradient(100% 100% at 100% 0, #e7ba76 0, #c27354 100%);
 }
 
 .btn-submit {
@@ -117,7 +121,7 @@ main {
   width: 100%;
   height: 40px;
   border-radius: 5px;
-  background-color: #62d58c;
+  background-image: radial-gradient(100% 100% at 100% 0, #d3a053 0, #d06237 100%);
   color: #ffffff;
   font-weight: bold;
   cursor: pointer;
@@ -126,7 +130,8 @@ main {
 }
 
 .btn-submit button:hover {
-  background-color: #3ca66e;
+
+  background-image: radial-gradient(100% 100% at 100% 0, #f9ac38 0, #f05112 100%);
 }
 
 h5 {
@@ -134,8 +139,14 @@ h5 {
   color: rgb(214, 34, 34);
   font-size: 14px;
 }
+#forgot{
+  margin-top: 10px;
+  color: coral;
+  font-weight: 500;
+}
 #forgot:hover{
-  color: blue;
+  font-weight: 800;
+  color: rgb(255, 123, 0);
   cursor: pointer;
 }
 </style>
@@ -210,9 +221,11 @@ const login = async () => {
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'
-              alertStore.msg = 'Logged in'
-
-              router.push({ name: 'home' });
+              alertStore.msg = 'Login success'
+              if(user.role === 'admin')
+              router.push({ path: "/admin" })
+              else
+              router.push({ path: "/" });
             }
           });
     } catch (e) {
