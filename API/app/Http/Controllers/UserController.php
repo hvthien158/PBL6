@@ -8,9 +8,17 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct(){
         $this->middleware(['auth:api', 'checkrole']);
     }
+    /**
+     * @param null|int $id
+     * 
+     * @return object
+     */
     public function user($id = null){
         if($id){
             $user = User::where('id',$id)->get();

@@ -17,8 +17,10 @@ class Shift extends Model
         'time_valid_check_in',
         'time_valid_check_out'
     ];
+    public $timestamps = false;
     public function timeKeeping(): HasMany
     {
         return $this->hasMany(TimeKeeping::class);
     }
+    
 }

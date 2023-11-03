@@ -28,4 +28,13 @@ class CreateDepartmentRequest extends FormRequest
             'phoneNumber' => 'required|string|unique:departments,phone_number'
         ];
     }
+    /**
+     * @return array
+     */
+    public function messages(): array 
+    {
+        return [
+            'departmentName.unique' => 'Tên đã tồn tại'
+        ];
+    }
 }
