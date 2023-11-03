@@ -10,6 +10,10 @@ export const useUserStore = defineStore('user', () => {
             name: '',
             email: '',
             password: '',
+            address: '',
+            DOB: '',
+            phone_number: '',
+            avatar: '',
             expired: '',
             role: ''
         })
@@ -21,6 +25,10 @@ export const useUserStore = defineStore('user', () => {
         user.value.name = ''
         user.value.email = ''
         user.value.password = ''
+        user.value.address = ''
+        user.value.DOB = ''
+        user.value.avatar = ''
+        user.value.phone_number = ''
         user.value.expired = ''
         user.value.role = ''
     }

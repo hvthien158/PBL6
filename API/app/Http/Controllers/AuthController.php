@@ -20,9 +20,9 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword', 'checkEmail']]);
     }
-    
+
     public function login(LoginRequest $request)
     {
         $info = array_merge(['email' => $request->email], ['password' => $request->password]);
@@ -163,11 +163,22 @@ class AuthController extends Controller
             : response()->json(['error' => $status], 400);
     }
 
+    public function checkEmail(Request $request){
+        $request->validate(['email' => 'required|email']);
+
+        $email = DB::table('users')->where('email', '=', $request->input('email'))->first();
+        if($email){
+            return response()->json([], 200);
+        } else {
+            return response()->json([], 404);
+        }
+    }
+
     public function resetPassword(Request $request){
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'email' => 'email|required',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $status = Password::reset(

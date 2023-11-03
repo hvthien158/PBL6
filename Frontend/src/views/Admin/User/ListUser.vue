@@ -2,25 +2,24 @@
   <main>
     <SlideBar></SlideBar>
     <div class="user">
-      <h1>Quản lý user</h1>
+      <h1>List user</h1>
       <div class="table-responsive-md">
       <table class="table">
-        <thead class="table-dark">
+        <thead style="background-color: #ef9400">
             <tr>
                 <td scope="col">ID</td>
-                <td>Tên</td>
+                <td>Name</td>
                 <td>Email</td>
-                <td>Địa Chỉ</td>
-                <td>Ngày sinh</td>
-                <td>Số điện thoại</td>
-                <td>Avatar</td>
-                <td>Lương</td>
-                <td>Vị trí</td>
+                <td>Address</td>
+                <td>Birthday</td>
+                <td>Phone number</td>
+                <td>Salary</td>
+                <td>Position</td>
                 <td>Role</td>
-                <td>Tên cơ quan</td>
-                <td>Lịch sử chấm công</td>
-                <td>Sửa Thông Tin</td>
-                <td>Xóa User</td>
+                <td>Department</td>
+                <td>Working date</td>
+                <td>Profile</td>
+                <td>Delete</td>
             </tr>
         </thead>
         <tbody>
@@ -31,14 +30,13 @@
                 <td>{{ item.address }}</td>
                 <td>{{ item.DOB }}</td>
                 <td>{{ item.phoneNumber }}</td>
-                <td>{{ item.avatar }}</td>
                 <td>{{ item.salary }}</td>
                 <td>{{ item.position }}</td>
-                <td>{{ item.role }}</td>
+                <td>{{ item.role === 'admin' ? 'admin' : 'user'}}</td>
                 <td>{{ item.department.name }}</td>
-                <td><a @click = "router.push({ path: `/admin/list-timekeeping/${item.id}` })">Xem</a></td>
-                <td><a @click = "router.push({ path: `/admin/update-user/${item.id}` })">Sửa</a></td>
-                <td><a @click = "deleteUser(item.id)" v-if="item.id != user.id">Xóa</a></td>
+                <td><a @click = "router.push({ path: `/admin/list-timekeeping/${item.id}` })">Check</a></td>
+                <td><a @click = "router.push({ path: `/admin/update-user/${item.id}` })">Update</a></td>
+                <td><a @click = "deleteUser(item.id)" v-if="item.id !== user.id">Delete</a></td>
             </tr>
         </tbody>
       </table>
@@ -53,16 +51,24 @@ main {
   border-top: 0.1em solid black;
   box-sizing: border-box;
   display: flex;
+  font-size: small;
 }
 .user {
-  width: 85vw;
   display: block;
 }
 .user h1 {
   text-align: center;
 }
+.table{
+  background-color: white;
+  margin-left: 32px;
+}
 .table td{
     border: 1px solid #dee2e6;
+}
+a:hover{
+  cursor: pointer;
+  color: #f3952d !important;
 }
 </style>
 <script setup>
@@ -99,6 +105,6 @@ const deleteUser = async(id) => {
   } catch(e){
     console.log(e)
   }
-  displayUser()
+  await displayUser()
 }
 </script>

@@ -26,8 +26,8 @@
             Check Out
           </button>
         </div>
-        <router-link to="/schedule">
-          <button class="active-button" style="margin-top: 20px; height: 40px">Lịch sử</button>
+        <router-link style="text-decoration: none" to="/schedule">
+          <button class="active-button" style="margin-top: 20px; height: 40px">Data</button>
         </router-link>
       </div>
     </div>
@@ -49,7 +49,6 @@ main {
 .checkin-container {
   min-height: 20px;
   width: 100%;
-  background-color: #2b2b2b;
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -123,7 +122,7 @@ main {
   margin: 10px;
   align-items: center;
   appearance: none;
-  background-image: radial-gradient(100% 100% at 100% 0, #FCFCFD 0, #9ca3af 100%);;
+  background-image: radial-gradient(100% 100% at 100% 0, #FCFCFD 0, #9ca3af 100%);
   border-radius: 4px;
   border-width: 0;
   box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
@@ -150,7 +149,6 @@ main {
 }
 
 #time-span {
-  color: white;
   font-size: 100px;
   font-family: 'alarm clock', sans-serif;
 }

@@ -11,7 +11,7 @@
                 v-model="dataSearch.startTime"
               />
             </div>
-            Đến
+            To
             <div class="col-sm-2 my-1">
               <input
                 type="date"
@@ -45,7 +45,7 @@
                 class="btn btn-primary"
                 @click="findTimeKeeping"
               >
-                Tìm kiếm
+                Search
               </button>
             </div>
             <div class="col-auto my-1">
@@ -54,7 +54,7 @@
                 class="btn btn-primary"
                 @click="getListTimeKeeping"
               >
-                Xem tất cả
+                View all
               </button>
             </div>
             <div class="col-auto my-1">
@@ -63,26 +63,25 @@
                 class="btn btn-primary"
                 @click="exportExcel"
               >
-                Xuất Excel
+                Export Excel
               </button>
             </div>
             <div class="col-auto my-1">
               <button type="button" class="btn btn-primary" @click="exportCSV">
-                Xuất CSV
+                Export CSV
               </button>
             </div>
           </div>
         </form>
         <div class="table-responsive-md">
           <table class="table">
-            <thead class="thead-dark">
+            <thead style="background-color: #ef9400">
               <tr>
-                <th scope="col">Ngày</th>
-                <th scope="col">Giờ Check-In</th>
-                <th scope="col">Giờ Check-Out</th>
-                <th scope="col">Ca Làm</th>
-                <th scope="col">Số công</th>
-                <th scope="col">Yêu cầu</th>
+                <th scope="col">Date</th>
+                <th scope="col">Check-In</th>
+                <th scope="col">Check-Out</th>
+                <th scope="col">Shift</th>
+                <th scope="col">Request</th>
               </tr>
             </thead>
             <tbody v-for="item in data" :key="item.id">
@@ -91,9 +90,8 @@
                 <td>{{ item.timeCheckIn }}</td>
                 <td>{{ item.timeCheckOut }}</td>
                 <td>{{ item.shift.name }}</td>
-                <td>{{ item.shift.amount }}</td>
                 <th scope="col">
-                  <button type="button" class="btn btn-primary">Gửi</button>
+                  <button type="button" class="btn btn-primary">Send</button>
                 </th>
               </tr>
             </tbody>
@@ -111,7 +109,6 @@ main {
   min-height: 80vh;
   display: flex;
   justify-content: center;
-  border: 0.1em solid black;
   padding-top: 12px;
 }
 .container {
@@ -121,6 +118,7 @@ main {
   max-width: 100%;
 }
 table {
+  background-color: white;
   width: 80vw;
   border: 0.1em solid black;
 }
@@ -148,25 +146,25 @@ let dataSearch = reactive({
 });
 let data = ref();
 const month = [
-  { value: null, text: "Tìm theo tháng" },
-  { value: 1, text: "Tháng 1" },
-  { value: 2, text: "Tháng 2" },
-  { value: 3, text: "Tháng 3" },
-  { value: 4, text: "Tháng 4" },
-  { value: 5, text: "Tháng 5" },
-  { value: 6, text: "Tháng 6" },
-  { value: 7, text: "Tháng 7" },
-  { value: 8, text: "Tháng 8" },
-  { value: 9, text: "Tháng 9" },
-  { value: 10, text: "Tháng 10" },
-  { value: 11, text: "Tháng 11" },
-  { value: 12, text: "Tháng 12" },
+  { value: null, text: "Search by month" },
+  { value: 1, text: "January" },
+  { value: 2, text: "February" },
+  { value: 3, text: "March" },
+  { value: 4, text: "April" },
+  { value: 5, text: "May" },
+  { value: 6, text: "June" },
+  { value: 7, text: "July" },
+  { value: 8, text: "August" },
+  { value: 9, text: "September" },
+  { value: 10, text: "October" },
+  { value: 11, text: "November" },
+  { value: 12, text: "December" },
 ];
 const currentYear = new Date().getFullYear();
-const years = [];
+const years = [{ value: null, text: "Search by year" }];
 
 for (let year = currentYear; year >= 2020; year--) {
-  years.push({ value: year, text: "Năm " + year });
+  years.push({ value: year, text: year });
 }
 
 onMounted(() => {
@@ -235,7 +233,7 @@ const findTimeKeeping = async () => {
       console.log(e);
     }
   } else {
-    alert("Vui lòng điền thông tin trước khi search");
+    alert("Please enter missing fields");
   }
 };
 const exportExcel = () => {

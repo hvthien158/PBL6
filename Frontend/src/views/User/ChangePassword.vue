@@ -2,11 +2,11 @@
   <main>
     <div class="container">
       <div class="form-container">
-        <h3>Đổi mật khẩu</h3>
+        <h3>ChangePassword</h3>
         <div class="form-input">
           <div class="form-info">
             <div class="label-info">
-              <label>Mật khẩu cũ</label>
+              <label>Current password</label>
             </div>
             <div class="input-info">
               <input v-model="info.old_password" type="password" />
@@ -15,7 +15,7 @@
           </div>
           <div class="form-info">
             <div class="label-info">
-              <label>Mật khẩu mới</label>
+              <label>New password</label>
             </div>
             <div class="input-info">
               <input v-model="info.new_password" type="password" />
@@ -24,7 +24,7 @@
           </div>
           <div class="form-info">
             <div class="label-info">
-              <label>Nhập lại mật khẩu</label>
+              <label>Confirm</label>
             </div>
             <div class="input-info">
               <input v-model="info.new_password_confirm" type="password" />
@@ -32,11 +32,11 @@
             </div>
           </div>
           <div class="btn-submit">
-            <button type="submit" @click="login">Đổi mật khẩu</button>
+            <button type="submit" @click="login">Change</button>
           </div>
         </div>
         <div v-if="fail_change">
-          <span style="color: red">Sai mật khẩu</span>
+          <span style="color: red">Wrong password</span>
         </div>
       </div>
     </div>
@@ -76,9 +76,8 @@ main {
 .form-input {
   display: block;
   padding: 20px;
-  background-color: #313335;
   border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 400px;
 }
 
@@ -162,7 +161,7 @@ let info = reactive({
 
 const checkOldPassword = computed(() => {
   if (info.old_password.length === 0) {
-    return "Vui lòng nhập mật khẩu cũ";
+    return "Please enter your current password";
   } else {
     return "";
   }
@@ -170,7 +169,7 @@ const checkOldPassword = computed(() => {
 
 const checkNewPassword = computed(() => {
   if (info.new_password.length === 0) {
-    return "Vui lòng nhập mật khẩu mới";
+    return "Please enter new password";
   } else {
     return "";
   }
@@ -178,9 +177,9 @@ const checkNewPassword = computed(() => {
 
 const checkNewPasswordConfirm = computed(() => {
   if (info.new_password_confirm.length === 0) {
-    return "Vui lòng nhập mật khẩu xác nhận";
+    return "Please enter confirmation password";
   } else if(info.new_password_confirm !== info.new_password){
-    return "Mật khẩu xác nhận không trùng khớp"
+    return "Confirm password is not matched"
   } else {
     return "";
   }
@@ -203,7 +202,7 @@ const login = async () => {
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'
-              alertStore.msg = 'Đổi mật khẩu thành công'
+              alertStore.msg = 'Success: Change pass'
 
               useUserStore().logout()
               router.push({ name: 'login' });

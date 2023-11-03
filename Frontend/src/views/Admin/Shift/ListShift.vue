@@ -38,7 +38,7 @@
                   <td>{{ item.department.name }}</td>
                   <td><a @click = "router.push({ path: `/admin/list-timekeeping/${item.id}` })">Xem</a></td>
                   <td><a @click = "router.push({ path: `/admin/update-user/${item.id}` })">Sửa</a></td>
-                  <td><a @click = "deleteUser(item.id)" v-if="item.id != user.id">Xóa</a></td>
+                  <td><a @click = "deleteUser(item.id)" v-if="item.id !== user.id">Xóa</a></td>
               </tr>
           </tbody>
         </table>

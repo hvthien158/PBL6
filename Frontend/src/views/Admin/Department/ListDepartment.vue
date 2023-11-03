@@ -3,20 +3,20 @@
     <SlideBar></SlideBar>
     <div class="department">
       <div class="list-department">
-        <h1>Danh sách cơ quan làm việc</h1>
+        <h1>List department</h1>
         <div class="table-responsive-md">
           <table class="table">
-            <thead class="table-dark">
+            <thead style="background-color: #ef9400">
               <tr>
                 <td scope="col">ID</td>
-                <td>Tên cơ quan</td>
-                <td>Địa chỉ</td>
-                <td>Số điện thoại</td>
+                <td>Name</td>
+                <td>Address</td>
+                <td>Phone</td>
                 <td>Email</td>
-                <td>Tổng số nhân viên</td>
-                <td>Quản lý nhân viên trong cơ quan</td>
-                <td>Chỉnh sửa thông tin</td>
-                <td>Xóa cơ quan</td>
+                <td>Employees</td>
+                <td>List employees</td>
+                <td>Update</td>
+                <td>Delete</td>
               </tr>
             </thead>
             <tbody>
@@ -27,9 +27,9 @@
                 <td>{{ item.phoneNumber }}</td>
                 <td>{{ item.email }}</td>
                 <td>{{ item.quantityUser }}</td>
-                <td><a>Xem danh sách</a></td>
-                <td><a @click="router.push({ path : `/admin/update-department/${item.id}`})">Chỉnh sửa</a></td>
-                <td><a @click="deleteDepartment(item.id)">Xóa</a></td>
+                <td><a>View list</a></td>
+                <td><a @click="router.push({ path : `/admin/update-department/${item.id}`})">Update</a></td>
+                <td><a @click="deleteDepartment(item.id)">Delete</a></td>
               </tr>
             </tbody>
           </table>
@@ -50,14 +50,18 @@ main {
     display: flex;
     justify-content: center;
 }
+.table{
+  background-color: white;
+}
 .table td{
     border: 1px solid #dee2e6;
 }
 .department h1 {
     text-align: center;
 }
-.table td a {
+a:hover{
   cursor: pointer;
+  color: #f3952d !important;
 }
 </style>
 <script setup>

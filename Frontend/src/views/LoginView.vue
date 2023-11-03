@@ -2,10 +2,10 @@
   <main>
     <div class="container">
       <div v-if="verifyQuest">
-        <p style="font-weight: bold">Thư xác nhận đã được gửi đến email của bạn, vui lòng xác nhận để tiếp tục...</p>
+        <p style="font-weight: bold">A confirmation email has been sent to your email, please confirm to continue...</p>
       </div>
       <div class="form-container" v-else>
-        <h3>Đăng nhập</h3>
+        <h3>LOGIN</h3>
         <div class="form-input">
           <div class="form-info">
             <div class="label-info">
@@ -18,7 +18,7 @@
           </div>
           <div class="form-info">
             <div class="label-info">
-              <label>Mật khẩu</label>
+              <label>Password</label>
             </div>
             <div class="input-info">
               <input @keyup.enter="login" ref="passwordInput" v-model="info.password" type="password" />
@@ -26,14 +26,14 @@
             </div>
           </div>
           <div class="btn-submit">
-            <button type="submit" @click="login">Đăng nhập</button>
+            <button type="submit" @click="login">Login</button>
           </div>
         </div>
         <div v-if="fail_login">
-          <span style="color: red">Sai tài khoản hoặc mật khẩu</span>
+          <span style="color: red">Wrong email or password</span>
         </div>
-        <div>
-          <span id="forgot" @click="goToForgot">Quên mật khẩu?</span>
+        <div style="margin-top: 12px">
+          <span id="forgot" @click="goToForgot">Forgot password?</span>
         </div>
       </div>
     </div>
@@ -73,9 +73,9 @@ main {
 .form-input {
   display: block;
   padding: 20px;
-  background-color: #313335;
+  background-color: white;
   border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 400px;
 }
 
@@ -162,15 +162,17 @@ let info = reactive({
   password: "",
 });
 const checkEmail = computed(() => {
-  if (!isEmail(info.email)) {
-    return "Email không đúng định dạng";
+  if(info.email === ''){
+    return "Please enter your email"
+  } else if (!isEmail(info.email)) {
+    return "Invalid email";
   } else {
     return "";
   }
 });
 const checkPassword = computed(() => {
   if (info.password.length === 0) {
-    return "Vui lòng nhập mật khẩu";
+    return "Please enter your password";
   } else {
     return "";
   }
@@ -183,7 +185,6 @@ const isEmail = (email) => {
 const login = async () => {
   if (checkEmail.value === '' && checkPassword.value === '') {
     try {
-    console.log(1)
       await axios
           .post('http://127.0.0.1:8000/api/login', {
             email: info.email,
@@ -199,15 +200,19 @@ const login = async () => {
               user.name = response.data.user.name
               user.email = response.data.user.email
               user.password = response.data.user.password
+              user.address = response.data.user.address
+              user.DOB = response.data.user.DOB
+              user.phone_number = response.data.user.phone_number
+              user.avatar = response.data.user.avatar
               user.expired = response.data.expires_at
               user.role = response.data.user.role
-              
-              
+
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'
-              alertStore.msg = 'Đăng nhập thành công'
-              (user.role === 'admin') ? router.push({ path: "/admin" }):  router.push({ path: "/" });
+              alertStore.msg = 'Logged in'
+
+              router.push({ name: 'home' });
             }
           });
     } catch (e) {

@@ -1,6 +1,6 @@
 <template>
   <HeaderHome></HeaderHome>
-  <router-view style="margin-top: 9vh; background-color: #2b2b2b; min-height: 82vh" :key="$route.fullPath"></router-view>
+  <router-view style="margin-top: 60px; background-color: #f2f6fc; min-height: calc(100vh - 120px);" :key="$route.fullPath"></router-view>
   <Footer></Footer>
   <transition name="slide-fade">
     <AlertBox v-if="isAlert" :type="typeAlert" :msg="msgAlert"></AlertBox>
@@ -8,12 +8,6 @@
 </template>
 
 <style>
-* {
-  color: #a9a9a9;
-}
-input{
-  color: black;
-}
 .slide-fade-enter-active {
   transition: all 0.3s ease-out;
 }
@@ -32,17 +26,10 @@ input{
 <script setup>
 import { RouterView } from "vue-router";
 import HeaderHome from "./components/HeaderHome.vue";
-import router from "./router";
 import Footer from "./components/Footer.vue";
 import {useAlertStore} from "./stores/alert";
 import AlertBox from "./components/AlertBox.vue";
 import {ref, watch} from "vue";
-
-
-const user = useUserStore().user
-if(user.expired == ''){
-  router.push({ path: "/login" });
-}
 
 const isAlert = ref(false)
 const typeAlert = ref('')

@@ -2,10 +2,10 @@
   <main>
     <div class="container">
       <div v-if="verifyQuest">
-        <p style="font-weight: bold">Thư xác nhận đã được gửi đến email của bạn, vui lòng xác nhận để tiếp tục...</p>
+        <p style="font-weight: bold">A confirmation email has been sent to your email, please confirm to continue...</p>
       </div>
       <div class="form-container" v-else>
-        <h3>Quên mật khẩu</h3>
+        <h3>FORGOT PASSWORD</h3>
         <div class="form-input">
           <div class="form-info">
             <div class="label-info">
@@ -17,7 +17,7 @@
             </div>
           </div>
           <div class="btn-submit">
-            <button type="submit" @click="forgot">Gửi</button>
+            <button type="submit" @click="forgot">Send</button>
           </div>
         </div>
       </div>
@@ -59,7 +59,6 @@ main {
 .form-input {
   display: block;
   padding: 20px;
-  background-color: #313335;
   border-radius: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   width: 400px;
@@ -130,7 +129,7 @@ import {ref} from "vue";
 import {useUserStore} from "../../stores/user";
 
 const verifyQuest = ref(false)
-
+const email_not_signed = ref(false)
 const user = useUserStore().user
 
 if(user.token !== ''){
@@ -141,9 +140,9 @@ const email = ref('')
 
 const checkEmail = computed(() => {
   if(email.value === ''){
-    return "Vui lòng nhập email"
+    return "Please enter your email"
   } else if (!isEmail(email.value)) {
-    return "Email không đúng định dạng";
+    return "Invalid email";
   } else {
     return "";
   }
@@ -156,17 +155,22 @@ const isEmail = (email) => {
 };
 const forgot = async () => {
   if (email.value !== '') {
-    try {
-      await axios
-          .post('http://127.0.0.1:8000/api/forgot-password', {
-            email: email.value,
-          })
-          .then(function () {
-            verifyQuest.value = true
-          });
-    } catch (e) {
-      console.log(e);
-    }
+      await axios.post('http://127.0.0.1:8000/api/check-email', {
+        email: email.value
+      }).then(() => {
+        verifyQuest.value = true
+        axios.post('http://127.0.0.1:8000/api/forgot-password', {
+              email: email.value,
+            })
+            .then(function () {
+              localStorage.setItem('email_forgot', email.value)
+            })
+            .catch((e)=> {
+              console.log(e)
+            })
+      }).catch(() => {
+        email_not_signed.value = true
+      })
   }
 };
 

@@ -3,8 +3,8 @@
     <SlideBar></SlideBar>
     <div class="add-department">
       <div class="input-container">
-        <h1 v-if="isUpdateDepartment">Thêm cơ quan</h1>
-        <h1 v-else>Chỉnh sửa cơ quan</h1>
+        <h1 v-if="isUpdateDepartment">Add new department</h1>
+        <h1 v-else>Update department</h1>
         <div class="form-floating">
           <input
             v-model="dataDepartment.departmentName"
@@ -14,19 +14,19 @@
               'is-invalid': !dataDepartment.departmentName,
               'is-valid': dataDepartment.departmentName,
             }"
-            placeholder="Tên cơ quan"
+            placeholder="Name"
             required
           />
         </div>
         <div class="invalid-feedback" v-if="!dataDepartment.departmentName">
-          Điền tên cơ quan hợp lệ
+          Please enter department's name
         </div>
         <div class="form-floating">
           <input
             v-model="dataDepartment.address"
             type="text"
             class="form-control"
-            placeholder="Địa chỉ"
+            placeholder="Address"
             :class="{
               'is-invalid': !dataDepartment.address,
               'is-valid': dataDepartment.address,
@@ -35,7 +35,7 @@
           />
         </div>
         <div class="invalid-feedback" v-if="!dataDepartment.address">
-          Điền địa chỉ hợp lệ
+          Please enter department's address
         </div>
         <div class="form-floating">
           <input
@@ -47,22 +47,22 @@
             required
           />
         </div>
-        <div class="invalid-feedback" v-if="!checkEmail">Điền email hợp lệ</div>
+        <div class="invalid-feedback" v-if="!checkEmail">Please enter department's email</div>
         <div class="form-floating">
           <input
             v-model="dataDepartment.phoneNumber"
             type="text"
             class="form-control"
             :class="{
-              'is-valid': !checkPhoneNumber,
+              'is-invalid': !checkPhoneNumber,
               'is-valid': checkPhoneNumber,
             }"
-            placeholder="Số điện thoại"
+            placeholder="Phone"
             required
           />
         </div>
         <div class="invalid-feedback" v-if="!checkPhoneNumber">
-          Điền số điện thoại hợp lệ
+          Please enter department's phone
         </div>
         <div class="btn-submit" v-if="!isUpdateDepartment">
           <button
@@ -70,7 +70,7 @@
             type="button"
             class="btn btn-primary"
           >
-            Thêm Cơ Quan Mới
+            Create
           </button>
         </div>
         <div class="btn-submit" v-else>
@@ -79,7 +79,7 @@
             type="button"
             class="btn btn-primary"
           >
-            Chỉnh sửa
+            Update
           </button>
         </div>
       </div>
@@ -132,7 +132,7 @@ const route = useRoute();
 let isUpdateDepartment = false;
 onMounted(() => {
   isUpdateDepartment =
-    route.path == `/admin/update-department/${route.params.id}` ? true : false;
+    route.path === `/admin/update-department/${route.params.id}`;
   displayDepartment();
 });
 const dataDepartment = reactive({
@@ -142,7 +142,7 @@ const dataDepartment = reactive({
   phoneNumber: "",
 });
 const checkEmail = computed(() => {
-  return !isEmail(dataDepartment.email) ? false : true;
+  return isEmail(dataDepartment.email);
 });
 const isEmail = (email) => {
   let filter =
@@ -150,7 +150,7 @@ const isEmail = (email) => {
   return filter.test(email);
 };
 const checkPhoneNumber = computed(() => {
-  return !isPhoneNumber(dataDepartment.phoneNumber) ? false : true;
+  return isPhoneNumber(dataDepartment.phoneNumber);
 });
 const isPhoneNumber = (phoneNumber) => {
   let filter = /^([0-9]{10})+$/;
@@ -217,7 +217,7 @@ const updateDepartment = async () => {
       },{
         headers : { Authorization : `Bearer ${user.token}`}
       }).then(function(response){
-        response.status == 200 ? router.push({ path : '/admin/list-department'}) : console.log(response)
+        response.status === 200 ? router.push({ path : '/admin/list-department'}) : console.log(response)
       }) 
   } catch (e) {
     console.log(e);

@@ -3,8 +3,8 @@
     <SlideBar></SlideBar>
     <div class="add-user">
       <div class="input-container">
-        <h1 v-if="!isUpdateUser">Thêm người dùng</h1>
-        <h1 v-else>Chỉnh sửa người dùng</h1>
+        <h1 v-if="!isUpdateUser">Add new account</h1>
+        <h1 v-else>Update user</h1>
         <div class="form-floating">
           <input
             v-model="dataPost.email"
@@ -16,7 +16,7 @@
           />
         </div>
         <div class="invalid-feedback" v-if="!checkEmail">
-          Please field valid Email
+          Please enter valid email
         </div>
         <div class="form-floating is-invalid">
           <input
@@ -29,7 +29,7 @@
           />
         </div>
         <div class="invalid-feedback" v-if="!checkName">
-          Please field valid name
+          Please enter valid name
         </div>
         <div class="form-floating" v-if="!isUpdateUser">
           <input
@@ -42,50 +42,7 @@
           />
         </div>
         <div class="invalid-feedback" v-if="!checkPassword && !isUpdateUser" >
-          Please field password > 6
-        </div>
-        <div class="form-floating" v-if="!isUpdateUser">
-          <input
-            
-            v-model="dataPost.confirmPassword"
-            type="password"
-            class="form-control"
-            :class="{ 'is-invalid': !checkConfirmPassword }"
-            placeholder="Confirmation Password"
-            required
-          />
-        </div>
-        <div class="invalid-feedback" v-if="!checkConfirmPassword && !isUpdateUser">
-          Confirm Password not match
-        </div>
-        <div class="form-floating is-invalid">
-          <input
-            type="text"
-            v-model="dataPost.address"
-            class="form-control"
-            placeholder="Address"
-            required
-          />
-        </div>
-        <div class="form-floating">
-          <input
-            type="date"
-            class="form-control"
-            v-model="dataPost.DOB"
-          />
-        </div>
-        <div class="form-floating">
-          <input
-            v-model="dataPost.phoneNumber"
-            type="text"
-            class="form-control"
-            placeholder="Phone Number"
-            :class="{ 'is-invalid': !checkPhoneNumber }"
-            required
-          />
-        </div>
-        <div class="invalid-feedback" v-if="!checkPhoneNumber">
-          Please field valid phone number
+          Please enter password > 6
         </div>
         <div class="form-floating">
           <input
@@ -128,10 +85,10 @@
         </div>
         <div class="btn-submit">
           <button v-if="!isUpdateUser" type="button" class="btn btn-primary" @click="createUser">
-            Tạo Người dùng
+            Create
           </button>
           <button v-else type="button" class="btn btn-primary" @click="updateUser">
-            Chỉnh sửa
+            Update
           </button>
         </div>
       </div>
@@ -149,6 +106,7 @@ main {
   width: 85vw;
   display: flex;
   justify-content: center;
+  padding-bottom: 32px;
 }
 .input-container {
   width: 40%;
@@ -227,7 +185,7 @@ const position = [
 ];
 onMounted(() => {
   displayDepartment();
-  isUpdateUser = (route.path ==`/admin/update-user/${route.params.id}`) ? true : false
+  isUpdateUser = (route.path === `/admin/update-user/${route.params.id}`)
   if(isUpdateUser) {
     displayUser()
   }
@@ -261,21 +219,19 @@ const displayDepartment = async () => {
 };
 
 const checkName = computed(() => {
-  return dataPost.name.length == 0 ? false : true;
+  return dataPost.name.length !== 0;
 });
 const checkEmail = computed(() => {
-  return !isEmail(dataPost.email) ? false : true;
+  return isEmail(dataPost.email);
 });
 const checkPassword = computed(() => {
-  return dataPost.password.length <= 6 ? false : true;
+  return dataPost.password.length > 6;
 });
 const checkConfirmPassword = computed(() => {
-  return dataPost.password === dataPost.confirmPassword ? true : false;
+  return dataPost.password === dataPost.confirmPassword;
 });
 const checkPhoneNumber = computed(() => {
-  return isPhoneNumber(dataPost.phoneNumber) || dataPost.phoneNumber.length == 0
-    ? true
-    : false;
+  return isPhoneNumber(dataPost.phoneNumber) || dataPost.phoneNumber.length === 0;
 });
 const isEmail = (email) => {
   let filter =
@@ -301,18 +257,14 @@ const createUser = async () => {
         name : dataPost.name,
         email: dataPost.email,
         password: dataPost.password,
-        password_confirmation: dataPost.confirmPassword,
         department_id: dataPost.department,
-        address: dataPost.address,
-        DOB: dataPost.DOB,
-        phone_number: dataPost.phoneNumber,
         salary: dataPost.salary,
         position: dataPost.position,
         role: dataPost.role
       },{
         headers : { Authorization : `Bearer ${user.token}`}
       }).then(function(response){
-        if(response.status == 200) {
+        if(response.status === 200) {
           router.push({path : '/admin/list-user'})
         }
       });
@@ -343,7 +295,7 @@ const updateUser = async () => {
       },{
         headers : { Authorization : `Bearer ${user.token}`}
       }).then(function(response){
-        if(response.status == 200) {
+        if(response.status === 200) {
           router.push({path : '/admin/list-user'})
         }
       });

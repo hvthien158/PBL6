@@ -2,11 +2,11 @@
   <main>
     <div class="container">
       <div class="form-container">
-        <h3>Đặt lại mật khẩu</h3>
+        <h3>RESET PASSWORD</h3>
         <div class="form-input">
           <div class="form-info">
             <div class="label-info">
-              <label>Mật khẩu mới</label>
+              <label>New password</label>
             </div>
             <div class="input-info">
               <input v-model="info.password" type="password" />
@@ -15,7 +15,7 @@
           </div>
           <div class="form-info">
             <div class="label-info">
-              <label>Nhập lại mật khẩu</label>
+              <label>Confirm</label>
             </div>
             <div class="input-info">
               <input v-model="info.password_confirm" type="password" />
@@ -23,7 +23,7 @@
             </div>
           </div>
           <div class="btn-submit">
-            <button type="submit" @click="login">Đặt lại</button>
+            <button type="submit" @click="reset">Reset</button>
           </div>
         </div>
       </div>
@@ -135,7 +135,9 @@ import router from "../../router";
 import {ref} from "vue";
 import {useUserStore} from "../../stores/user";
 import {useRoute} from "vue-router";
+import {useAlertStore} from "../../stores/alert";
 
+const alertStore = useAlertStore()
 const user = useUserStore().user
 const route = useRoute()
 
@@ -143,8 +145,7 @@ if(user.token !== ''){
   router.push({name : 'home'})
 }
 let info = reactive({
-  token: route.query.token,
-  email: route.query.email,
+  token: route.params.token,
   password: "",
   password_confirm: "",
 });
@@ -164,18 +165,22 @@ const checkPasswordConfirm = computed(() => {
     return "";
   }
 });
-const login = async () => {
-  if (info.email && info.password) {
+const reset = async () => {
+  if (info.password) {
     try {
       await axios
           .post('http://127.0.0.1:8000/api/reset-password', {
             token: info.token,
-            email: info.email,
+            email: localStorage.getItem('email_forgot'),
             password: info.password,
             password_confirmation: info.password_confirm,
           })
           .then(function () {
             //component alert success
+            alertStore.alert = true
+            alertStore.type = 'success'
+            alertStore.msg = 'Success'
+
             router.push({
               name: 'login'
             })

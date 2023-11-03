@@ -2,28 +2,28 @@
   <div class="container">
     <div class="sidebar">
       <ul class="sidebar-menu">
-        <li @click="selectedOption = (selectedOption == 'user' ? null : 'user') " :class="{ active: selectedOption === 'user' }">Quản lý người dùng</li>
+        <li @click="selectedOption = (selectedOption === 'user' ? null : 'user') " :class="{ active: selectedOption === 'user' }">User</li>
         <div v-if="selectedOption === 'user'" class="sub-menu">
-          <button @click="router.push({ path : '/admin/list-user'})">Danh sách người dùng</button>
-          <button @click="router.push({ path : '/admin/create-user'})">Thêm người dùng</button>
+          <button @click="router.push({ path : '/admin/list-user'})">List user</button>
+          <button @click="router.push({ path : '/admin/create-user'})">Create new account</button>
         </div>
-        <li @click="selectedOption = (selectedOption == 'organization' ?  null : 'organization') " :class="{ active: selectedOption === 'organization' }">Quản lý cơ quan</li>
+        <li @click="selectedOption = (selectedOption === 'organization' ?  null : 'organization') " :class="{ active: selectedOption === 'organization' }">Department</li>
         <div v-if="selectedOption === 'organization'" class="sub-menu">
-          <button @click="router.push({ path : '/admin/list-department'})">Danh sách cơ quan</button>
-          <button @click="router.push({ path : '/admin/add-department'})">Thêm cơ quan</button>
+          <button @click="router.push({ path : '/admin/list-department'})">List department</button>
+          <button @click="router.push({ path : '/admin/add-department'})">Create new department</button>
         </div>
-        <li @click="selectedOption = (selectedOption == 'attendance' ? null: 'attendance')" :class="{ active: selectedOption === 'attendance' }">Quản lý chấm công</li>
-        <div v-if="selectedOption === 'attendance'" class="sub-menu">
-          <button>Thêm chấm công</button>
-          <button>Sửa chấm công</button>
-          <button>Xóa chấm công</button>
-        </div>
-        <li @click="selectedOption =(selectedOption == 'shift' ? null : 'shift') " :class="{ active: selectedOption === 'shift' }">Quản lý ca làm</li>
-        <div v-if="selectedOption === 'shift'" class="sub-menu">
-          <button>Thêm ca làm</button>
-          <button>Sửa ca làm</button>
-          <button>Xóa ca làm</button>
-        </div>
+<!--        <li @click="selectedOption = (selectedOption === 'attendance' ? null: 'attendance')" :class="{ active: selectedOption === 'attendance' }">Quản lý chấm công</li>-->
+<!--        <div v-if="selectedOption === 'attendance'" class="sub-menu">-->
+<!--          <button>Thêm chấm công</button>-->
+<!--          <button>Sửa chấm công</button>-->
+<!--          <button>Xóa chấm công</button>-->
+<!--        </div>-->
+<!--        <li @click="selectedOption =(selectedOption === 'shift' ? null : 'shift') " :class="{ active: selectedOption === 'shift' }">Quản lý ca làm</li>-->
+<!--        <div v-if="selectedOption === 'shift'" class="sub-menu">-->
+<!--          <button>Thêm ca làm</button>-->
+<!--          <button>Sửa ca làm</button>-->
+<!--          <button>Xóa ca làm</button>-->
+<!--        </div>-->
       </ul>
     </div>
   </div>
@@ -35,14 +35,14 @@
   background-color: #f1f1f1;
   width: 15vw;
   margin: 0;
-  padding: 0
+  padding: 0;
+  font-size: small;
 }
 
 .sidebar {
   width: 100%;
-  background-color: #333;
-  color: #fff;
   padding: 10px;
+  background-color: white;
 }
 
 .sidebar-menu {
@@ -56,6 +56,10 @@
   padding: 10px;
   margin-bottom: 5px;
 }
+.sidebar-menu li:hover {
+  cursor: pointer;
+  border-left: #9ca3af 4px solid;
+}
 
 .sub-menu {
   display: flex;
@@ -64,8 +68,6 @@
 }
 
 .sub-menu button {
-  background-color: #666;
-  color: #fff;
   border: none;
   padding: 5px 10px;
   margin-bottom: 5px;
@@ -73,6 +75,7 @@
 }
 
 .sub-menu button:hover {
+  cursor: pointer;
   background-color: #888;
 }
 
@@ -81,7 +84,6 @@
 }
 
 .sidebar-menu li.active {
-  background-color: #555;
   border-radius: 3px;
 }
 

@@ -1,22 +1,22 @@
 <template>
   <div style="margin-top: 40px; padding: 0 100px">
-    <h1>Cập nhật thông tin cá nhân:</h1>
+    <h1>Update your profile:</h1>
     <div style="display: flex; align-items: center">
       <input type="file" name="file" id="file" class="inputfile" @input="onFileChange"/>
       <label for="file">
-        <img :src="imgPath" alt="" style="max-width: 100px; border-radius: 50%">
+        <img :src="imgPath ? imgPath : 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg'" style="width: 100px; height: 100px; border-radius: 50%">
       </label>
       <div style="display: flex; flex-direction: column; padding-left: 20px">
-        <span>Địa chỉ: </span>
+        <span>Address: </span>
         <input v-model="address" type="text" name="" id="">
-        <span>Ngày sinh: </span>
+        <span>Birthday: </span>
         <input v-model="DOB" type="text" name="" id="">
-        <span>SĐT: </span>
+        <span>Phone number: </span>
         <input v-model="phone_number" type="text" name="" id="">
       </div>
     </div>
     <br>
-    <button @click="updateProfile">Cập nhật</button>
+    <el-button @click="updateProfile">Update</el-button>
   </div>
 </template>
 
@@ -57,7 +57,6 @@ const user = useUserStore().user
 if (user.token === '') {
   router.push({ path: "/login" });
 }
-
 const alertStore = useAlertStore()
 const address = ref(user.address)
 const DOB = ref(user.DOB)
@@ -84,14 +83,12 @@ function updateProfile(){
         },
       })
       .then(() => {
-        //alert success
-        alertStore.alert = true
-        alertStore.type = 'success'
-        alertStore.msg = 'Thành công'
+        user.address = address.value
+        user.phone_number = phone_number.value
+        user.DOB = DOB.value
+        user.avatar = avatar.value
 
-        router.push({
-          name: 'home'
-        })
+        router.go(0)
       })
       .catch((e) => {
         console.log(e)

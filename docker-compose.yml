@@ -33,3 +33,9 @@ services:
     restart: unless-stopped
     environment:
       - CHOKIDAR_USEPOLLING=true
+  mailhog:
+    image: travanthien202/mailhog
+    ports:
+      - 1025:1025
+      - 8025:8025
+    restart: unless-stopped
