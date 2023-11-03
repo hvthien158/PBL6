@@ -1,17 +1,35 @@
 <template>
-  <HeaderHome></HeaderHome>
-  <router-view style="margin-top: 9vh; background-color: #2b2b2b; min-height: 82vh" :key="$route.fullPath"></router-view>
-  <Footer></Footer>
-  <transition name="slide-fade">
-    <AlertBox v-if="isAlert" :type="typeAlert" :msg="msgAlert"></AlertBox>
-  </transition>
+  <div class="content">
+    <HeaderHome></HeaderHome>
+      <router-view class="main-view" :key="$route.fullPath"></router-view>
+    <Footer></Footer>
+    <transition name="slide-fade">
+      <AlertBox v-if="isAlert" :type="typeAlert" :msg="msgAlert"></AlertBox>
+    </transition>
+  </div>
 </template>
 
 <style>
 * {
   color: #a9a9a9;
 }
-input{
+*.table tbody td {
+  color: black;
+}
+*.table thead td {
+  color: rgb(255, 255, 255);
+}
+
+.main-view {
+  margin-top: 9vh;
+  background-color: rgb(255 255 255);
+  min-height: 82vh;
+  display: flex
+}
+.main-view .fix-margin{
+  margin-top: calc(var(--margin-top)) + 20px;
+} 
+input {
   color: black;
 }
 .slide-fade-enter-active {
@@ -32,32 +50,35 @@ input{
 <script setup>
 import { RouterView } from "vue-router";
 import HeaderHome from "./components/HeaderHome.vue";
+import SlideBar from "./components/SlideBar.vue";
 import router from "./router";
 import Footer from "./components/Footer.vue";
-import {useAlertStore} from "./stores/alert";
+import { useAlertStore } from "./stores/alert";
 import AlertBox from "./components/AlertBox.vue";
-import {ref, watch} from "vue";
+import { ref, watch } from "vue";
+import { useUserStore } from "./stores/user";
 
-
-const user = useUserStore().user
-if(user.expired == ''){
+const user = useUserStore().user;
+if (user.expired == "") {
   router.push({ path: "/login" });
 }
+const isAlert = ref(false);
+const typeAlert = ref("");
+const msgAlert = ref("");
+const alertStore = useAlertStore();
 
-const isAlert = ref(false)
-const typeAlert = ref('')
-const msgAlert = ref('')
-const alertStore = useAlertStore()
-
-watch(() => alertStore.alert, () => {
-  if(alertStore.alert === true){
-    typeAlert.value = alertStore.type
-    msgAlert.value = alertStore.msg
-    isAlert.value = true
-    setTimeout(() => {
-      alertStore.clear()
-      isAlert.value = false
-    }, 3000)
+watch(
+  () => alertStore.alert,
+  () => {
+    if (alertStore.alert === true) {
+      typeAlert.value = alertStore.type;
+      msgAlert.value = alertStore.msg;
+      isAlert.value = true;
+      setTimeout(() => {
+        alertStore.clear();
+        isAlert.value = false;
+      }, 3000);
+    }
   }
-})
+);
 </script>

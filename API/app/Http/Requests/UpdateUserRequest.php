@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\EmailUpdateRule;
 use Illuminate\Foundation\Http\FormRequest;
-
+use PharIo\Manifest\Rule;
 class UpdateUserRequest extends FormRequest
 {
     /**
@@ -23,7 +24,7 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             "name"=> "required|string|between:4,100",
-            'email' => 'required|string|email|max:100',
+            'email' => ['required','string','email','max:100', new EmailUpdateRule],
             'department_id' => 'required|',
             'address' => 'string|nullable',
             'DOB' => 'nullable|date',

@@ -14,10 +14,16 @@ use App\Models\Shift;
 
 class TimeKeepingController extends Controller
 {
+    /**
+     * @return void
+     */
     public function __construct()
     {
         $this->middleware('auth:api');
     }
+    /**
+     * @return object
+     */
     public function checkIn()
     {
         try {
@@ -35,6 +41,11 @@ class TimeKeepingController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
+    /**
+     * @param TimeKeeping $timeKeeping
+     * 
+     * @return mixed
+     */
     public function checkOut(TimeKeeping $timeKeeping)
     {
         try {
@@ -68,6 +79,9 @@ class TimeKeepingController extends Controller
             return response()->json(['message' => $e->getMessage()]);
         }
     }
+    /**
+     * @return object
+     */
     public function getTimeKeeping()
     {
         $timezone = 'Asia/Ho_Chi_Minh';
@@ -75,11 +89,19 @@ class TimeKeepingController extends Controller
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->whereDate('time_check_in', $currentDate)->first();
         return response()->json($timeKeeping);
     }
+    /**
+     * @return object
+     */
     public function getListTimeKeeping()
     {
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->orderBy('time_check_in', 'desc')->get();
         return TimeKeepingResource::collection($timeKeeping);
     }
+    /**
+     * @param TimeRequest $request
+     * 
+     * @return object
+     */
     public function searchByAroundTime(TimeRequest $request)
     {
         $startDate = $request->startTime;
@@ -91,15 +113,20 @@ class TimeKeepingController extends Controller
 
         return TimeKeepingResource::collection($timekeepingRecords);
     }
+    /**
+     * @param MonthYearRequest $request
+     * 
+     * @return object
+     */
     public function searchByMonth(MonthYearRequest $request)
     {
         $month = $request->month;
         $year = $request->year;
-        if ($month) {
-            $timekeepingRecords = Timekeeping::whereMonth('time_check_in', $month)->whereYear('time_check_in', $year)->get();
-        } else {
-            $timekeepingRecords = Timekeeping::whereYear('time_check_in', $year)->get();
-        }
-        return TimeKeepingResource::collection($timekeepingRecords);
+        if ($month && $year) {
+            $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereMonth('time_check_in', $month)->whereYear('time_check_in', $year)->get();
+        } else if($year) {
+            $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereYear('time_check_in', $year)->get();
+        } 
+        return $timekeepingRecords;
     }
 }

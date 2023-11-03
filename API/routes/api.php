@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\TimeKeepingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
@@ -61,5 +62,10 @@ Route::post('create-user', [AdminController::class,'createUser']);
 Route::put('update-user/{id}', [AdminController::class,'updateUser']);
 Route::delete('delete-user/{id}', [AdminController::class,'deleteUser']);
 Route::post('create-department', [AdminController::class,'createDepartment']);
+Route::get('user-department/{name}', [AdminController::class,'getUserDepartment']);
 Route::put('update-department/{id}', [AdminController::class,'updateDepartment']);
 Route::delete('delete-department/{id}', [AdminController::class,'deleteDepartment']);
+Route::get('shift', [ShiftController::class,'index']);
+Route::get('shift/{id}', [ShiftController::class,'index']);
+Route::post('create-shift', [AdminController::class,'createShift']);
+Route::put('update-shift/{id}',[AdminController::class,'updateShift']);
