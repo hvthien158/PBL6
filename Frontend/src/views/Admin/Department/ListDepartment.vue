@@ -3,20 +3,20 @@
     <SlideBar></SlideBar>
     <div class="department">
       <div class="list-department">
-        <h1>Danh sách cơ quan làm việc</h1>
+        <h1>List department</h1>
         <div class="table-responsive-md">
           <table class="table">
             <thead class="table-dark">
               <tr>
                 <td scope="col">ID</td>
-                <td>Tên cơ quan</td>
-                <td>Địa chỉ</td>
-                <td>Số điện thoại</td>
+                <td>Name department</td>
+                <td>Address</td>
+                <td>Phone number</td>
                 <td>Email</td>
-                <td>Tổng số nhân viên</td>
-                <td>Quản lý nhân viên trong cơ quan</td>
-                <td>Chỉnh sửa thông tin</td>
-                <td>Xóa cơ quan</td>
+                <td>Quantity staff</td>
+                <td>View list staff</td>
+                <td>Edit info</td>
+                <td>Delete department</td>
               </tr>
             </thead>
             <tbody>
@@ -27,9 +27,31 @@
                 <td>{{ item.phoneNumber }}</td>
                 <td>{{ item.email }}</td>
                 <td>{{ item.quantityUser }}</td>
-                <td><a>Xem danh sách</a></td>
-                <td><a @click="router.push({ path : `/admin/update-department/${item.id}`})">Chỉnh sửa</a></td>
-                <td><a @click="deleteDepartment(item.id)">Xóa</a></td>
+                <td>
+                  <a
+                    @click="
+                      router.push({
+                        path: `/admin/list-user/${item.name}`,
+                      })
+                    "
+                    >View list</a
+                  >
+                </td>
+                <td>
+                  <a
+                    @click="
+                      router.push({
+                        path: `/admin/update-department/${item.id}`,
+                      })
+                    "
+                    >Edit</a
+                  >
+                </td>
+                <td>
+                  <a @click="deleteDepartment(item.id, item.quantityUser)"
+                    >Delete</a
+                  >
+                </td>
               </tr>
             </tbody>
           </table>
@@ -45,16 +67,16 @@ main {
   box-sizing: border-box;
   display: flex;
 }
-.department{
-    width: 85vw;
-    display: flex;
-    justify-content: center;
+.department {
+  width: 85vw;
+  display: flex;
+  justify-content: center;
 }
-.table td{
-    border: 1px solid #dee2e6;
+.table td {
+  border: 1px solid #dee2e6;
 }
 .department h1 {
-    text-align: center;
+  text-align: center;
 }
 .table td a {
   cursor: pointer;
@@ -62,15 +84,17 @@ main {
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, onMounted } from "vue";
+import axios from "axios";
 import router from "../../../router";
 import { useUserStore } from "../../../stores/user";
-const user = useUserStore().user
-const department = ref()
+import { useAlertStore } from "../../../stores/alert";
+const user = useUserStore().user;
+const alertStore = useAlertStore();
+const department = ref();
 onMounted(() => {
-    displayDepartment()
-})
+  displayDepartment();
+});
 const displayDepartment = async () => {
   try {
     await axios
@@ -82,16 +106,30 @@ const displayDepartment = async () => {
     console.log(e);
   }
 };
-const deleteDepartment = async(id) => {
-  try {
-    await axios.delete(`http://127.0.0.1:8000/api/delete-department/${id}`,{
-      headers : { Authorization : `Bearer ${user.token}`}
-    })
-    .then(function(response){
-        displayDepartment()
-    })
-  } catch(e) {
-    console.log(e)
+const deleteDepartment = async (id, isHasStaff) => {
+  if (isHasStaff === 0) {
+    try {
+      await axios
+        .delete(`http://127.0.0.1:8000/api/delete-department/${id}`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        })
+        .then(function (response) {
+          console.log(response);
+          if (response.status == 200) {
+            messages("success", response.data.message);
+            displayDepartment();
+          }
+        });
+    } catch (e) {
+      messages("error", e.data.message);
+    }
+  } else {
+    messages("error", "Please move staff to another department");
   }
-}
+};
+const messages = (type, msg) => {
+  alertStore.alert = true;
+  alertStore.type = type;
+  alertStore.msg = msg;
+};
 </script>

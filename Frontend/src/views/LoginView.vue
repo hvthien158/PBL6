@@ -5,7 +5,7 @@
         <p style="font-weight: bold">Thư xác nhận đã được gửi đến email của bạn, vui lòng xác nhận để tiếp tục...</p>
       </div>
       <div class="form-container" v-else>
-        <h3>Đăng nhập</h3>
+        <h3>Login</h3>
         <div class="form-input">
           <div class="form-info">
             <div class="label-info">
@@ -18,7 +18,7 @@
           </div>
           <div class="form-info">
             <div class="label-info">
-              <label>Mật khẩu</label>
+              <label>Password</label>
             </div>
             <div class="input-info">
               <input @keyup.enter="login" ref="passwordInput" v-model="info.password" type="password" />
@@ -26,14 +26,14 @@
             </div>
           </div>
           <div class="btn-submit">
-            <button type="submit" @click="login">Đăng nhập</button>
+            <button type="submit" @click="login">Login</button>
           </div>
         </div>
         <div v-if="fail_login">
-          <span style="color: red">Sai tài khoản hoặc mật khẩu</span>
+          <span style="color: red">Email or password incorrect</span>
         </div>
         <div>
-          <span id="forgot" @click="goToForgot">Quên mật khẩu?</span>
+          <p id="forgot" @click="goToForgot">Forgot password?</p>
         </div>
       </div>
     </div>
@@ -57,6 +57,10 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.form-container h3 {
+  color: #e06230;
+  margin-bottom: 20px
 }
 .additional-content {
   text-align: center;
@@ -104,7 +108,7 @@ main {
 
 .form-input input:focus {
   outline: none;
-  border-color: #62d58c;
+  background-image: radial-gradient(100% 100% at 100% 0, #e7ba76 0, #c27354 100%);
 }
 
 .btn-submit {
@@ -117,7 +121,7 @@ main {
   width: 100%;
   height: 40px;
   border-radius: 5px;
-  background-color: #62d58c;
+  background-image: radial-gradient(100% 100% at 100% 0, #d3a053 0, #d06237 100%);
   color: #ffffff;
   font-weight: bold;
   cursor: pointer;
@@ -126,7 +130,8 @@ main {
 }
 
 .btn-submit button:hover {
-  background-color: #3ca66e;
+  
+  background-image: radial-gradient(100% 100% at 100% 0, #f9ac38 0, #f05112 100%);
 }
 
 h5 {
@@ -134,8 +139,14 @@ h5 {
   color: rgb(214, 34, 34);
   font-size: 14px;
 }
+#forgot{
+  margin-top: 10px;
+  color: coral;
+  font-weight: 500;
+}
 #forgot:hover{
-  color: blue;
+  font-weight: 800;
+  color: rgb(255, 123, 0);
   cursor: pointer;
 }
 </style>
@@ -163,14 +174,14 @@ let info = reactive({
 });
 const checkEmail = computed(() => {
   if (!isEmail(info.email)) {
-    return "Email không đúng định dạng";
+    return "Email Invalid";
   } else {
     return "";
   }
 });
 const checkPassword = computed(() => {
   if (info.password.length === 0) {
-    return "Vui lòng nhập mật khẩu";
+    return "Password Invalid";
   } else {
     return "";
   }
@@ -183,7 +194,6 @@ const isEmail = (email) => {
 const login = async () => {
   if (checkEmail.value === '' && checkPassword.value === '') {
     try {
-    console.log(1)
       await axios
           .post('http://127.0.0.1:8000/api/login', {
             email: info.email,
@@ -201,13 +211,14 @@ const login = async () => {
               user.password = response.data.user.password
               user.expired = response.data.expires_at
               user.role = response.data.user.role
-              
-              
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'
-              alertStore.msg = 'Đăng nhập thành công'
-              (user.role === 'admin') ? router.push({ path: "/admin" }):  router.push({ path: "/" });
+              alertStore.msg = 'Login success'
+              if(user.role == 'admin') 
+              router.push({ path: "/admin" })
+              else
+              router.push({ path: "/" });
             }
           });
     } catch (e) {

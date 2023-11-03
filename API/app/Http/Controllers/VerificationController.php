@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Redirect;
 
 class VerificationController extends Controller
 {
+    /**
+     * @param mixed $user_id
+     * @param Request $request
+     * 
+     * @return mixed
+     */
     public function verify($user_id, Request $request) {
         if (!$request->hasValidSignature()) {
             return response()->json(["msg" => "Invalid/Expired url provided."], 401);
@@ -22,6 +28,9 @@ class VerificationController extends Controller
         return Redirect::to('http://localhost:5173/login');
     }
 
+    /**
+     * @return object
+     */
     public function resend() {
         if (auth()->user()->hasVerifiedEmail()) {
             return response()->json(["msg" => "Email already verified."], 400);
