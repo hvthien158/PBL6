@@ -43,7 +43,6 @@
 <style scoped>
 main {
   max-width: 100vw;
-  min-height: 100vh;
 }
 .container {
   display: flex;
@@ -222,10 +221,8 @@ const login = async () => {
               alertStore.alert = true
               alertStore.type = 'success'
               alertStore.msg = 'Login success'
-              if(user.role === 'admin')
-              router.push({ path: "/admin" })
-              else
-              router.push({ path: "/" });
+
+              router.push({ name: "home" });
             }
           });
     } catch (e) {

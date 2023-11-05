@@ -10,9 +10,6 @@
 </template>
 
 <style>
-* {
-  color: #a9a9a9;
-}
 *.table tbody td {
   color: black;
 }
@@ -22,7 +19,7 @@
 
 .main-view {
   margin-top: 60px;
-  background-color: rgb(255 255 255);
+  background-color: rgb(240, 240, 240);
   min-height: calc(100vh - 120px);
   display: flex
 }

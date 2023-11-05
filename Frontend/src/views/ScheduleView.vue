@@ -91,7 +91,6 @@
 @import "https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css";
 main {
   max-width: 100vw;
-  min-height: 80vh;
   display: flex;
   justify-content: center;
   padding-top: 12px;

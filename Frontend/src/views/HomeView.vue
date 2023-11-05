@@ -26,9 +26,7 @@
             Check Out
           </button>
         </div>
-        <router-link to="/schedule">
-          <button class="active-button" style="margin-top: 20px; height: 40px">History</button>
-        </router-link>
+        <button @click="router.push({name: 'schedule'})" class="active-button no-underline" style="margin-top: 20px; height: 40px">History</button>
       </div>
     </div>
   </main>
@@ -36,7 +34,6 @@
 <style scoped>
 main {
   max-width: 100vw;
-  min-height: 82vh;
   display: flex;
   justify-content: center;
   align-items: center;

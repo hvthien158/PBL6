@@ -34,7 +34,6 @@
 <style scoped>
 main {
   max-width: 100vw;
-  min-height: 100vh;
 }
 .container {
   display: flex;
