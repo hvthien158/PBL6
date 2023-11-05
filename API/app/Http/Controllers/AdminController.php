@@ -9,6 +9,9 @@ use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use App\Jobs\MailInfomationAccount;
 use App\Models\Department;
 use App\Models\Shift;
 use App\Models\User;
@@ -31,18 +34,23 @@ class AdminController extends Controller
     {
         $this->authorize('create', User::class);
         try {
+            $password = Str::random(10);
             User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => bcrypt($request->password),
+                'password' => Hash::make($password),
                 'department_id' => $request->department_id,
-                'address' => $request->address,
-                'DOB' => $request->DOB,
-                'phone_number' => $request->phone_number,
                 'salary' => $request->salary,
                 'position' => $request->position,
                 'role' => $request->role
             ]);
+            $account = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $password,
+                'link' => 'http://localhost:5173/login'
+            ];
+            MailInfomationAccount::dispatch($account);
             return response()->json(['message' => 'Create user successfully']);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()]);

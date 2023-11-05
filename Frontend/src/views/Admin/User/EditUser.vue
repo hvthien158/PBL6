@@ -6,106 +6,44 @@
         <h1 v-if="!isUpdateUser">Add User</h1>
         <h1 v-else>Update User</h1>
         <div class="form-floating">
-          <input
-            v-model="dataPost.email"
-            type="text"
-            class="form-control"
-            :class="{
-              'is-invalid': !(checkEmail == ''),
-              'is-valid': checkEmail == '',
-            }"
-            placeholder="Email"
-            required
-          />
+          <input v-model="dataPost.email" type="text" class="form-control" placeholder="Email" required />
+          <el-icon :color="currentColor">
+            <WarningFilled />
+          </el-icon>
         </div>
+
         <div class="invalid-feedback">
           {{ checkEmail }}
         </div>
-        <div class="form-floating is-invalid">
-          <input
-            v-model="dataPost.name"
-            type="text"
-            class="form-control"
-            :class="{
-              'is-invalid': !(checkName == ''),
-              'is-valid': checkName == '',
-            }"
-            placeholder="Name"
-            required
-          />
+        <div class="form-floating">
+          <input v-model="dataPost.name" type="text" class="form-control" placeholder="Name" required />
+          <el-icon :color="currentColor">
+            <WarningFilled />
+          </el-icon>
         </div>
         <div class="invalid-feedback">
           {{ checkName }}
         </div>
-        <div class="form-floating" v-if="!isUpdateUser">
-          <input
-            v-model="dataPost.password"
-            type="password"
-            class="form-control"
-            :class="{
-              'is-invalid': !checkPassword == '',
-              'is-valid': checkPassword == '',
-            }"
-            placeholder="Password"
-            required
-          />
-        </div>
-        <div class="invalid-feedback" v-if="!isUpdateUser">
-          {{ checkPassword }}
-        </div>
-        <div class="form-floating" v-if="!isUpdateUser">
-          <input
-            v-model="dataPost.confirmPassword"
-            type="password"
-            class="form-control"
-            :class="{
-              'is-invalid': !checkConfirmPassword == '',
-              'is-valid': !checkConfirmPassword == '',
-            }"
-            placeholder="Confirmation Password"
-            required
-          />
-        </div>
-        <div class="invalid-feedback" v-if="!isUpdateUser">
-          {{ checkConfirmPassword }}
-        </div>
-        <div class="form-floating is-invalid">
-          <input
-            type="text"
-            v-model="dataPost.address"
-            class="form-control"
-            placeholder="Address"
-            required
-          />
-        </div>
-        <div class="input-group mb-3">
-          <span class="input-group-text">Date of birth</span>
-          <input type="date" class="form-control" v-model="dataPost.DOB" />
-        </div>
-        <div class="form-floating">
-          <input
-            v-model="dataPost.phoneNumber"
-            type="text"
-            class="form-control"
-            placeholder="Phone Number"
-            :class="{
+        <div v-if="isUpdateUser">
+          <div class="form-floating">
+            <input type="text" v-model="dataPost.address" class="form-control" placeholder="Address" required />
+          </div>
+          <div class="input-group mb-3">
+            <span class="input-group-text">Date of birth</span>
+            <input type="date" class="form-control" v-model="dataPost.DOB" />
+          </div>
+          <div class="form-floating">
+            <input v-model="dataPost.phoneNumber" type="text" class="form-control" placeholder="Phone Number" :class="{
               'is-invalid': !checkPhoneNumber == '',
               'is-valid': !checkPhoneNumber == '',
-            }"
-            required
-          />
+            }" required />
+          </div>
         </div>
         <div class="invalid-feedback">
           {{ checkPhoneNumber }}
         </div>
         <div class="form-floating">
-          <input
-            type="text"
-            v-model="dataPost.salary"
-            class="form-control"
-            placeholder="Salary"
-            required
-          />
+          <input type="text" v-model="dataPost.salary" class="form-control" placeholder="Salary" required />
         </div>
         <div class="input-group mb-3">
           <span class="input-group-text">Position</span>
@@ -125,38 +63,26 @@
         </div>
         <div class="input-group mb-3">
           <span class="input-group-text">Department</span>
-          <select
-            class="custom-select"
-            v-model="dataPost.department"
-            :class="{
-              'is-invalid': !checkDepartment == '',
-              'is-valid': checkDepartment,
-            }"
-            required
-          >
+          <select class="custom-select" v-model="dataPost.department" :class="{
+            'is-invalid': !checkDepartment == '',
+            'is-valid': checkDepartment,
+          }" required>
             <option v-for="options in data" :value="options.id">
               {{ options.name }}
             </option>
           </select>
+          <el-icon :color="currentColor">
+            <WarningFilled />
+          </el-icon>
         </div>
         <div class="invalid-feedback">
           {{ checkDepartment }}
         </div>
         <div class="btn-submit">
-          <button
-            v-if="!isUpdateUser"
-            type="button"
-            class="btn btn-primary"
-            @click="createUser"
-          >
+          <button v-if="!isUpdateUser" type="button" class="btn btn-primary" @click="createUser">
             Create
           </button>
-          <button
-            v-else
-            type="button"
-            class="btn btn-primary"
-            @click="updateUser"
-          >
+          <button v-else type="button" class="btn btn-primary" @click="updateUser">
             Update
           </button>
         </div>
@@ -171,6 +97,7 @@ main {
   box-sizing: border-box;
   display: flex;
 }
+
 .add-user {
   width: 85vw;
   display: flex;
@@ -178,28 +105,49 @@ main {
   padding: 20px;
   /* align-items: center; */
 }
+
 .input-container {
   width: 40%;
 }
+
 .add-user h1 {
   text-align: center;
   color: black;
   margin: 20px 0 20px 0;
 }
+
 .input-group-text {
   width: 25%;
 }
+
 .form-floating {
   margin-bottom: 10px;
+  display: flex;
+  position: relative;
+  align-items: center;
 }
+
 .invalid-feedback {
   display: block;
   margin-bottom: 5px;
 }
+
 .btn-submit {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+.mb-3 {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.el-icon {
+  left: 100%;
+  position: absolute;
+  margin-left: 10px;
 }
 </style>
 <script setup>
@@ -214,6 +162,7 @@ const user = useUserStore().user;
 const route = useRoute();
 const alertStore = useAlertStore();
 let isUpdateUser = false;
+let currentColor = '#f12727'
 let checkLanding = reactive({
   name: false,
   email: false,
@@ -239,6 +188,10 @@ let dataPost = reactive({
 });
 const role = [
   {
+    name: 'Select role',
+    value: '',
+  },
+  {
     name: "Admin",
     value: "admin",
   },
@@ -248,6 +201,10 @@ const role = [
   },
 ];
 const position = [
+  {
+    name: 'Select Position',
+    value: '',
+  },
   {
     name: "Intern",
     value: "intern",
@@ -288,8 +245,7 @@ const displayUser = async () => {
         dataPost.DOB = response.data.data[0].DOB;
         dataPost.salary = response.data.data[0].salary;
         dataPost.position = response.data.data[0].position;
-        dataPost.role =
-          response.data.data[0].role == "admin" ? "admin" : "user";
+        dataPost.role = response.data.data[0].role == "admin" ? "admin" : "user";
         dataPost.department = response.data.data[0].department.id;
       });
   } catch (e) {
@@ -302,6 +258,7 @@ const displayDepartment = async () => {
       .get("http://127.0.0.1:8000/api/department")
       .then(function (response) {
         data.value = response.data.data;
+        dataPost.department = response.data.data[0].id
       });
   } catch (e) {
     console.log(e);
@@ -309,7 +266,7 @@ const displayDepartment = async () => {
 };
 
 const checkName = computed(() => {
-  if (dataPost.name.length <= 4) {
+  if (dataPost.name.length <= 4 && dataPost.name != "") {
     checkLanding.name = false;
     return "Please field name > 4";
   } else {
@@ -318,29 +275,11 @@ const checkName = computed(() => {
   }
 });
 const checkEmail = computed(() => {
-  if (!isEmail(dataPost.email)) {
+  if (!isEmail(dataPost.email) && dataPost.email != "") {
     checkLanding.email = false;
     return "Please field valid email";
   } else {
     checkLanding.email = true;
-    return "";
-  }
-});
-const checkPassword = computed(() => {
-  if (dataPost.password.length <= 6) {
-    checkLanding.password = false;
-    return "Please field password more than 6 character";
-  } else {
-    checkLanding.password = true;
-    return "";
-  }
-});
-const checkConfirmPassword = computed(() => {
-  if (dataPost.password !== dataPost.confirmPassword) {
-    checkLanding.confirmPassword = false;
-    return "Password not match";
-  } else {
-    checkLanding.confirmPassword = true;
     return "";
   }
 });
@@ -354,7 +293,7 @@ const checkPhoneNumber = computed(() => {
   }
 });
 const checkDepartment = computed(() => {
-  if (dataPost.department == "") {
+  if (dataPost.department == "" && dataPost.department == null) {
     checkLanding.department = false;
     return "Please field department";
   } else {
@@ -375,10 +314,7 @@ const createUser = async () => {
   if (
     checkLanding.name &&
     checkLanding.email &&
-    checkLanding.password &&
-    checkLanding.confirmPassword &&
-    checkLanding.department &&
-    checkLanding.phoneNumber
+    checkLanding.department
   ) {
     try {
       await axios
@@ -387,12 +323,7 @@ const createUser = async () => {
           {
             name: dataPost.name,
             email: dataPost.email,
-            password: dataPost.password,
-            password_confirmation: dataPost.confirmPassword,
             department_id: dataPost.department,
-            address: dataPost.address,
-            DOB: dataPost.DOB,
-            phone_number: dataPost.phoneNumber,
             salary: dataPost.salary,
             position: dataPost.position,
             role: dataPost.role,
@@ -422,7 +353,6 @@ const updateUser = async () => {
     checkLanding.phoneNumber
   ) {
     try {
-      console.log(`Bearer ${user.token}`);
       await axios
         .put(
           `http://127.0.0.1:8000/api/update-user/${route.params.id}`,

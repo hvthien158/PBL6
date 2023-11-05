@@ -9,7 +9,8 @@
   </div>
 </template>
 
-<style>
+
+<style >
 * {
   color: #a9a9a9;
 }
@@ -50,7 +51,6 @@ input {
 <script setup>
 import { RouterView } from "vue-router";
 import HeaderHome from "./components/HeaderHome.vue";
-import SlideBar from "./components/SlideBar.vue";
 import router from "./router";
 import Footer from "./components/Footer.vue";
 import { useAlertStore } from "./stores/alert";
