@@ -212,7 +212,6 @@ const login = async () => {
           });
     } catch (e) {
       fail_login.value = true
-      console.log(e);
     }
   }
 };
