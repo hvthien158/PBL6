@@ -2,29 +2,49 @@
   <main>
     <div class="container">
       <div class="form-container">
-        <h3>RESET PASSWORD</h3>
         <div class="form-input">
-          <div class="form-info">
-            <div class="label-info">
-              <label>New password</label>
-            </div>
-            <div class="input-info">
-              <input v-model="info.password" type="password" />
-              <h5>{{ checkPassword }}</h5>
-            </div>
+          <h3 style="text-align: center; font-weight: 700; color: #e06230">RESET PASSWORD</h3>
+          <div class="login__field">
+            <i class="login__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              </svg>
+            </i>
+            <input
+                v-model="info.password"
+                type="password"
+                class="login__input"
+                placeholder="New password"
+                @blur="checkpass"
+                @input="checkpass"
+            >
+            <span class="error">{{ password_error }}</span>
           </div>
-          <div class="form-info">
-            <div class="label-info">
-              <label>Confirm</label>
-            </div>
-            <div class="input-info">
-              <input v-model="info.password_confirm" type="password" />
-              <h5>{{ checkPasswordConfirm }}</h5>
-            </div>
+          <div class="login__field">
+            <i class="login__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+              </svg>
+            </i>
+            <input
+                ref="passwordInput"
+                v-model="info.password_confirm"
+                type="password"
+                class="login__input"
+                placeholder="Confirm"
+                @blur="checkConfirm"
+                @input="checkConfirm"
+                @keyup.enter="reset"
+            >
+            <span class="error">{{ confirm_error }}</span>
           </div>
-          <div class="btn-submit">
-            <button type="submit" @click="reset">Reset</button>
+          <div class="login__field" style="display: flex; justify-content: center">
+            <ButtonLoading :loading="loading" @click="reset" style="font-size: 15px;" size="large" type="warning" round>Change password</ButtonLoading>
           </div>
+        </div>
+        <div class="content-bottom">
+          <span>Already have an account? </span>
+          <span id="go-login" @click="router.push({name: 'login'})">Sign in</span>
         </div>
       </div>
     </div>
@@ -35,6 +55,7 @@
 main {
   max-width: 100vw;
 }
+
 .container {
   display: flex;
   justify-content: center;
@@ -42,88 +63,80 @@ main {
   height: 80vh;
   min-height: 80vh;
 }
+
 .form-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 100px;
-}
-.additional-content {
-  text-align: center;
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.additional-content p {
-  margin-bottom: 10px;
 }
 
 .form-input {
   display: block;
-  padding: 20px;
-  background-color: #f2f2f2;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 400px;
 }
 
-.form-info {
-  display: flex;
-  margin-bottom: 10px;
+.login__field {
+  padding: 20px 0;
+  position: relative;
 }
 
-.form-info .label-info {
-  display: flex;
-  align-items: center;
-  width: 150px;
-  padding-right: 5px;
-  color: #333333;
-  font-weight: bold;
+.login__icon {
+  position: absolute;
+  top: 30px;
+  color: #7875B5;
 }
 
-.form-input input {
-  padding: 10px;
-  width: 100%;
-  border-radius: 2px;
-  display: block;
-  border: 1px solid #999999;
-  transition: border-color 0.3s ease-in-out;
-}
-
-.form-input input:focus {
-  outline: none;
-  border-color: #62d58c;
-}
-
-.btn-submit {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.btn-submit button {
-  width: 100%;
-  height: 40px;
-  border-radius: 5px;
-  background-color: #62d58c;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: pointer;
+.login__input {
   border: none;
-  transition: background-color 0.3s ease-in-out;
+  border-bottom: 2px solid #D1D1D4;
+  background: none;
+  padding: 10px 10px 10px 24px;
+  width: 95%;
+  font-weight: 700;
+  transition: .2s;
 }
 
-.btn-submit button:hover {
-  background-color: #3ca66e;
+.login__input:active,
+.login__input:focus,
+.login__input:hover {
+  outline: none;
+  border-bottom-color: #6A679E;
 }
 
-h5 {
-  margin-top: 5px;
-  color: rgb(214, 34, 34);
+.error{
+  color: red;
+  font-size: small;
+  position: absolute;
+  left: 25px;
+  top: 66px;
+}
+
+.fail-login{
+  color: red;
   font-size: 14px;
+  text-align: center;
+  position: absolute;
+  left: calc(50% - 80px);
+}
+
+.content-bottom{
+  position: absolute;
+  bottom: 28%;
+}
+
+#go-login{
+  color: #7875B5;
+  font-weight: 700;
+}
+
+#go-login:hover{
+  cursor: pointer;
+  opacity: 0.8;
 }
 </style>
 
@@ -135,10 +148,15 @@ import {ref} from "vue";
 import {useUserStore} from "../../stores/user";
 import {useRoute} from "vue-router";
 import {useAlertStore} from "../../stores/alert";
+import ButtonLoading from "../../components/ButtonLoading.vue";
 
 const alertStore = useAlertStore()
 const user = useUserStore().user
 const route = useRoute()
+const password_error = ref('')
+const confirm_error = ref('')
+const fail_reset = ref(false)
+const loading = ref(false)
 
 if(user.token !== ''){
   router.push({name : 'home'})
@@ -148,24 +166,20 @@ let info = reactive({
   password: "",
   password_confirm: "",
 });
-const checkPassword = computed(() => {
-  if (info.password.length === 0) {
-    return "Vui lòng nhập mật khẩu";
-  } else {
-    return "";
-  }
-});
-const checkPasswordConfirm = computed(() => {
-  if (info.password_confirm.length === 0) {
-    return "Vui lòng nhập mật khẩu";
-  } else if (info.password_confirm !== info.password) {
-    return "Mật khẩu xác nhận không trùng khớp"
-  } else {
-    return "";
-  }
-});
+
+function checkpass() {
+  password_error.value = (info.password.length === 0) ? 'Please enter your password' : ''
+}
+
+function checkConfirm(){
+  confirm_error.value = (info.password_confirm.length === 0) ? 'Please enter confirmation password'
+      : (info.password_confirm !== info.password) ? 'Confirm password not match'
+          : ''
+}
+
 const reset = async () => {
-  if (info.password) {
+  loading.value = true
+  if (info.password && confirm_error.value === '') {
     try {
       await axios
           .post('http://127.0.0.1:8000/api/reset-password', {
@@ -185,7 +199,11 @@ const reset = async () => {
             })
           });
     } catch (e) {
-      console.log(e);
+      alertStore.alert = true
+      alertStore.type = 'error'
+      alertStore.msg = 'Something wrong'
+
+      loading.value = false
     }
   }
 };

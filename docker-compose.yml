@@ -38,4 +38,9 @@ services:
     ports:
       - 1025:1025
       - 8025:8025
+    volumes:
+      - ./API/.docker/data/mailhog:/home/mailhog/maildir
+    environment:
+      - MH_STORAGE=maildir
+      - MH_MAILDIR_PATH=/home/mailhog/maildir
     restart: unless-stopped
