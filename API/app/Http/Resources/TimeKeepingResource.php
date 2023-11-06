@@ -7,12 +7,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\ShiftResource;
-
 class TimeKeepingResource extends JsonResource
 {
-    public function toArray($request): array
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
     {
-        if (!$this->shift) {
+        if(!$this->shift){
             $shift = [
                 'id' => 0,
                 'name' => 'OFF',
@@ -23,37 +27,11 @@ class TimeKeepingResource extends JsonResource
         } else {
             $shift = new ShiftResource($this->shift);
         }
-
-        $timezone = 'Asia/Ho_Chi_Minh';
-        $timeCheckIn = '';
-        $timeCheckOut = '';
-        $timeWorkMinutes = 0;
-        $timeWorkHours = 0;
-        $timeWork = '0:00';
-        if ($this->time_check_in) {
-            $timeCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_in)->format('H:i:s');
-            $now = Carbon::now()->setTimezone($timezone);
-        }
-
-        if ($this->time_check_out) {
-            $timeCheckOut = Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_out)->format('H:i:s');
-            $carbonCheckIn = Carbon::createFromFormat('H:i:s', $timeCheckIn);
-            $carbonCheckOut = Carbon::createFromFormat('H:i:s', $timeCheckOut);
-            $timeWorkHours = $carbonCheckOut->diffInHours($carbonCheckIn);
-            if($timeWorkHours != 0){
-                $timeWorkMinutes = $carbonCheckOut->diffInMinutes($carbonCheckIn) - $timeWorkHours*60;
-            } else {
-                $timeWorkMinutes = $carbonCheckOut->diffInMinutes($carbonCheckIn);
-            }
-            $timeWork = $timeWorkHours.':'.$timeWorkMinutes;
-        }
-
         return [
             'id' => $this->id,
             'date' => Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_in)->format('d-m-Y'),
-            'timeCheckIn' => $timeCheckIn,
-            'timeCheckOut' => $timeCheckOut,
-            'timeWork' => $timeWork,
+            'timeCheckIn' => Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_in)->format('H:i:s'),
+            'timeCheckOut' => Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_out)->format('H:i:s'),
             'user' => new UserResource($this->user),
             'shift' => $shift
         ];
