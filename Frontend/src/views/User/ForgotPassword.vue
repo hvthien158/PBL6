@@ -25,7 +25,7 @@
             <span class="error">{{ email_error }}</span>
           </div>
           <div class="login__field" style="display: flex; justify-content: center">
-            <el-button @click="forgot" style="font-size: 15px;" size="large" type="warning" round>Send mail</el-button>
+            <ButtonLoading :loading="loading" @click="forgot" style="font-size: 15px;" size="large" type="warning" round>Send mail</ButtonLoading>
           </div>
           <p class="fail-login" v-if="email_not_signed">Email not exist</p>
         </div>
@@ -130,11 +130,13 @@ import axios from "axios";
 import router from "../../router";
 import {ref} from "vue";
 import {useUserStore} from "../../stores/user";
+import ButtonLoading from "../../components/ButtonLoading.vue";
 
 const verifyQuest = ref(false)
 const email_not_signed = ref(false)
 const user = useUserStore().user
 const email_error = ref('')
+const loading = ref(false)
 
 if(user.token !== ''){
   router.push({name : 'home'})
@@ -152,8 +154,10 @@ const isEmail = (email) => {
   return filter.test(email);
 };
 const forgot = async () => {
+  loading.value = true
   if(!isEmail(email.value)){
     email_error.value = 'Invalid email'
+    loading.value = false
   } else if (email.value !== '') {
       await axios.post('http://127.0.0.1:8000/api/check-email', {
         email: email.value
@@ -170,6 +174,7 @@ const forgot = async () => {
             })
       }).catch(() => {
         email_not_signed.value = true
+        loading.value = false
       })
   }
 };

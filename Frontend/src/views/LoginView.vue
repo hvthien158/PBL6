@@ -43,7 +43,7 @@
             <span class="error">{{ password_error }}</span>
           </div>
           <div class="login__field">
-            <el-button @click="login" style="font-size: 15px" size="large" type="warning" round>Login</el-button>
+            <ButtonLoading :loading="loading" @click="login" style="font-size: 15px" size="large" type="warning" round>Login</ButtonLoading>
             <span @click="goToForgot" class="login__forgot">Forgot password?</span>
           </div>
           <p class="fail-login" v-if="fail_login">Wrong email or password</p>
@@ -146,6 +146,7 @@ import router from "../router";
 import {ref} from "vue";
 import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
+import ButtonLoading from "../components/ButtonLoading.vue";
 
 const verifyQuest = ref(false)
 const alertStore = useAlertStore()
@@ -154,6 +155,7 @@ const fail_login = ref(false)
 const passwordInput = ref(null)
 const email_error = ref('')
 const password_error = ref('')
+const loading = ref(false)
 
 if(user.token !== ''){
   router.push({name : 'home'})
@@ -177,8 +179,10 @@ function checkpass() {
 }
 
 const login = async () => {
+  loading.value = true
   if(!isEmail(info.email)){
     email_error.value = 'Invalid email'
+    loading.value = false
   } else if (email_error.value === '' && password_error.value === '') {
     try {
       await axios
@@ -212,6 +216,7 @@ const login = async () => {
           });
     } catch (e) {
       fail_login.value = true
+      loading.value = false
     }
   }
 };

@@ -22,8 +22,8 @@
           </div>
           <div class="login__field">
             <i class="login__icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
-                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
               </svg>
             </i>
             <input
@@ -39,7 +39,7 @@
             <span class="error">{{ confirm_error }}</span>
           </div>
           <div class="login__field" style="display: flex; justify-content: center">
-            <el-button @click="reset" style="font-size: 15px;" size="large" type="warning" round>Change password</el-button>
+            <ButtonLoading :loading="loading" @click="reset" style="font-size: 15px;" size="large" type="warning" round>Change password</ButtonLoading>
           </div>
         </div>
         <div class="content-bottom">
@@ -148,6 +148,7 @@ import {ref} from "vue";
 import {useUserStore} from "../../stores/user";
 import {useRoute} from "vue-router";
 import {useAlertStore} from "../../stores/alert";
+import ButtonLoading from "../../components/ButtonLoading.vue";
 
 const alertStore = useAlertStore()
 const user = useUserStore().user
@@ -155,6 +156,7 @@ const route = useRoute()
 const password_error = ref('')
 const confirm_error = ref('')
 const fail_reset = ref(false)
+const loading = ref(false)
 
 if(user.token !== ''){
   router.push({name : 'home'})
@@ -176,7 +178,8 @@ function checkConfirm(){
 }
 
 const reset = async () => {
-  if (info.password) {
+  loading.value = true
+  if (info.password && confirm_error.value === '') {
     try {
       await axios
           .post('http://127.0.0.1:8000/api/reset-password', {
@@ -199,6 +202,8 @@ const reset = async () => {
       alertStore.alert = true
       alertStore.type = 'error'
       alertStore.msg = 'Something wrong'
+
+      loading.value = false
     }
   }
 };
