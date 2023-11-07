@@ -7,7 +7,6 @@ import { useUserStore } from "../stores/user";
 import { useAlertStore } from "../stores/alert";
 import ListUser from "../views/Admin/User/ListUser.vue"
 import ListTimeKeeping from '../views/Admin/TimeKeeping/ListTimeKeeping.vue'
-import EditUser from '../views/Admin/User/EditUser.vue'
 import ListDepartment from '../views/Admin/Department/ListDepartment.vue'
 import EditDepartment from '../views/Admin/Department/EditDepartment.vue'
 import ForgotPassword from "../views/User/ForgotPassword.vue";
@@ -47,16 +46,6 @@ const router = createRouter({
       path: '/admin/list-user',
       name: 'listUser',
       component: ListUser,
-    },
-    {
-      path: '/admin/create-user',
-      name: 'createUser',
-      component: EditUser,
-    },
-    {
-      path: '/admin/update-user/:id',
-      name: 'updateUser',
-      component: EditUser,
     },
     {
       path: '/admin/list-timekeeping/:id',
