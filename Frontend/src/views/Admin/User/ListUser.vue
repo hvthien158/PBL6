@@ -23,14 +23,14 @@
         <el-table-column prop="department.name" label="Department" width="120" />
         <el-table-column prop="role" label="Role" width="100" />
         <el-table-column label="History" width="100">
-          <template #default>
-            <el-button link type="primary" size="small">View</el-button>
+          <template #default="scope">
+            <el-button link type="primary" @click="handleViewHistory(scope.row.id)">View</el-button>
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="Operations" width="120">
           <template #default="scope">
-            <el-button link type="primary" size="small" @click="handleEdit(scope.row.id)">Edit</el-button>
-            <el-button link type="danger" size="small" @click="handleDelete(scope.row.id)">Delete</el-button>
+            <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
+            <el-button link type="danger" @click="handleDelete(scope.row.id)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -43,7 +43,7 @@
         title="Are you sure?"
         msg="Delete this user?"
         @confirm="deleteUser"
-        @cancel="handleCancelConfirmBox"
+        @cancel="confirm_box = false"
     >
     </ConfirmBox>
   </main>
@@ -176,5 +176,9 @@ function handleEdit(id){
   visible_mode.value = true;
   operation_mode.value = 'update'
   userID_update.value = id
+}
+
+function handleViewHistory(id){
+  router.push({ path: `/admin/list-timekeeping/${id}`})
 }
 </script>
