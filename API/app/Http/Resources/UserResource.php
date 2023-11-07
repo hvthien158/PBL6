@@ -21,12 +21,12 @@ class UserResource extends JsonResource
             'name'=> $this->name,
             'email'=> $this->email,
             'avatar'=> $this->avatar,
-            'address' => $this->address,
-            'DOB' => $this->DOB,
-            'role' => $this->role,
-            'phoneNumber' => $this->phone_number,
-            'salary' => $this->salary,
-            'position' => $this->position,
+            'address' => $this->address ?: 'none',
+            'DOB' => $this->DOB ?: 'none',
+            'role' => $this->role ?: 'user',
+            'phone_number' => $this->phone_number ?: 'none',
+            'salary' => $this->salary ?: 'none',
+            'position' => $this->position ?: 'none',
             'department' => new DepartmentResource($this->department),
         ];
     }
