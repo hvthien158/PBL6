@@ -2,16 +2,21 @@
   <main>
     <SlideBar></SlideBar>
     <div class="user">
-      <div style="position: relative">
-        <h1>User management</h1>
-        <el-button class="new-user" type="warning" @click="handleCreate">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-          </svg>
-          New
-        </el-button>
+      <div class="title-table">
+        <div>
+          <el-button type="warning" @click="handleCreate">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+            </svg>
+            New
+          </el-button>
+        </div>
+        <span style="font-size: 32px; font-weight: 700; padding-bottom: 50px">User management</span>
+        <div>
+          <el-input v-model="search" placeholder="Type to search" />
+        </div>
       </div>
-      <el-table :data="data" height="48vh" style="width: 100%">
+      <el-table :data="filterTableData" height="48vh" style="width: 100%">
         <el-table-column prop="id" label="ID" width="50" />
         <el-table-column prop="name" label="Name" width="180" />
         <el-table-column prop="email" label="Email" width="220" />
@@ -56,6 +61,7 @@ main {
 }
 .user {
   width: 80vw;
+  margin-top: -40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -69,10 +75,17 @@ main {
 .header-row{
   background-color: #f3952d;
 }
-.new-user{
-  position: absolute;
-  top: 12px;
-  right: 43vw;
+.title-table{
+  width: 75vw;
+  display: flex;
+  justify-content: space-between;
+}
+.title-table div{
+  margin-top: 30px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  padding-bottom: 4px;
 }
 .form-user{
   position: absolute;
@@ -82,14 +95,14 @@ main {
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
 import NewUser from "../../../components/NewUser.vue"
-import { ref, onMounted } from "vue";
+import {ref, onMounted, computed} from "vue";
 import { useUserStore } from "../../../stores/user";
 import axios from "axios";
 import router from "../../../router";
 import { useRoute } from "vue-router";
 import { useAlertStore } from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
-let data = ref();
+const data = ref();
 const user = useUserStore().user;
 const alertStore = useAlertStore();
 const route = useRoute();
@@ -97,6 +110,15 @@ const visible_mode = ref(false)
 const operation_mode = ref('create')
 const userID_update = ref(0)
 const confirm_box = ref(false)
+const search = ref('')
+
+const filterTableData = computed(() =>
+    data.value.filter(
+        (data) =>
+            !search.value ||
+            data.name.toLowerCase().includes(search.value.toLowerCase())
+    )
+)
 
 onMounted(() => {
   if (user.role !== "admin") {
