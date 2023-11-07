@@ -84,7 +84,7 @@
         </div>
         <div class="form-floating">
           <input
-            v-model="dataPost.phoneNumber"
+            v-model="dataPost.phone_number"
             type="text"
             class="form-control"
             placeholder="Phone Number"
@@ -210,6 +210,7 @@ import { useRoute } from "vue-router";
 import { useUserStore } from "../../../stores/user";
 import router from "../../../router";
 import { useAlertStore } from "../../../stores/alert";
+
 const user = useUserStore().user;
 const route = useRoute();
 const alertStore = useAlertStore();
@@ -219,7 +220,7 @@ let checkLanding = reactive({
   email: false,
   password: false,
   confirmPassword: false,
-  phoneNumber: true,
+  phone_number: true,
   department: false,
 });
 let data = ref();
@@ -230,7 +231,7 @@ let dataPost = reactive({
   confirmPassword: "",
   address: "",
   DOB: "",
-  phoneNumber: "",
+  phone_number: "",
   avatar: "",
   salary: "",
   position: "",
@@ -279,16 +280,15 @@ const displayUser = async () => {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then(function (response) {
-        console.log(response);
         dataPost.email = response.data.data[0].email;
         dataPost.name = response.data.data[0].name;
         dataPost.address = response.data.data[0].address;
-        dataPost.phoneNumber = response.data.data[0].phoneNumber;
+        dataPost.phone_number = response.data.data[0].phone_number;
         dataPost.DOB = response.data.data[0].DOB;
         dataPost.salary = response.data.data[0].salary;
         dataPost.position = response.data.data[0].position;
         dataPost.role =
-          response.data.data[0].role == "admin" ? "admin" : "user";
+          response.data.data[0].role === "admin" ? "admin" : "user";
         dataPost.department = response.data.data[0].department.id;
       });
   } catch (e) {
@@ -310,7 +310,7 @@ const displayDepartment = async () => {
 const checkName = computed(() => {
   if (dataPost.name.length <= 4) {
     checkLanding.name = false;
-    return "Please field name > 4";
+    return "Please enter name > 4";
   } else {
     checkLanding.name = true;
     return "";
@@ -319,7 +319,7 @@ const checkName = computed(() => {
 const checkEmail = computed(() => {
   if (!isEmail(dataPost.email)) {
     checkLanding.email = false;
-    return "Please field valid email";
+    return "Please enter valid email";
   } else {
     checkLanding.email = true;
     return "";
@@ -328,7 +328,7 @@ const checkEmail = computed(() => {
 const checkPassword = computed(() => {
   if (dataPost.password.length <= 6) {
     checkLanding.password = false;
-    return "Please field password more than 6 character";
+    return "Please enter password more than 6 character";
   } else {
     checkLanding.password = true;
     return "";
@@ -344,18 +344,18 @@ const checkConfirmPassword = computed(() => {
   }
 });
 const checkPhoneNumber = computed(() => {
-  if (!isPhoneNumber(dataPost.phoneNumber) && !(dataPost.phoneNumber.length == 0)) {
-    checkLanding.phoneNumber = false;
-    return "Please field valid phone number";
+  if (!isPhoneNumber(dataPost.phone_number) && !(dataPost.phone_number.length === 0)) {
+    checkLanding.phone_number = false;
+    return "Please enter valid phone number";
   } else {
-    checkLanding.phoneNumber = true;
+    checkLanding.phone_number = true;
     return "";
   }
 });
 const checkDepartment = computed(() => {
-  if (dataPost.department == "") {
+  if (dataPost.department === "") {
     checkLanding.department = false;
-    return "Please field department";
+    return "Please enter department";
   } else {
     checkLanding.department = true;
     return "";
@@ -366,9 +366,9 @@ const isEmail = (email) => {
     /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return filter.test(email);
 };
-const isPhoneNumber = (phoneNumber) => {
+const isPhoneNumber = (phone_number) => {
   let filter = /^([0-9]{10})+$/;
-  return filter.test(phoneNumber);
+  return filter.test(phone_number);
 };
 const createUser = async () => {
   if (
@@ -377,7 +377,7 @@ const createUser = async () => {
     checkLanding.password &&
     checkLanding.confirmPassword &&
     checkLanding.department &&
-    checkLanding.phoneNumber
+    checkLanding.phone_number
   ) {
     try {
       await axios
@@ -391,7 +391,7 @@ const createUser = async () => {
             department_id: dataPost.department,
             address: dataPost.address,
             DOB: dataPost.DOB,
-            phone_number: dataPost.phoneNumber,
+            phone_number: dataPost.phone_number,
             salary: dataPost.salary,
             position: dataPost.position,
             role: dataPost.role,
@@ -401,16 +401,16 @@ const createUser = async () => {
           }
         )
         .then(function (response) {
-          if (response.status == 200) {
-            message('success', response.data.message);
+          if (response.status === 200) {
+            message('success', "Create success");
             router.push({ path: "/admin/list-user" });
           }
         });
     } catch (e) {
-      message("error", e.response.data.message);
+      message("error", "Something wrong");
     }
   } else {
-    message("error", "Please field valid full infomation");
+    message("error", "Please enter valid full information");
   }
 };
 const updateUser = async () => {
@@ -418,7 +418,7 @@ const updateUser = async () => {
     checkLanding.name &&
     checkLanding.email &&
     checkLanding.department &&
-    checkLanding.phoneNumber
+    checkLanding.phone_number
   ) {
     try {
       console.log(`Bearer ${user.token}`);
@@ -431,7 +431,7 @@ const updateUser = async () => {
             department_id: dataPost.department,
             address: dataPost.address,
             DOB: dataPost.DOB,
-            phone_number: dataPost.phoneNumber,
+            phone_number: dataPost.phone_number,
             salary: dataPost.salary,
             position: dataPost.position,
             role: dataPost.role,
@@ -441,15 +441,15 @@ const updateUser = async () => {
           }
         )
         .then(function (response) {
-          message("success", response.data.message);
+          message("success", "Update success");
           router.push({ path: "/admin/list-user" });
         });
     } catch (e) {
       console.log(e);
-      message("error", e.response.data.message);
+      message("error", "Something wrong");
     }
   } else {
-    message("error", "Please field full infomation");
+    message("error", "Please enter full information");
   }
 };
 const message = (type, msg) => {

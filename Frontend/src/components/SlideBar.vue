@@ -2,7 +2,7 @@
   <div class="container">
     <div class="sidebar">
       <ul class="sidebar-menu">
-        <li @click="selectedOption = (selectedOption == 'user' ? null : 'user') " :class="{ active: selectedOption === 'user' }">Manager user</li>
+        <li @click="selectedOption = (selectedOption === 'user' ? null : 'user') " :class="{ active: selectedOption === 'user' }">User management</li>
         <div v-if="selectedOption === 'user'" class="sub-menu">
           <button @click="router.push({ path : '/admin/list-user'})">List user</button>
           <button @click="router.push({ path : '/admin/create-user'})">Add user</button>
