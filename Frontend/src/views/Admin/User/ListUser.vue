@@ -102,7 +102,7 @@ import router from "../../../router";
 import { useRoute } from "vue-router";
 import { useAlertStore } from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
-const data = ref();
+const data = ref([]);
 const user = useUserStore().user;
 const alertStore = useAlertStore();
 const route = useRoute();
