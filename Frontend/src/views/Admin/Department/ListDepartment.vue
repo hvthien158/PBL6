@@ -25,7 +25,10 @@
             <el-table-column prop="quantityUser" label="Quantity staff"></el-table-column>
             <el-table-column label="Staff">
               <template #default="scope">
-                <el-button class="el-button--text"
+                <el-button class="el-button--text" v-if="scope.row.quantityUser === 0"
+                  @click="messages('error','There are no employees at this department')">View
+                  Staff</el-button>
+                  <el-button class="el-button--text" v-else
                   @click="router.push({ path: `/admin/list-user/${scope.row.name}` })">View
                   Staff</el-button>
               </template>
@@ -173,6 +176,7 @@ const filteredData = computed(() => {
     return department.value
   } else {
     let searchText = dataSearch.value.toLowerCase();
+    currentPage.value = 1
     return department.value.filter((item) => {
       console.log(searchText)
       return item.name.toLowerCase().includes(searchText);

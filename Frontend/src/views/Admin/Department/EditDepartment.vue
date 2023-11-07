@@ -2,87 +2,43 @@
   <main>
     <SlideBar></SlideBar>
     <div class="add-department">
-      <div class="input-container">
-        <h1 v-if="!isUpdateDepartment">Add department</h1>
-        <h1 v-else>Edit department</h1>
-        <div class="form-floating">
-          <input
-            v-model="dataDepartment.departmentName"
-            type="text"
-            class="form-control"
-            :class="{
-              'is-invalid': !dataDepartment.departmentName,
-              'is-valid': dataDepartment.departmentName,
-            }"
-            placeholder="Department name"
-            required
-          />
+      <el-form class="input-container">
+        <h2 v-if="!isUpdateDepartment">Add department</h2>
+        <h2 v-else>Edit department</h2>
+        <el-form-item>
+          <el-input v-model="dataDepartment.departmentName" placeholder="Department name" clearable />
+        </el-form-item>
+        <div class="invalid-feedback">
+          {{ checkName }}
         </div>
-        <div class="invalid-feedback" v-if="!dataDepartment.departmentName">
-          Please enter department's name
+        <el-form-item>
+          <el-input v-model="dataDepartment.address" placeholder="Address" clearable />
+        </el-form-item>
+        <div class="invalid-feedback">
+          {{ checkAddress }}
         </div>
-        <div class="form-floating">
-          <input
-            v-model="dataDepartment.address"
-            type="text"
-            class="form-control"
-            placeholder="Address"
-            :class="{
-              'is-invalid': !dataDepartment.address,
-              'is-valid': dataDepartment.address,
-            }"
-            required
-          />
-        </div>
-        <div class="invalid-feedback" v-if="!dataDepartment.address">
-          Please enter department's address
-        </div>
-        <div class="form-floating">
-          <input
-            v-model="dataDepartment.email"
-            type="text"
-            class="form-control"
-            :class="{ 'is-invalid': !checkEmail, 'is-valid': checkEmail }"
-            placeholder="Email"
-            required
-          />
-        </div>
-        <div class="invalid-feedback" v-if="!checkEmail">Please enter department's email</div>
-        <div class="form-floating">
-          <input
-            v-model="dataDepartment.phoneNumber"
-            type="text"
-            class="form-control"
-            :class="{
-              'is-invalid': !checkPhoneNumber,
-              'is-valid': checkPhoneNumber,
-            }"
-            placeholder="Phone number"
-            required
-          />
-        </div>
-        <div class="invalid-feedback" v-if="!checkPhoneNumber">
-          Please enter department's phone
+        <el-form-item>
+          <el-input v-model="dataDepartment.email" placeholder="Email" clearable />
+        </el-form-item>
+       
+        <div class="invalid-feedback">{{ checkEmail }}</div>
+        <el-form-item>
+          <el-input v-model="dataDepartment.phoneNumber" placeholder="Phone Number" clearable />
+        </el-form-item>
+        <div class="invalid-feedback">
+          {{ checkPhoneNumber }}
         </div>
         <div class="btn-submit" v-if="!isUpdateDepartment">
-          <button
-            @click="createDepartment"
-            type="button"
-            class="btn btn-primary"
-          >
+          <button @click="createDepartment" type="button" class="btn btn-primary">
             Add department
           </button>
         </div>
         <div class="btn-submit" v-else>
-          <button
-            @click="updateDepartment"
-            type="button"
-            class="btn btn-primary"
-          >
+          <button @click="updateDepartment" type="button" class="btn btn-primary">
             Edit department
           </button>
         </div>
-      </div>
+      </el-form>
     </div>
   </main>
 </template>
@@ -93,6 +49,19 @@ main {
   box-sizing: border-box;
   display: flex;
 }
+
+.el-card {
+  width: 100%;
+  height: 100%;
+}
+
+.card-content {
+  display: flex;
+  justify-content: center;
+}
+.el-form-item{
+  margin-bottom: 5px
+}
 .add-department {
   width: 85vw;
   display: flex;
@@ -100,26 +69,37 @@ main {
   align-items: center;
   margin-bottom: 100px;
 }
+
 .add-department h1 {
   color: black;
 }
+
 .input-container {
   width: 40%;
 }
-.add-department h1 {
+
+.input-content {
+  display: block;
+}
+
+.add-department h2 {
   text-align: center;
   margin-bottom: 30px;
 }
+
 .input-group-text {
   width: 25%;
 }
+
 .form-floating {
   margin-bottom: 10px;
 }
+
 .invalid-feedback {
   display: block;
   margin-bottom: 5px;
 }
+
 .btn-submit {
   display: flex;
   justify-content: center;
@@ -145,13 +125,35 @@ onMounted(() => {
   } else isUpdateDepartment = false;
 });
 const dataDepartment = reactive({
-  departmentName: "",
-  address: "",
-  email: "",
-  phoneNumber: "",
+  departmentName: null,
+  address: null,
+  email: null,
+  phoneNumber: null,
 });
+const checkName = computed(() => {
+  if (dataDepartment.departmentName == '') {
+    return `Please enter department's name`
+  } else {
+    return ''
+  }
+})
+const checkAddress = computed(() => {
+  if (dataDepartment.address == '') {
+    return `Please enter department's address`
+  } else {
+    return ''
+  }
+})
 const checkEmail = computed(() => {
-  return isEmail(dataDepartment.email);
+  if (dataDepartment.email == null || isEmail(dataDepartment.email)) {
+    return ''
+  } else {
+    if (dataDepartment.email == '') {
+      return `Please enter department's email`
+    } else if (!isEmail(dataDepartment.email)) {
+      return `Please enter valid email`
+    }
+  }
 });
 const isEmail = (email) => {
   let filter =
@@ -159,7 +161,15 @@ const isEmail = (email) => {
   return filter.test(email);
 };
 const checkPhoneNumber = computed(() => {
-  return isPhoneNumber(dataDepartment.phoneNumber);
+  if (dataDepartment.phoneNumber == null || (isPhoneNumber(dataDepartment.phoneNumber))) {
+    return ''
+  } else {
+    if (dataDepartment.phoneNumber == '') {
+      return `Please enter department's phone number`
+    } else if (!(isPhoneNumber(dataDepartment.phoneNumber))) {
+      return `Please enter valid phone number`
+    }
+  }
 });
 const isPhoneNumber = (phoneNumber) => {
   let filter = /^([0-9]{10})+$/;
@@ -170,7 +180,9 @@ const createDepartment = async () => {
     dataDepartment.departmentName &&
     dataDepartment.address &&
     dataDepartment.email &&
-    dataDepartment.phoneNumber
+    dataDepartment.phoneNumber &&
+    checkEmail.value == '' &&
+    checkPhoneNumber.value == ''
   ) {
     try {
       await axios
@@ -191,11 +203,15 @@ const createDepartment = async () => {
           router.push({ path: "/admin/list-department" });
         });
     } catch (e) {
-      errorMessage('error',e.response.data.message)
+      errorMessage('error', e.response.data.message)
       console.log(e);
     }
   } else {
-    errorMessage('error','Please field all info')
+    if (dataDepartment.departmentName == null) dataDepartment.departmentName = ''
+    if (dataDepartment.address == null) dataDepartment.address = ''
+    if (dataDepartment.email == null) dataDepartment.email = ''
+    if (dataDepartment.phoneNumber == null) dataDepartment.phoneNumber = ''
+    errorMessage('error', 'Please field all info')
   }
 };
 const displayDepartment = async () => {
@@ -244,14 +260,14 @@ const updateDepartment = async () => {
             : console.log(response);
         });
     } catch (e) {
-      errorMessage('error',e.message)
+      errorMessage('error', e.message)
       console.log(e);
     }
   } else {
-    errorMessage('error','Please enter all info')
+    errorMessage('error', 'Please enter all info')
   }
 };
-const errorMessage = (type,msg) => {
+const errorMessage = (type, msg) => {
   alertStore.alert = true;
   alertStore.type = type;
   alertStore.msg = msg;
