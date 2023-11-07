@@ -12,6 +12,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Department;
 use App\Models\Shift;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -45,7 +46,7 @@ class AdminController extends Controller
             ]);
             return response()->json(['message' => 'Create user successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     /**
@@ -72,7 +73,7 @@ class AdminController extends Controller
             ]);
             return response()->json(['message' => 'Update user successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     /**
@@ -85,13 +86,14 @@ class AdminController extends Controller
     {
         $this->authorize('delete', $user);
         try {
-            $user = User::find($id);
-            if ($user) {
-                $user->delete();
+            $user = DB::table('users')->delete($id);
+            if($user == 1){
+                return response()->json(['message' => 'Delete user successfully']);
+            } else {
+                return response()->json(['message' => 'User not found'], 400);
             }
-            return response()->json(['message' => 'Delete user successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     /**
@@ -111,7 +113,7 @@ class AdminController extends Controller
             ]);
             return response()->json(['message' => 'Create department successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     /**
@@ -133,7 +135,7 @@ class AdminController extends Controller
             ]);
             return response()->json(['message' => 'Update department successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     /**
@@ -151,7 +153,7 @@ class AdminController extends Controller
                 $department->delete();
             return response()->json(['message' => 'Delete department successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     /**
@@ -171,7 +173,7 @@ class AdminController extends Controller
                 return response()->json(['message'=> 'Không có user nào']);
             }
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     /**
@@ -191,7 +193,7 @@ class AdminController extends Controller
             ]);
             return response()->json(['message' => 'Create shift successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     /**
@@ -213,7 +215,7 @@ class AdminController extends Controller
             ]);
             return response()->json(['message' => 'Update shift successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
     public function deleteShift($id, Shift $shift)
