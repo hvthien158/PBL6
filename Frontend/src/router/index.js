@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
-import NProgress from 'nprogress';
 import HomeView from '../views/HomeView.vue'
 import ScheduleView from '../views/ScheduleView.vue'
 import MyProfile from "../views/User/MyProfile.vue";
