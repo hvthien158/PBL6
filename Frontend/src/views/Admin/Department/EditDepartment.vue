@@ -19,7 +19,7 @@
           />
         </div>
         <div class="invalid-feedback" v-if="!dataDepartment.departmentName">
-          Please field valid department
+          Please enter department's name
         </div>
         <div class="form-floating">
           <input
@@ -35,7 +35,7 @@
           />
         </div>
         <div class="invalid-feedback" v-if="!dataDepartment.address">
-          Please field valid department
+          Please enter department's address
         </div>
         <div class="form-floating">
           <input
@@ -47,14 +47,14 @@
             required
           />
         </div>
-        <div class="invalid-feedback" v-if="!checkEmail">Please field valid email</div>
+        <div class="invalid-feedback" v-if="!checkEmail">Please enter department's email</div>
         <div class="form-floating">
           <input
             v-model="dataDepartment.phoneNumber"
             type="text"
             class="form-control"
             :class="{
-              'is-valid': !checkPhoneNumber,
+              'is-invalid': !checkPhoneNumber,
               'is-valid': checkPhoneNumber,
             }"
             placeholder="Phone number"
@@ -62,7 +62,7 @@
           />
         </div>
         <div class="invalid-feedback" v-if="!checkPhoneNumber">
-          Please field valid phone number
+          Please enter department's phone
         </div>
         <div class="btn-submit" v-if="!isUpdateDepartment">
           <button
@@ -139,7 +139,7 @@ const user = useUserStore().user;
 const route = useRoute();
 let isUpdateDepartment = false;
 onMounted(() => {
-  if (route.path == `/admin/update-department/${route.params.id}`) {
+  if (route.path === `/admin/update-department/${route.params.id}`) {
     isUpdateDepartment = true;
     displayDepartment();
   } else isUpdateDepartment = false;
@@ -151,7 +151,7 @@ const dataDepartment = reactive({
   phoneNumber: "",
 });
 const checkEmail = computed(() => {
-  return !isEmail(dataDepartment.email) ? false : true;
+  return isEmail(dataDepartment.email);
 });
 const isEmail = (email) => {
   let filter =
@@ -159,7 +159,7 @@ const isEmail = (email) => {
   return filter.test(email);
 };
 const checkPhoneNumber = computed(() => {
-  return !isPhoneNumber(dataDepartment.phoneNumber) ? false : true;
+  return isPhoneNumber(dataDepartment.phoneNumber);
 });
 const isPhoneNumber = (phoneNumber) => {
   let filter = /^([0-9]{10})+$/;
@@ -239,7 +239,7 @@ const updateDepartment = async () => {
           }
         )
         .then(function (response) {
-          response.status == 200
+          response.status === 200
             ? router.push({ path: "/admin/list-department" })
             : console.log(response);
         });
@@ -248,7 +248,7 @@ const updateDepartment = async () => {
       console.log(e);
     }
   } else {
-    errorMessage('error','Please field all info')
+    errorMessage('error','Please enter all info')
   }
 };
 const errorMessage = (type,msg) => {

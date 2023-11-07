@@ -24,7 +24,7 @@ class AdminController extends Controller
     }
     /**
      * @param CreateUserRequest $request
-     * 
+     *
      * @return object
      */
     public function createUser(CreateUserRequest $request)
@@ -52,7 +52,7 @@ class AdminController extends Controller
      * @param UpdateUserRequest $request
      * @param User $user
      * @param int $id
-     * 
+     *
      * @return object
      */
     public function updateUser(UpdateUserRequest $request, User $user, $id)
@@ -78,7 +78,7 @@ class AdminController extends Controller
     /**
      * @param User $user
      * @param int $id
-     * 
+     *
      * @return object
      */
     public function deleteUser(User $user, $id)
@@ -96,7 +96,7 @@ class AdminController extends Controller
     }
     /**
      * @param CreateDepartmentRequest $request
-     * 
+     *
      * @return object
      */
     public function createDepartment(CreateDepartmentRequest $request)
@@ -118,7 +118,7 @@ class AdminController extends Controller
      * @param UpdateDepartmentRequest $request
      * @param Department $department
      * @param int $id
-     * 
+     *
      * @return object
      */
     public function updateDepartment(UpdateDepartmentRequest $request, Department $department, $id)
@@ -139,7 +139,7 @@ class AdminController extends Controller
     /**
      * @param int $id
      * @param Department $department
-     * 
+     *
      * @return object
      */
     public function deleteDepartment($id, Department $department)
@@ -156,7 +156,7 @@ class AdminController extends Controller
     }
     /**
      * @param mixed $name
-     * 
+     *
      * @return object
      */
     public function getUserDepartment($name, Department $department)
@@ -176,7 +176,7 @@ class AdminController extends Controller
     }
     /**
      * @param CreateShiftRequest $request
-     * 
+     *
      * @return object
      */
     public function createShift(CreateShiftRequest $request)
@@ -198,7 +198,7 @@ class AdminController extends Controller
      * @param UpdateShiftRequest $request
      * @param Shift $shift
      * @param int $id
-     * 
+     *
      * @return object
      */
     public function updateShift(UpdateShiftRequest $request, Shift $shift, $id)

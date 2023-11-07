@@ -34,14 +34,14 @@
   background-color: #f1f1f1;
   width: 15vw;
   margin: 0;
-  padding: 0
+  padding: 0;
+  font-size: small;
 }
 
 .sidebar {
   width: 100%;
-  background-color: #333;
-  color: #fff;
   padding: 10px;
+  background-color: white;
 }
 
 .sidebar-menu {
@@ -55,6 +55,10 @@
   padding: 10px;
   margin-bottom: 5px;
 }
+.sidebar-menu li:hover {
+  cursor: pointer;
+  border-left: #9ca3af 4px solid;
+}
 
 .sub-menu {
   display: flex;
@@ -63,8 +67,6 @@
 }
 
 .sub-menu button {
-  background-color: #666;
-  color: #fff;
   border: none;
   padding: 5px 10px;
   margin-bottom: 5px;
@@ -72,6 +74,7 @@
 }
 
 .sub-menu button:hover {
+  cursor: pointer;
   background-color: #888;
 }
 
@@ -80,7 +83,6 @@
 }
 
 .sidebar-menu li.active {
-  background-color: #555;
   border-radius: 3px;
 }
 
@@ -102,5 +104,4 @@ button {
 import { ref } from 'vue';
 import router from '../router'
 const selectedOption = ref(null);
-
 </script>

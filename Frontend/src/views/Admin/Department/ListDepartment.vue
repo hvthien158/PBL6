@@ -6,7 +6,7 @@
         <h1>List department</h1>
         <div class="table-responsive-md">
           <table class="table">
-            <thead class="table-dark">
+            <thead style="background-color: #ef9400">
               <tr>
                 <td scope="col">ID</td>
                 <td>Name department</td>
@@ -78,8 +78,10 @@ main {
 .department h1 {
   text-align: center;
 }
-.table td a {
+
+a:hover{
   cursor: pointer;
+  color: #f3952d !important;
 }
 </style>
 <script setup>

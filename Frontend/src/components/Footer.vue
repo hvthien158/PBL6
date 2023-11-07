@@ -10,8 +10,8 @@
   }
   footer {
     max-width: 100vw;
-    height: 9vh;
-    background-color: #313335;
+    height: 60px;
+    background-color: white;
     color: #f3952d;
     padding: 20px 10px;
     border-top: rgba(156, 163, 175, 0.6) 1px solid;

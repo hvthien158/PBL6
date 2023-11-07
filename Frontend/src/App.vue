@@ -10,9 +10,6 @@
 </template>
 
 <style>
-* {
-  color: #a9a9a9;
-}
 *.table tbody td {
   color: black;
 }
@@ -21,14 +18,11 @@
 }
 
 .main-view {
-  margin-top: 9vh;
-  background-color: rgb(255 255 255);
-  min-height: 82vh;
+  margin-top: 60px;
+  background-color: rgb(240, 240, 240);
+  min-height: calc(100vh - 120px);
   display: flex
 }
-.main-view .fix-margin{
-  margin-top: calc(var(--margin-top)) + 20px;
-} 
 input {
   color: black;
 }
@@ -50,18 +44,11 @@ input {
 <script setup>
 import { RouterView } from "vue-router";
 import HeaderHome from "./components/HeaderHome.vue";
-import SlideBar from "./components/SlideBar.vue";
-import router from "./router";
 import Footer from "./components/Footer.vue";
 import { useAlertStore } from "./stores/alert";
 import AlertBox from "./components/AlertBox.vue";
 import { ref, watch } from "vue";
-import { useUserStore } from "./stores/user";
 
-const user = useUserStore().user;
-if (user.expired == "") {
-  router.push({ path: "/login" });
-}
 const isAlert = ref(false);
 const typeAlert = ref("");
 const msgAlert = ref("");

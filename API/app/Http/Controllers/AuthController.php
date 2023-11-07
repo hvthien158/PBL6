@@ -20,12 +20,12 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword', 'checkEmail']]);
     }
 
     /**
      * @param LoginRequest $request
-     * 
+     *
      * @return object
      */
     public function login(LoginRequest $request)
@@ -46,7 +46,7 @@ class AuthController extends Controller
 
     /**
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function register(Request $request)
@@ -101,7 +101,7 @@ class AuthController extends Controller
 
     /**
      * @param string $token
-     * 
+     *
      * @return object
      */
     protected function createNewToken($token)
@@ -116,7 +116,7 @@ class AuthController extends Controller
 
     /**
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function changePassword(Request $request)
@@ -152,7 +152,7 @@ class AuthController extends Controller
 
     /**
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function updateProfile(Request $request){
@@ -184,7 +184,7 @@ class AuthController extends Controller
 
     /**
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function forgotPassword(Request $request){
@@ -204,11 +204,27 @@ class AuthController extends Controller
      * 
      * @return object
      */
+    public function checkEmail(Request $request){
+        $request->validate(['email' => 'required|email']);
+
+        $email = DB::table('users')->where('email', '=', $request->input('email'))->first();
+        if($email){
+            return response()->json([], 200);
+        } else {
+            return response()->json([], 404);
+        }
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return object
+     */
     public function resetPassword(Request $request){
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'email' => 'email|required',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $status = Password::reset(

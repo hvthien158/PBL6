@@ -26,9 +26,7 @@
             Check Out
           </button>
         </div>
-        <router-link to="/schedule">
-          <button class="active-button" style="margin-top: 20px; height: 40px">History</button>
-        </router-link>
+        <button @click="router.push({name: 'schedule'})" class="active-button no-underline" style="margin-top: 20px; height: 40px">History</button>
       </div>
     </div>
   </main>
@@ -36,7 +34,6 @@
 <style scoped>
 main {
   max-width: 100vw;
-  min-height: 82vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -124,7 +121,7 @@ main {
   margin: 10px;
   align-items: center;
   appearance: none;
-  background-image: radial-gradient(100% 100% at 100% 0, #FCFCFD 0, #9ca3af 100%);;
+  background-image: radial-gradient(100% 100% at 100% 0, #FCFCFD 0, #9ca3af 100%);
   border-radius: 4px;
   border-width: 0;
   box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;

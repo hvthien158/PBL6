@@ -11,8 +11,8 @@
             type="text"
             class="form-control"
             :class="{
-              'is-invalid': !(checkEmail == ''),
-              'is-valid': checkEmail == '',
+              'is-invalid': checkEmail !== '',
+              'is-valid': checkEmail === '',
             }"
             placeholder="Email"
             required
@@ -27,8 +27,8 @@
             type="text"
             class="form-control"
             :class="{
-              'is-invalid': !(checkName == ''),
-              'is-valid': checkName == '',
+              'is-invalid': checkName !== '',
+              'is-valid': checkName === '',
             }"
             placeholder="Name"
             required
@@ -43,8 +43,8 @@
             type="password"
             class="form-control"
             :class="{
-              'is-invalid': !checkPassword == '',
-              'is-valid': checkPassword == '',
+              'is-invalid': checkPassword !== '',
+              'is-valid': checkPassword === '',
             }"
             placeholder="Password"
             required
@@ -59,8 +59,8 @@
             type="password"
             class="form-control"
             :class="{
-              'is-invalid': !checkConfirmPassword == '',
-              'is-valid': !checkConfirmPassword == '',
+              'is-invalid': checkConfirmPassword !== '',
+              'is-valid': checkConfirmPassword === '',
             }"
             placeholder="Confirmation Password"
             required
@@ -89,8 +89,8 @@
             class="form-control"
             placeholder="Phone Number"
             :class="{
-              'is-invalid': !checkPhoneNumber == '',
-              'is-valid': !checkPhoneNumber == '',
+              'is-invalid': checkPhoneNumber !== '',
+              'is-valid': checkPhoneNumber === '',
             }"
             required
           />
@@ -129,7 +129,7 @@
             class="custom-select"
             v-model="dataPost.department"
             :class="{
-              'is-invalid': !checkDepartment == '',
+              'is-invalid': checkDepartment !== '',
               'is-valid': checkDepartment,
             }"
             required
@@ -267,10 +267,9 @@ const position = [
 ];
 onMounted(() => {
   displayDepartment();
-  isUpdateUser =
-    route.path == `/admin/update-user/${route.params.id}` ? true : false;
-  if (isUpdateUser) {
-    displayUser();
+  isUpdateUser = (route.path === `/admin/update-user/${route.params.id}`)
+  if(isUpdateUser) {
+    displayUser()
   }
 });
 const displayUser = async () => {

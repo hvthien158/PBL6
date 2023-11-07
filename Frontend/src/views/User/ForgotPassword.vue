@@ -2,23 +2,36 @@
   <main>
     <div class="container">
       <div v-if="verifyQuest">
-        <p style="font-weight: bold">Thư xác nhận đã được gửi đến email của bạn, vui lòng xác nhận để tiếp tục...</p>
+        <p style="font-weight: bold">A confirmation email has been sent to your email, please confirm to continue...</p>
       </div>
       <div class="form-container" v-else>
-        <h3>Quên mật khẩu</h3>
         <div class="form-input">
-          <div class="form-info">
-            <div class="label-info">
-              <label>Email</label>
-            </div>
-            <div class="input-info">
-              <input v-model="email" type="text" />
-              <h5>{{ checkEmail }}</h5>
-            </div>
+          <h3 style="text-align: center; font-weight: 700; color: #e06230">FORGOT PASSWORD</h3>
+          <div class="login__field">
+            <i class="login__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+              </svg>
+            </i>
+            <input
+                v-model="email"
+                type="text"
+                class="login__input"
+                placeholder="Email"
+                @blur="checkmail"
+                @input="checkmail"
+                @keyup.enter="forgot"
+            >
+            <span class="error">{{ email_error }}</span>
           </div>
-          <div class="btn-submit">
-            <button type="submit" @click="forgot">Gửi</button>
+          <div class="login__field" style="display: flex; justify-content: center">
+            <ButtonLoading :loading="loading" @click="forgot" style="font-size: 15px;" size="large" type="warning" round>Send mail</ButtonLoading>
           </div>
+          <p class="fail-login" v-if="email_not_signed">Email not exist</p>
+        </div>
+        <div class="content-bottom">
+          <span>Already have an account? </span>
+          <span id="go-login" @click="router.push({name: 'login'})">Sign in</span>
         </div>
       </div>
     </div>
@@ -28,7 +41,6 @@
 <style scoped>
 main {
   max-width: 100vw;
-  min-height: 100vh;
 }
 .container {
   display: flex;
@@ -42,96 +54,89 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 100px;
-}
-.additional-content {
-  text-align: center;
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.additional-content p {
-  margin-bottom: 10px;
 }
 
 .form-input {
   display: block;
-  padding: 20px;
-  background-color: #313335;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 400px;
 }
-
-.form-info {
-  display: flex;
-  margin-bottom: 10px;
+.login__field {
+  padding: 20px 0;
+  position: relative;
 }
 
-.form-info .label-info {
-  display: flex;
-  align-items: center;
-  width: 150px;
-  padding-right: 5px;
-  color: #333333;
-  font-weight: bold;
+.login__icon {
+  position: absolute;
+  top: 30px;
+  color: #7875B5;
 }
 
-.form-input input {
-  padding: 10px;
-  width: 100%;
-  border-radius: 2px;
-  display: block;
-  border: 1px solid #999999;
-  transition: border-color 0.3s ease-in-out;
-}
-
-.form-input input:focus {
-  outline: none;
-  border-color: #62d58c;
-}
-
-.btn-submit {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.btn-submit button {
-  width: 100%;
-  height: 40px;
-  border-radius: 5px;
-  background-color: #62d58c;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: pointer;
+.login__input {
   border: none;
-  transition: background-color 0.3s ease-in-out;
+  border-bottom: 2px solid #D1D1D4;
+  background: none;
+  padding: 10px 10px 10px 24px;
+  width: 95%;
+  font-weight: 700;
+  transition: .2s;
 }
 
-.btn-submit button:hover {
-  background-color: #3ca66e;
+.login__input:active,
+.login__input:focus,
+.login__input:hover {
+  outline: none;
+  border-bottom-color: #6A679E;
 }
 
-h5 {
-  margin-top: 5px;
-  color: rgb(214, 34, 34);
+.error{
+  color: red;
+  font-size: small;
+  position: absolute;
+  left: 25px;
+  top: 66px;
+}
+
+.fail-login{
+  color: red;
   font-size: 14px;
+  text-align: center;
+  position: absolute;
+  left: calc(50% - 44px);
+  bottom: calc(50% - 186px);
+}
+
+.content-bottom{
+  position: absolute;
+  bottom: 34%;
+}
+
+#go-login{
+  color: #7875B5;
+  font-weight: 700;
+}
+
+#go-login:hover{
+  cursor: pointer;
+  opacity: 0.8;
 }
 </style>
 
 <script setup>
-import { computed } from "vue";
 import axios from "axios";
 import router from "../../router";
 import {ref} from "vue";
 import {useUserStore} from "../../stores/user";
+import ButtonLoading from "../../components/ButtonLoading.vue";
 
 const verifyQuest = ref(false)
-
+const email_not_signed = ref(false)
 const user = useUserStore().user
+const email_error = ref('')
+const loading = ref(false)
 
 if(user.token !== ''){
   router.push({name : 'home'})
@@ -139,15 +144,9 @@ if(user.token !== ''){
 
 const email = ref('')
 
-const checkEmail = computed(() => {
-  if(email.value === ''){
-    return "Vui lòng nhập email"
-  } else if (!isEmail(email.value)) {
-    return "Email không đúng định dạng";
-  } else {
-    return "";
-  }
-});
+function checkmail() {
+  email_error.value = (email.value.length === 0) ? 'Please enter your email' : ''
+}
 
 const isEmail = (email) => {
   let filter =
@@ -155,18 +154,28 @@ const isEmail = (email) => {
   return filter.test(email);
 };
 const forgot = async () => {
-  if (email.value !== '') {
-    try {
-      await axios
-          .post('http://127.0.0.1:8000/api/forgot-password', {
-            email: email.value,
-          })
-          .then(function () {
-            verifyQuest.value = true
-          });
-    } catch (e) {
-      console.log(e);
-    }
+  loading.value = true
+  if(!isEmail(email.value)){
+    email_error.value = 'Invalid email'
+    loading.value = false
+  } else if (email.value !== '') {
+      await axios.post('http://127.0.0.1:8000/api/check-email', {
+        email: email.value
+      }).then(() => {
+        verifyQuest.value = true
+        axios.post('http://127.0.0.1:8000/api/forgot-password', {
+              email: email.value,
+            })
+            .then(function () {
+              localStorage.setItem('email_forgot', email.value)
+            })
+            .catch((e)=> {
+              console.log(e)
+            })
+      }).catch(() => {
+        email_not_signed.value = true
+        loading.value = false
+      })
   }
 };
 

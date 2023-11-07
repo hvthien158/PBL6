@@ -4,8 +4,8 @@
     <div class="user">
       <h1>Manager user</h1>
       <div class="table-responsive-md">
-        <table class="table">
-          <thead class="table-dark">
+      <table class="table">
+        <thead style="background-color: #ef9400">
             <tr>
               <td scope="col">ID</td>
               <td>Name</td>

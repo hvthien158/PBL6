@@ -1,119 +1,95 @@
 <template>
-  <main>
-    <div class="container">
-      <div class="list-timekeeping">
-        <form @submit.prevent="getListTimeKeeping" method="get">
-          <div class="form-row align-items-center">
-            <div class="col-sm-2 my-1">
-              <input
-                type="date"
-                class="form-control"
-                v-model="dataSearch.startTime"
-              />
-            </div>
-            Đến
-            <div class="col-sm-2 my-1">
-              <input
-                type="date"
-                class="form-control"
-                v-model="dataSearch.endTime"
-              />
-            </div>
-            <div class="col-sm-2 my-1">
-              <select class="custom-select" v-model="dataSearch.month">
-                <option v-for="options in month" :value="options.value">
-                  {{ options.text }}
-                </option>
-              </select>
-            </div>
-            <div class="col-sm-2 my-1">
-              <select class="custom-select" v-model="dataSearch.year">
-                <option v-for="options in years" :value="options.value">
-                  {{ options.text }}
-                </option>
-              </select>
-            </div>
-            <div class="col-auto my-1">
-              <button
-                type="submit"
-                class="btn btn-primary"
-                @click="getListTimeKeeping"
-              >
-                Xem tất cả
-              </button>
-            </div>
-            <div class="col-auto my-1">
-              <button
-                type="button"
-                class="btn btn-primary"
-                @click="exportExcel"
-              >
-                Xuất Excel
-              </button>
-            </div>
-            <div class="col-auto my-1">
-              <button type="button" class="btn btn-primary" @click="exportCSV">
-                Xuất CSV
-              </button>
-            </div>
-          </div>
-        </form>
-        <div class="table-responsive-md">
-          <table class="table">
-            <thead class="thead-dark">
-              <tr>
-                <th scope="col">Ngày</th>
-                <th scope="col">Giờ Check-In</th>
-                <th scope="col">Giờ Check-Out</th>
-                <th scope="col">Ca Làm</th>
-                <th scope="col">Số công</th>
-                <th scope="col">Yêu cầu</th>
-              </tr>
-            </thead>
-            <tbody v-for="item in filteredData" :key="item.id">
-              <tr>
-                <td scope="row">{{ item.date }}</td>
-                <td>{{ item.timeCheckIn }}</td>
-                <td>{{ item.timeCheckOut }}</td>
-                <td>{{ item.shift.name }}</td>
-                <td>{{ item.shift.amount }}</td>
-                <th scope="col">
-                  <button type="button" class="btn btn-primary">Gửi</button>
-                </th>
-              </tr>
-            </tbody>
-          </table>
+  <div class="timekeeping-management">
+    <el-card>
+      <div slot="header" class="card-header">
+        Time Keeping
+      </div>
+      <div class="card-content">
+        <el-form inline>
+          <el-form-item label="For date">
+            <el-date-picker v-model="dataSearch.startDate" type="date"
+              placeholder="Select date"></el-date-picker>
+          </el-form-item>
+          <el-form-item label="To date">
+            <el-date-picker v-model="dataSearch.endDate" type="date"
+              placeholder="Select date"></el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="exportExcel">Export Excel</el-button>
+            <el-button type="primary" @click="exportCSV">Export CSV</el-button>
+          </el-form-item>
+        </el-form>
+
+        <el-table :data="getCurrentPageData" border stripe>
+          <el-table-column prop="date" label="Date"></el-table-column>
+          <el-table-column prop="timeCheckIn" label="Time Checkin"></el-table-column>
+          <el-table-column prop="timeCheckOut" label="Time Checkout"></el-table-column>
+          <el-table-column prop="timeWork" label="Time Work"></el-table-column>
+          <el-table-column prop="shift.name" label="Shift"></el-table-column>
+          <el-table-column label="Request">
+            <template #default="scope">
+              <el-button class="el-button--text">Edit</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="pagination">
+          <el-button @click="previousPage" :disabled="currentPage === 1">
+            Previous
+          </el-button>
+          <span>{{ currentPage }} / {{ getTotalPage }}</span>
+          <el-button @click="nextPage" :disabled="currentPage === getTotalPage">
+            Next
+          </el-button>
         </div>
       </div>
-    </div>
-  </main>
+    </el-card>
+  </div>
 </template>
 
 <style scoped>
-@import "https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css";
-main {
-  max-width: 100vw;
-  min-height: 80vh;
+.timekeeping-management {
+  padding: 20px;
   display: flex;
   justify-content: center;
-  border: 0.1em solid black;
-  padding-top: 12px;
 }
-.container {
+
+.el-form {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.el-card {
+  min-width: 50vw;
+}
+
+.card-content {
+  margin-top: 20px;
+}
+
+.export {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pagination {
   display: flex;
   justify-content: center;
-  width: 100%;
-  max-width: 100%;
+  align-items: center;
+  margin-top: 10px;
 }
-table {
-  width: 80vw;
-  border: 0.1em solid black;
+
+.el-form-item {
+  margin-bottom: 0;
 }
-.table td {
-  border-color: black;
-}
-.table th {
-  border-color: black;
+
+.pagination span {
+  margin: 0 10px;
 }
 </style>
 
@@ -126,32 +102,13 @@ import axios from "axios";
 
 const user = useUserStore().user;
 let dataSearch = reactive({
-  startTime: null,
-  endTime: null,
-  month: null,
-  year: null,
+  startDate: null,
+  endDate: null,
 });
-let data = ref();
-const month = [
-  { value: null, text: "Tìm theo tháng" },
-  { value: 1, text: "Tháng 1" },
-  { value: 2, text: "Tháng 2" },
-  { value: 3, text: "Tháng 3" },
-  { value: 4, text: "Tháng 4" },
-  { value: 5, text: "Tháng 5" },
-  { value: 6, text: "Tháng 6" },
-  { value: 7, text: "Tháng 7" },
-  { value: 8, text: "Tháng 8" },
-  { value: 9, text: "Tháng 9" },
-  { value: 10, text: "Tháng 10" },
-  { value: 11, text: "Tháng 11" },
-  { value: 12, text: "Tháng 12" },
-];
-const currentYear = new Date().getFullYear();
-const years = [];
-for (let year = currentYear; year >= 2020; year--) {
-  years.push({ value: year, text: "Năm " + year });
-}
+let data = ref()
+let currentPage = ref(1);
+const pageSize = 10;
+
 onMounted(() => {
   getListTimeKeeping();
 });
@@ -165,49 +122,134 @@ const getListTimeKeeping = async () => {
       })
       .then(function (response) {
         data.value = response.data.data;
-        console.log(data.value);
       });
-      dataSearch.startTime = null 
-      dataSearch.endTime = null
-      dataSearch.month = null
-      dataSearch.year = null
+    dataSearch.startDate = null
+    dataSearch.endDate = null
   } catch (e) {
     console.log(e);
   }
 };
+const formatDate = (date) => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${year}-${month}-${day}`;
+};
 const filteredData = computed(() => {
-  if (dataSearch.startTime && dataSearch.endTime) {
+  if (dataSearch.startDate && dataSearch.endDate) {
+    const startDate = formatDate(dataSearch.startDate)
+    const endDate = formatDate(dataSearch.endDate)
     return data.value.filter((item) => {
-      const dateParts = item.date.split("-"); 
-
-      const day = dateParts[0];
-      const month = dateParts[1];
-      const year = dateParts[2]; 
-
-      const outputDateString = `${year}-${month}-${day}`;
-      console.log(outputDateString >= dataSearch.startTime)
-      console.log(outputDateString <= dataSearch.endTime)
-      return (
-        outputDateString >= dataSearch.startTime && outputDateString <= dataSearch.endTime
-      );
-    });
-  } else if (dataSearch.year && dataSearch.month) {
-    return data.value.filter((item) => {
-      const dateParts = item.date.split("-");
-      const month = parseInt(dateParts[1], 10);
-      const year = parseInt(dateParts[2], 10);
-      return year === dataSearch.year && month === dataSearch.month;
-    });
-  } else if (dataSearch.year) {
-    return data.value.filter((item) => {
-      const dateParts = item.date.split("-");
-      const year = parseInt(dateParts[2], 10);
-      return year === dataSearch.year;
-    });
-  } else {
+      const datePart = item.date.split("-");
+      const itemDay = datePart[0]
+      const itemMonth = datePart[1]
+      const itemYear = datePart[2]
+      const itemDate = `${itemYear}-${itemMonth}-${itemDay}`;
+      return (itemDate >= startDate && itemDate <= endDate)
+    })
+  }
+  else {
     return data.value;
   }
 });
+const getTotalPage = computed(() => {
+  if (!(dataSearch.startDate || dataSearch.endDate) && filteredData.value && data.value) {
+    let countTotal = 0;
+    let month = 0;
+    let year = 0;
+    data.value.filter((item) => {
+      const datePart = item.date.split("-");
+      const itemMonth = datePart[1]
+      const itemYear = datePart[2]
+      if (itemMonth != month || itemYear != year) {
+        countTotal += 1
+        month = itemMonth
+        year = itemYear
+      }
+    })
+    return countTotal
+  } else {
+    if (filteredData.value) {
+      const filteredDataLength = filteredData.value.length;
+      return Math.ceil(filteredDataLength / getPageSize.value);
+    }
+  }
+})
+let temp = 0
+const getDistinctMonthsAndYears = () => {
+  const distinctMonthsAndYears = [];
+  let topTime = 1
+  data.value.forEach((item) => {
+    const datePart = item.date.split("-");
+    const itemMonth = parseInt(datePart[1]);
+    const itemYear = parseInt(datePart[2]);
+    const monthYear = { month: itemMonth, year: itemYear, time : topTime };
+    const exists = distinctMonthsAndYears.some(
+      (my) => my.month === itemMonth && my.year === itemYear
+    );
+
+    if (!exists) {
+      distinctMonthsAndYears.push(monthYear);
+      topTime += 1
+      console.log(monthYear)
+    }
+  });
+
+  return distinctMonthsAndYears;
+};
+
+const getPageSize = computed(() => {
+  if (currentPage.value && data.value && !(dataSearch.startDate || dataSearch.endDate)) {
+    const distinctMonthsAndYears = getDistinctMonthsAndYears();
+
+    const currentPageItem = distinctMonthsAndYears.find((item) => item.time === currentPage.value);
+    if (currentPageItem) {
+      const currentMonth = currentPageItem.month;
+      const currentYear = currentPageItem.year;
+      let countPageSize = 0;
+      data.value.forEach((item) => {
+        const datePart = item.date.split("-");
+        const itemMonth = parseInt(datePart[1]);
+        const itemYear = parseInt(datePart[2]);
+        console.log(itemMonth, itemYear)
+        if (itemMonth === currentMonth && itemYear === currentYear) {
+          countPageSize += 1; 
+        }
+      });
+      console.log(countPageSize)
+      return countPageSize;
+    }
+  }
+
+  return pageSize;
+});
+let tempEndIndex
+const getCurrentPageData = computed(() => {
+  if (filteredData.value) {
+    let startIndex = 0
+    if(currentPage.value == 1){
+      startIndex = 0
+    } else {
+      startIndex = tempEndIndex
+    }
+    let endIndex = startIndex + getPageSize.value;
+    tempEndIndex = endIndex
+    
+    return filteredData.value.slice(startIndex, endIndex);
+  }
+});
+const nextPage = () => {
+  if (currentPage.value < getTotalPage.value) {
+    currentPage.value++;
+  }
+};
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    tempEndIndex = tempEndIndex - getPageSize.value 
+  }
+};
+//
 const exportExcel = () => {
   const excelData = filteredData.value.map((item) => {
     return {
@@ -215,6 +257,7 @@ const exportExcel = () => {
       date: item.date,
       timeCheckIn: item.timeCheckIn,
       timeCheckOut: item.timeCheckOut,
+      timeWork: item.timeWork,
       ShiftName: item.shift.name,
       ShiftAmount: item.shift.amount,
     };
@@ -239,6 +282,7 @@ const exportCSV = () => {
     "date",
     "timeCheckIn",
     "timeCheckOut",
+    "timeWork",
     "Shiftname",
     "Shiftamount",
   ];
@@ -260,7 +304,11 @@ const exportCSV = () => {
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "timekeeping.csv");
+  if (!(dataSearch.startDate || dataSearch.endDate)) {
+    link.setAttribute("download", `${user.name}.csv`);
+  } else {
+    link.setAttribute("download", `${user.name}_${dataSearch.startDate}_${dataSearch.endDate}.csv`);
+  }
   link.click();
 };
 </script>

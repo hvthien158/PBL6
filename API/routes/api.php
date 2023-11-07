@@ -37,9 +37,7 @@ Route::post('/change-password', [AuthController::class, 'changePassword']);
 //Forgot password
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
     ->middleware('guest')->name('password.email');
-Route::get('/reset-password/{token}', function (string $token) {
-    return Redirect::to('http://localhost:5173/reset-pass')->with('token', $token);
-})->middleware('guest')->name('password.reset');
+Route::post('/check-email', [AuthController::class, 'checkEmail']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])
     ->middleware('guest')->name('password.update');
 
