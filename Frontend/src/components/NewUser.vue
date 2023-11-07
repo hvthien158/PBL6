@@ -206,14 +206,20 @@ const isEmail = (email) => {
 };
 
 function validate() {
-  if (!isEmail(form.email)) {
-    fail_validation.value = 'Invalid email'
+  if(form.name === ''){
+    fail_validation.value = 'Please enter name'
     return false
   } else if (form.email === '') {
     fail_validation.value = 'Please enter email'
     return false
+  } else if (!isEmail(form.email)) {
+    fail_validation.value = 'Invalid email'
+    return false
   } else if (form.password === '' && prop.mode === 'create') {
     fail_validation.value = 'Please enter password'
+    return false
+  } else if (form.department === ''){
+    fail_validation.value = 'Please choice a department'
     return false
   }
   return true
