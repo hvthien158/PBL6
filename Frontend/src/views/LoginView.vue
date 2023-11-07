@@ -123,6 +123,7 @@ main {
   color: #7875B5;
   cursor: pointer;
 }
+
 .error{
   color: red;
   font-size: small;
@@ -130,6 +131,7 @@ main {
   left: 25px;
   top: 66px;
 }
+
 .fail-login{
   color: red;
   font-size: 14px;
@@ -205,12 +207,10 @@ const login = async () => {
               user.avatar = response.data.user.avatar
               user.expired = response.data.expires_at
               user.role = response.data.user.role
-
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'
               alertStore.msg = 'Login success'
-
               router.push({ name: "home" });
             }
           });

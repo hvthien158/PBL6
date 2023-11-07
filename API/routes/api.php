@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\TimeKeepingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;

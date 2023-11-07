@@ -104,5 +104,4 @@ button {
 import { ref } from 'vue';
 import router from '../router'
 const selectedOption = ref(null);
-
 </script>

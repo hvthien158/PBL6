@@ -199,6 +199,11 @@ class AuthController extends Controller
             : response()->json(['error' => $status], 400);
     }
 
+    /**
+     * @param Request $request
+     * 
+     * @return object
+     */
     public function checkEmail(Request $request){
         $request->validate(['email' => 'required|email']);
 
