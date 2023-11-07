@@ -3,84 +3,40 @@
     <SlideBar></SlideBar>
     <div class="add-shift">
       <div class="input-container">
-        <h1 v-if="!isUpdateShift">Thêm ca làm</h1>
-        <h1 v-else>Chỉnh sửa ca làm</h1>
-        <div class="form-floating">
-          <input
-            v-model="dataShift.name"
-            type="text"
-            class="form-control"
-            :class="{
-              'is-invalid': !dataShift.name,
-              'is-valid': dataShift.name,
-            }"
-            placeholder="Tên ca làm"
-            required
-          />
+        <h2 v-if="!isUpdateShift">Add Shift</h2>
+        <h2 v-else>Edit Shift</h2>
+        <el-form-item label="Shift name">
+          <el-input v-model="dataShift.name" clearable />
+        </el-form-item>
+        <div class="invalid-feedback">
+          {{ checkName }}
         </div>
-        <div class="invalid-feedback" v-if="!dataShift.name">
-          Điền tên ca làm hợp lệ
-        </div>
-        <div class="form-floating">
-          <input
-            v-model="dataShift.timeValidCheckIn"
-            type="text"
-            class="form-control"
-            placeholder="Thời gian check in"
-            :class="{
-              'is-invalid': !dataShift.timeValidCheckIn,
-              'is-valid': checkTimeCheckIn == '',
-            }"
-            inputmode="time"
-            required
-          />
-        </div>
+        <el-form-item label="Time Valid Check In">
+          <el-input v-model="dataShift.timeValidCheckIn" placeholder="Time Valid Check In" clearable />
+        </el-form-item>
         <div class="invalid-feedback">
           {{ checkTimeCheckIn }}
         </div>
-        <div class="form-floating">
-          <input
-            v-model="dataShift.timeValidCheckOut"
-            type="text"
-            class="form-control"
-            :class="{
-              'is-invalid': !dataShift.timeValidCheckOut,
-              'is-valid': checkTimeCheckOut == '',
-            }"
-            placeholder="Thời gian Check Out"
-            required
-          />
-        </div>
+        <el-form-item label="Time Valid Check Out">
+          <el-input v-model="dataShift.timeValidCheckOut" placeholder="Time Valid Check Out" clearable />
+        </el-form-item>
         <div class="invalid-feedback">
           {{ checkTimeCheckOut }}
         </div>
-        <div class="form-floating">
-          <input
-            v-model="dataShift.amount"
-            type="number"
-            class="form-control"
-            :class="{
-              'is-valid': !dataShift.amount,
-              'is-valid': dataShift.amount,
-            }"
-            step="0.5"
-            min="0"
-            max="2"
-            placeholder="Số công"
-            required
-          />
-        </div>
-        <div class="invalid-feedback" v-if="!dataShift.amount">
-          Điền số công
+        <el-form-item label="Amount">
+          <el-input v-model="dataShift.amount" placeholder="amount" clearable />
+        </el-form-item>
+        <div class="invalid-feedback">
+          {{ checkAmount }}
         </div>
         <div class="btn-submit" v-if="!isUpdateShift">
           <button @click="createShift" type="button" class="btn btn-primary">
-            Thêm ca làm mới
+            Add Shift
           </button>
         </div>
         <div class="btn-submit" v-else>
           <button @click="updateShift" type="button" class="btn btn-primary">
-            Chỉnh sửa
+            Edit Shift
           </button>
         </div>
       </div>
@@ -94,6 +50,9 @@ main {
   box-sizing: border-box;
   display: flex;
 }
+label {
+  margin-bottom: 0px;
+}
 .add-shift {
   width: 85vw;
   display: flex;
@@ -101,39 +60,46 @@ main {
   align-items: center;
   margin-bottom: 100px;
 }
+
 .input-container {
   width: 40%;
 }
-.add-shift h1 {
+
+.add-shift h2 {
   text-align: center;
   margin-bottom: 30px;
 }
+
 .input-group-text {
   width: 25%;
 }
+
 .form-floating {
   margin-bottom: 10px;
 }
+
 .invalid-feedback {
   display: block;
   margin-bottom: 5px;
 }
+
 .btn-submit {
   display: flex;
   justify-content: center;
   margin-top: 20px;
 }
-
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
 import axios from "axios";
-import { reactive, onMounted, computed } from "vue";
+import { reactive, onMounted, computed, ref } from "vue";
 import { useUserStore } from "../../../stores/user";
 import { useRoute } from "vue-router";
 import router from "../../../router";
+import { useAlertStore } from "../../../stores/alert";
 const user = useUserStore().user;
 const route = useRoute();
+const alertStore = useAlertStore();
 let isUpdateShift = false;
 onMounted(() => {
   if (route.path == `/admin/update-shift/${route.params.id}`) {
@@ -142,16 +108,16 @@ onMounted(() => {
   } else isUpdateShift = false;
 });
 const dataShift = reactive({
-  name: "",
-  timeValidCheckIn: "",
-  timeValidCheckOut: "",
-  amount: 0,
+  name: null,
+  timeValidCheckIn: null,
+  timeValidCheckOut: null,
+  amount: null,
 });
 const createShift = async () => {
   if (
     dataShift.name &&
-    dataShift.checkTimeCheckIn &&
-    dataShift.checkTimeCheckOut &&
+    checkTimeCheckIn.value == '' &&
+    checkTimeCheckOut.value == '' &&
     dataShift.amount
   ) {
     try {
@@ -170,10 +136,12 @@ const createShift = async () => {
         )
         .then(function (response) {
           console.log(response);
+          messages('success', response.data.message)
           router.push({ path: "/admin/list-shift" });
         });
     } catch (e) {
       console.log(e);
+      messages('error', e.data.message)
     }
   }
 };
@@ -213,34 +181,76 @@ const updateShift = async () => {
         }
       )
       .then(function (response) {
-        response.status == 200
-          ? router.push({ path: "/admin/list-shift" })
-          : console.log(response);
+        if (response.status == 200) {
+          router.push({ path: "/admin/list-shift" })
+          messages('success', response.data.message)
+        }
       });
   } catch (e) {
     console.log(e);
+    messages('error', e.data.message)
   }
 };
-const checkTimeCheckIn = computed(() => {
-  if (!isTime(dataShift.timeValidCheckIn)) {
-    return "Vui lòng nhập đúng định dạng(12:00:00)";
-  } else {
+const checkName = computed(() => {
+  if (dataShift.name == null) {
     return ''
+  } else {
+    if (dataShift.name != '') {
+      return ''
+    } else {
+      return `Please enter shift's name`
+    }
+  }
+})
+const checkAmount = computed(() => {
+  if (dataShift.amount == null) {
+    return ''
+  } else {
+    if (dataShift.amount != '') {
+      return ''
+    } else {
+      return `Please enter shift's amount`
+    }
+  }
+})
+const checkTimeCheckIn = computed(() => {
+  if (dataShift.timeValidCheckIn == null) {
+    return "";
+  } else {
+    if (dataShift.timeValidCheckIn == '') {
+      return `Please enter time checkin`
+    } else if (isTime(dataShift.timeValidCheckIn)) {
+      return ''
+    }
+    else {
+      return `Please enter valid time checkout`
+    }
   }
 });
 const checkTimeCheckOut = computed(() => {
-  if (!isTime(dataShift.timeValidCheckOut)) {
-    return "Vui lòng nhập đúng định dạng(12:00:00)";
+  if (dataShift.timeValidCheckOut == null) {
+    return "";
   } else {
-    if (dataShift.timeValidCheckIn > dataShift.timeValidCheckOut) {
-      return "Thời gian check in phải nhỏ hơn check out";
+    if (dataShift.timeValidCheckOut == '') {
+      return `Please enter time checkout`
+    } else if (isTime(dataShift.timeValidCheckOut)) {
+      if (dataShift.timeValidCheckIn < dataShift.timeValidCheckOut) {
+        return ''
+      } else {
+        return `Time checkout must be bigger than time checkin`
+      }
     } else {
-      return "";
+      return `Please enter valid time checkout`
     }
   }
 });
 const isTime = (time) => {
   let filter = /^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]+$/;
   return filter.test(time);
+};
+const messages = (type, msg) => {
+  alertStore.alert = true;
+  alertStore.type = type;
+  alertStore.msg = msg;
 };
 </script>

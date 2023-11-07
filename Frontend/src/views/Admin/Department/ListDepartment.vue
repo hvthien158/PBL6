@@ -224,7 +224,7 @@ const exportExcel = () => {
   });
   const worksheet = utils.json_to_sheet(excelData);
   const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, worksheet, "Timekeeping");
+  utils.book_append_sheet(workbook, worksheet, "ListDepartment");
   const excelBuffer = write(workbook, {
     bookType: "xlsx",
     type: "array",

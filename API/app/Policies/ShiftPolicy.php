@@ -48,7 +48,7 @@ class ShiftPolicy
      */
     public function delete(User $user, Shift $shift): bool
     {
-        //
+        return (auth()->user()->role == 'admin') ? true : false;
     }
 
     /**

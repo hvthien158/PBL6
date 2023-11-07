@@ -216,4 +216,16 @@ class AdminController extends Controller
             return response()->json(['message' => $e->getMessage()]);
         }
     }
+    public function deleteShift($id, Shift $shift)
+    {
+        $this->authorize('delete', $shift);
+        try {
+            $shift = Shift::find($id);
+            if ($shift)
+                $shift->delete();
+            return response()->json(['message' => 'Delete shift successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 401);
+        }
+    }
 }
