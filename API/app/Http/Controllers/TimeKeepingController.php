@@ -6,11 +6,13 @@ use App\Http\Requests\DateTimeRequest;
 use App\Http\Requests\MonthYearRequest;
 use App\Http\Requests\TimeRequest;
 use App\Http\Resources\TimeKeepingResource;
+use App\Models\Systemtime;
 use App\Models\TimeKeeping;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Shift;
+use Illuminate\Support\Facades\DB;
 
 class TimeKeepingController extends Controller
 {
@@ -30,8 +32,12 @@ class TimeKeepingController extends Controller
             $timezone = 'Asia/Ho_Chi_Minh';
             $today = Carbon::now(new DateTimeZone($timezone));
             if ($this->authorize('create', TimeKeeping::class)) {
-                TimeKeeping::create([
+                $timekeep = TimeKeeping::create([
                     'user_id' => auth()->id(),
+                    'time_check_in' => $today
+                ]);
+                Systemtime::create([
+                    'id' => $timekeep->id,
                     'time_check_in' => $today
                 ]);
                 return response()->json(['message' => 'Check In Thành Công']);
@@ -43,7 +49,7 @@ class TimeKeepingController extends Controller
     }
     /**
      * @param TimeKeeping $timeKeeping
-     * 
+     *
      * @return mixed
      */
     public function checkOut(TimeKeeping $timeKeeping)
@@ -57,10 +63,15 @@ class TimeKeepingController extends Controller
                 if ($checkTimeKeeping && $currentDate->isAfter($checkTimeKeeping->time_check_in)) {
                     $checkTimeKeeping->time_check_out = $currentDate;
                     $checkTimeKeeping->save();
-                    $shift = Shift::orderBy('amount', 'desc')->get();
+
+                    DB::table('systemtimes')
+                        ->where('id', '=', $checkTimeKeeping->id)
+                        ->update(['time_check_out' => $currentDate]);
+
+                    $shifts = Shift::orderBy('amount', 'desc')->get();
                     $timeCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_in, $timezone);
                     $timeCheckOut = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_out, $timezone);
-                    foreach ($shift as $shift) {
+                    foreach ($shifts as $shift) {
                         if (
                             $timeCheckIn->isBefore($shift->time_valid_check_in)
                             && $timeCheckOut->isAfter($shift->time_valid_check_out)
@@ -99,7 +110,7 @@ class TimeKeepingController extends Controller
     }
     /**
      * @param TimeRequest $request
-     * 
+     *
      * @return object
      */
     public function searchByAroundTime(TimeRequest $request)
@@ -115,7 +126,7 @@ class TimeKeepingController extends Controller
     }
     /**
      * @param MonthYearRequest $request
-     * 
+     *
      * @return object
      */
     public function searchByMonth(MonthYearRequest $request)
@@ -126,7 +137,7 @@ class TimeKeepingController extends Controller
             $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereMonth('time_check_in', $month)->whereYear('time_check_in', $year)->get();
         } else if($year) {
             $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereYear('time_check_in', $year)->get();
-        } 
+        }
         return $timekeepingRecords;
     }
 }

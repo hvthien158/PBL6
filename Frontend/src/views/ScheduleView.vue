@@ -22,9 +22,9 @@
 
         <el-table :data="getCurrentPageData" border stripe>
           <el-table-column prop="date" label="Date"></el-table-column>
-          <el-table-column prop="timeCheckIn" label="Time Checkin"></el-table-column>
-          <el-table-column prop="timeCheckOut" label="Time Checkout"></el-table-column>
-          <el-table-column prop="timeWork" label="Time Work"></el-table-column>
+          <el-table-column prop="timeCheckIn" label="Checkin"></el-table-column>
+          <el-table-column prop="timeCheckOut" label="Checkout"></el-table-column>
+          <el-table-column prop="timeWork" label="Working time"></el-table-column>
           <el-table-column prop="shift.name" label="Shift"></el-table-column>
           <el-table-column label="Request">
             <template #default="scope">
@@ -161,7 +161,7 @@ const getTotalPage = computed(() => {
       const datePart = item.date.split("-");
       const itemMonth = datePart[1]
       const itemYear = datePart[2]
-      if (itemMonth != month || itemYear != year) {
+      if (itemMonth !== month || itemYear !== year) {
         countTotal += 1
         month = itemMonth
         year = itemYear
