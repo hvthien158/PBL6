@@ -171,6 +171,7 @@ onMounted(() => {
   displayDepartment();
 });
 const displayDepartment = async () => {
+  visibleMode.value = false
   try {
     await axios
       .get("http://127.0.0.1:8000/api/department")

@@ -21,13 +21,13 @@
           <el-table :data="getCurrentPageData" height="50vh" border stripe>
             <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
             <el-table-column prop="name" label="Shift name" min-width="180"></el-table-column>
-            <el-table-column prop="TimeValidCheckIn" label="Time Valid Check In" min-width="300"></el-table-column>
-            <el-table-column prop="TimeValidCheckOut" label="Time Valid Check Out" min-width="300"></el-table-column>
+            <el-table-column prop="timeValidCheckIn" label="Time Valid Check In" min-width="300"></el-table-column>
+            <el-table-column prop="timeValidCheckOut" label="Time Valid Check Out" min-width="300"></el-table-column>
             <el-table-column prop="amount" min-width="100" label="Amount"></el-table-column>
             <el-table-column fixed="right" label="Operations" width="140">
               <template #default="scope">
-                <el-button link type="primary" @click="router.push({ path: `/admin/update-shift/${scope.row.id}` })">Edit</el-button>
-                <el-button link type="danger" @click="deleteShift(scope.row.id)">Delete</el-button>
+                <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
+                <el-button link type="danger" @click="handleDelete(scope.row.id)">Delete</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -41,6 +41,13 @@
             </el-button>
           </div>
         </div>
+        <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this shift?" @confirm="deleteShift()"
+          @cancel="confirmBox = false">
+        </ConfirmBox>
+        <div class="form-shift">
+          <NewShift @updateData="displayShift" @invisible="visibleMode = false" :mode="operationMode"
+            :shiftId="shiftId" v-if="visibleMode"></NewShift>
+        </div>
       </el-card>
     </div>
   </main>
@@ -52,7 +59,10 @@ main {
   box-sizing: border-box;
   display: flex;
 }
-
+.form-shift {
+  margin-top: 50px;
+  max-width: 938px;
+}
 .card-header {
   text-align: center;
   background-color: #f3952d;
@@ -119,12 +129,19 @@ import router from "../../../router";
 import { useAlertStore } from "../../../stores/alert";
 import { saveAs } from "file-saver";
 import { utils, write } from "xlsx";
-let data = ref();
+import ConfirmBox from "../../../components/ConfirmBox.vue";
+import NewShift from "../../../components/NewShift.vue";
 let dataSearch = ref(null);
 let currentPage = ref(1)
 const pageSize = 10
 const user = useUserStore().user;
 const alertStore = useAlertStore();
+const shift = ref();
+const shiftId = ref(0)
+const deleteId = ref(0)
+const visibleMode = ref(false)
+const operationMode = ref('create') 
+const confirmBox = ref(false)
 onMounted(() => {
   if (user.role !== "admin") {
     router.push({ path: "/" });
@@ -133,19 +150,21 @@ onMounted(() => {
 });
 
 const displayShift = async () => {
+  visibleMode.value = false
   try {
     await axios
       .get("http://127.0.0.1:8000/api/shift")
       .then(function (response) {
-        data.value = response.data.data;
+        shift.value = response.data.data;
       });
   } catch (e) {
     console.log(e);
   }
 }
-const deleteShift = async (id) => {
+const deleteShift = async () => {
+  confirmBox.value = false
   try {
-    await axios.delete(`http://127.0.0.1:8000/api/delete-shift/${id}`, {
+    await axios.delete(`http://127.0.0.1:8000/api/delete-shift/${deleteId.value}`, {
       headers: { Authorization: `Bearer ${user.token}` }
     }).then(function (response) {
       if (response.status == 200) {
@@ -161,11 +180,11 @@ const deleteShift = async (id) => {
 }
 const filteredData = computed(() => {
   if (!dataSearch.value) {
-    return data.value
+    return shift.value
   } else {
     let searchText = dataSearch.value.toLowerCase();
     currentPage.value = 1
-    return data.value.filter((item) => {
+    return shift.value.filter((item) => {
       console.log(searchText)
       return item.name.toLowerCase().includes(searchText);
     })
@@ -194,14 +213,28 @@ const previousPage = () => {
     currentPage.value--;
   }
 };
-
+function handleCreate() {
+  operationMode.value = 'create'
+  if (!visibleMode.value) {
+    visibleMode.value = true
+  }
+}
+function handleEdit(id) {
+  visibleMode.value = true;
+  operationMode.value = 'update'
+  shiftId.value = id
+}
+function handleDelete(id) {
+    confirmBox.value = true
+    deleteId.value = id
+}
 const exportExcel = () => {
   const excelData = filteredData.value.map((item) => {
     return {
       id: item.id,
       name: item.name,
-      TimeValidCheckIn: item.TimeValidCheckIn,
-      TimeValidCheckOut: item.TimeValidCheckOut,
+      timeValidCheckIn: item.timeValidCheckIn,
+      timeValidCheckOut: item.timeValidCheckOut,
       amount: item.amount,
     };
   });
@@ -223,8 +256,8 @@ const exportCSV = () => {
   const headers = [
     "id",
     "name",
-    "TimeValidCheckIn",
-    "TimeValidCheckOut",
+    "timeValidCheckIn",
+    "timeValidCheckOut",
     "amount"
   ];
   csvContent += headers.join(",") + "\n";

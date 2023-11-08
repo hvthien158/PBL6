@@ -10,11 +10,7 @@
           <button>Edit timekeeping</button>
           <button>Delete timekeeping</button>
         </div>
-        <li @click="selectedOption =(selectedOption == 'shift' ? null : 'shift') " :class="{ active: selectedOption === 'shift' }">Manager shift</li>
-        <div v-if="selectedOption === 'shift'" class="sub-menu">
-          <button @click="router.push({ path : '/admin/list-shift'})">List shift</button>
-          <button @click="router.push({ path : '/admin/add-shift'})">Add shift</button>
-        </div>
+        <li @click="router.push({ path : '/admin/list-shift'})" :class="{ active: selectedOption === 'attendance' }">Manager shift</li>
       </ul>
     </div>
   </div>
