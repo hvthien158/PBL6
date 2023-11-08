@@ -5,25 +5,25 @@
       <div class="input-container">
         <h2 v-if="!isUpdateShift">Add Shift</h2>
         <h2 v-else>Edit Shift</h2>
-        <el-form-item label="Shift name">
-          <el-input v-model="dataShift.name" clearable />
+        <el-form-item >
+          <el-input placeholder="Shift name" v-model="dataShift.name" clearable />
         </el-form-item>
         <div class="invalid-feedback">
           {{ checkName }}
         </div>
-        <el-form-item label="Time Valid Check In">
+        <el-form-item >
           <el-input v-model="dataShift.timeValidCheckIn" placeholder="Time Valid Check In" clearable />
         </el-form-item>
         <div class="invalid-feedback">
           {{ checkTimeCheckIn }}
         </div>
-        <el-form-item label="Time Valid Check Out">
+        <el-form-item >
           <el-input v-model="dataShift.timeValidCheckOut" placeholder="Time Valid Check Out" clearable />
         </el-form-item>
         <div class="invalid-feedback">
           {{ checkTimeCheckOut }}
         </div>
-        <el-form-item label="Amount">
+        <el-form-item>
           <el-input v-model="dataShift.amount" placeholder="amount" clearable />
         </el-form-item>
         <div class="invalid-feedback">

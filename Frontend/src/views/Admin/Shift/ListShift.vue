@@ -3,34 +3,31 @@
     <SlideBar></SlideBar>
     <div class="shift">
       <el-card>
-        <el-form inline>
-          <el-form-item label="Search by name">
-            <el-input v-model="dataSearch"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="exportExcel()">Export Excel</el-button>
-            <el-button type="primary" @click="exportCSV()">Export CSV</el-button>
-          </el-form-item>
-        </el-form>
-        <div slot="header" class="card-header">
-          List Shift
+        <h2 style="font-size: 32px; font-weight: 700; text-align: center; ">Shift management</h2>
+        <div class="title-table">
+        <div>
+          <el-button type="warning" @click="handleCreate">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+            </svg>
+            New
+          </el-button>
         </div>
+        <div>
+          <el-input v-model="dataSearch" placeholder="Type to search" />
+        </div>
+      </div>
         <div class="card-content">
-          <el-table :data="getCurrentPageData" border stripe>
-            <el-table-column prop="id" label="ID"></el-table-column>
-            <el-table-column prop="name" label="Shift name"></el-table-column>
-            <el-table-column prop="TimeValidCheckIn" label="Time Valid Check In"></el-table-column>
-            <el-table-column prop="TimeValidCheckOut" label="Time Valid Check Out"></el-table-column>
-            <el-table-column prop="amount" label="Amount"></el-table-column>
-            <el-table-column label="Edit shift">
+          <el-table :data="getCurrentPageData" height="50vh" border stripe>
+            <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
+            <el-table-column prop="name" label="Shift name" min-width="180"></el-table-column>
+            <el-table-column prop="TimeValidCheckIn" label="Time Valid Check In" min-width="300"></el-table-column>
+            <el-table-column prop="TimeValidCheckOut" label="Time Valid Check Out" min-width="300"></el-table-column>
+            <el-table-column prop="amount" min-width="100" label="Amount"></el-table-column>
+            <el-table-column fixed="right" label="Operations" width="140">
               <template #default="scope">
-                <el-button class="el-button--text"
-                  @click="router.push({ path: `/admin/update-shift/${scope.row.id}` })">Edit</el-button>
-              </template>
-            </el-table-column>
-            <el-table-column label="Delete Shift">
-              <template #default="scope">
-                <el-button class="el-button--text" @click="deleteShift(scope.row.id)">Delete</el-button>
+                <el-button link type="primary" @click="router.push({ path: `/admin/update-shift/${scope.row.id}` })">Edit</el-button>
+                <el-button link type="danger" @click="deleteShift(scope.row.id)">Delete</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -62,7 +59,17 @@ main {
   font-size: 20px;
   font-weight: 700;
 }
-
+.title-table{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0 10px 0
+}
+.title-table div{
+  display: flex;
+  align-items: end;
+  justify-content: center;
+}
 .shift {
   width: 85vw;
   display: flex;
@@ -91,12 +98,14 @@ main {
 .table td a {
   cursor: pointer;
 }
+
 .pagination {
   margin-top: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .pagination span {
   margin: 0 10px;
 }
@@ -185,6 +194,7 @@ const previousPage = () => {
     currentPage.value--;
   }
 };
+
 const exportExcel = () => {
   const excelData = filteredData.value.map((item) => {
     return {
