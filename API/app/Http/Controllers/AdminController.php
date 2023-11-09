@@ -273,17 +273,33 @@ class AdminController extends Controller
      * 
      * @return object
      */
-    public function manageTimeKeeping($id = null)
+    public function manageTimeKeeping($id, Request $request)
     {
         $this->authorize('viewAny',  TimeKeeping::class);
         try {
-            if ($id) {
-                $timekeeping = TimeKeeping::where('id', $id)->get();
-            } else {
-                $timekeeping = TimeKeeping::orderBy('time_check_in', 'desc')->get();
+            $itemsPerPage = 10;
+            $query = TimeKeeping::orderBy('time_check_in', 'desc')->with('user')->with('user.department');
+            if ($request->name != '') {
+                $query->whereHas('user', function ($subQuery) use ($request) {
+                    $subQuery->where('name', 'like', '%' . $request->name . '%');
+                });
             }
+            if ($request->startDate != '' && $request->endDate != '') {
+                $query->whereRaw('DATE(time_check_in) BETWEEN ? AND ?', [$request->startDate, $request->endDate]);
+            }
+            if ($request->department != '' && $request->department != null) {
+                $query->whereHas('user.department', function ($subQuery) use ($request) {
+                    $subQuery->where('department_name', '=', $request->department);
+                });
+            }
+            $totalPage = floor($query->count() / $itemsPerPage) + 1;
+            $timekeeping = $query->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
             if ($timekeeping) {
-                return TimeKeepingResource::collection($timekeeping);
+                $response = [
+                    'totalPage' => $totalPage,
+                    'timekeeping' => TimeKeepingResource::collection($timekeeping),
+                ];
+                return response()->json($response);
             } else {
                 return response()->json(['message' => 'Not found timekeeping'], 400);
             }
