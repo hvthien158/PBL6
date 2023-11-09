@@ -3,22 +3,14 @@
     <div class="sidebar">
       <ul class="sidebar-menu">
         <li @click="router.push({ path : '/admin/list-user'})" :class="{ active: selectedOption === 'user' }">User management</li>
-        <li @click="selectedOption = (selectedOption == 'organization' ?  null : 'organization') " :class="{ active: selectedOption === 'organization' }">Manager department</li>
-        <div v-if="selectedOption === 'organization'" class="sub-menu">
-          <button @click="router.push({ path : '/admin/list-department'})">List department</button>
-          <button @click="router.push({ path : '/admin/add-department'})">Add department</button>
-        </div>
+        <li @click="router.push({ path : '/admin/list-department'})" :class="{ active: selectedOption === 'organization' }">Department manager</li>
         <li @click="selectedOption = (selectedOption == 'attendance' ? null: 'attendance')" :class="{ active: selectedOption === 'attendance' }">Manager timekeeping</li>
         <div v-if="selectedOption === 'attendance'" class="sub-menu">
           <button>Add timekeeping</button>
           <button>Edit timekeeping</button>
           <button>Delete timekeeping</button>
         </div>
-        <li @click="selectedOption =(selectedOption == 'shift' ? null : 'shift') " :class="{ active: selectedOption === 'shift' }">Manager shift</li>
-        <div v-if="selectedOption === 'shift'" class="sub-menu">
-          <button @click="router.push({ path : '/admin/list-shift'})">List shift</button>
-          <button @click="router.push({ path : '/admin/add-shift'})">Add shift</button>
-        </div>
+        <li @click="router.push({ path : '/admin/list-shift'})" :class="{ active: selectedOption === 'attendance' }">Manager shift</li>
       </ul>
     </div>
   </div>

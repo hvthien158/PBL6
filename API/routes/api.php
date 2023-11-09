@@ -76,3 +76,4 @@ Route::put('update-shift/{id}',[AdminController::class,'updateShift']);
 //Shift
 Route::get('shift', [ShiftController::class,'index']);
 Route::get('shift/{id}', [ShiftController::class,'index']);
+Route::delete('delete-shift/{id}',[AdminController::class,'deleteShift']);
