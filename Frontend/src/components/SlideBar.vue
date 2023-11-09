@@ -3,9 +3,9 @@
     <div class="sidebar">
       <ul class="sidebar-menu">
         <li @click="router.push({ path : '/admin/list-user'})" :class="{ active: selectedOption === 'user' }">User management</li>
-        <li @click="router.push({ path : '/admin/list-department'})" :class="{ active: selectedOption === 'organization' }">Department manager</li>
-        <li @click="router.push({ path : '/admin/list-timekeeping'})" :class="{ active: selectedOption === 'attendance' }">Manager timekeeping</li>
-        <li @click="router.push({ path : '/admin/list-shift'})" :class="{ active: selectedOption === 'shift' }">Manager shift</li>
+        <li @click="router.push({ path : '/admin/list-department'})" :class="{ active: selectedOption === 'organization' }">Department management</li>
+        <li @click="router.push({ path : '/admin/list-timekeeping'})" :class="{ active: selectedOption === 'attendance' }">Timekeeping management</li>
+        <li @click="router.push({ path : '/admin/list-shift'})" :class="{ active: selectedOption === 'shift' }">Shift management</li>
       </ul>
     </div>
   </div>

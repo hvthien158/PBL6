@@ -4,14 +4,7 @@
     <div class="shift">
       <span style="font-size: 32px; font-weight: 700; text-align: center; ">Shift management</span>
         <div class="title-table">
-        <div>
-          <el-button type="warning" @click="handleCreate">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-            </svg>
-            New
-          </el-button>
-        </div>
+        
         <div>
           <el-input v-model="dataSearch" placeholder="Type to search" />
         </div>
@@ -22,12 +15,12 @@
             <el-table-column prop="timeValidCheckIn" label="Time Valid Check In" min-width="300"></el-table-column>
             <el-table-column prop="timeValidCheckOut" label="Time Valid Check Out" min-width="300"></el-table-column>
             <el-table-column prop="amount" min-width="100" label="Amount"></el-table-column>
-            <el-table-column fixed="right" label="Operations" width="140">
+            <!-- <el-table-column fixed="right" label="Operations" width="140">
               <template #default="scope">
                 <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
                 <el-button link type="danger" @click="handleDelete(scope.row.id)">Delete</el-button>
               </template>
-            </el-table-column>
+            </el-table-column> -->
           </el-table>
           <div class="pagination">
             <el-button @click="previousPage" :disabled="currentPage === 1">
@@ -39,13 +32,13 @@
             </el-button>
           </div>
         </div>
-        <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this shift?" @confirm="deleteShift()"
+        <!-- <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this shift?" @confirm="deleteShift()"
           @cancel="confirmBox = false">
-        </ConfirmBox>
-        <div class="form-shift">
+        </ConfirmBox> -->
+        <!-- <div class="form-shift">
           <NewShift @updateData="displayShift" @invisible="visibleMode = false" :mode="operationMode"
             :shiftId="shiftId" v-if="visibleMode"></NewShift>
-        </div>
+        </div> -->
   </main>
 </template>
 <style scoped>
@@ -66,7 +59,7 @@ main {
 .title-table{
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin: 10px 0 10px 0
 }
 .title-table div{
@@ -124,18 +117,18 @@ import { useAlertStore } from "../../../stores/alert";
 import { saveAs } from "file-saver";
 import { utils, write } from "xlsx";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
-import NewShift from "../../../components/NewShift.vue";
+// import NewShift from "../../../components/NewShift.vue";
 let dataSearch = ref(null);
 let currentPage = ref(1)
 const pageSize = 10
 const user = useUserStore().user;
 const alertStore = useAlertStore();
 const shift = ref();
-const shiftId = ref(0)
-const deleteId = ref(0)
-const visibleMode = ref(false)
-const operationMode = ref('create') 
-const confirmBox = ref(false)
+// const shiftId = ref(0)
+// const deleteId = ref(0)
+// const visibleMode = ref(false)
+// const operationMode = ref('create') 
+// const confirmBox = ref(false)
 onMounted(() => {
   if (user.role !== "admin") {
     router.push({ path: "/" });
@@ -144,7 +137,6 @@ onMounted(() => {
 });
 
 const displayShift = async () => {
-  visibleMode.value = false
   try {
     await axios
       .get("http://127.0.0.1:8000/api/shift")
@@ -207,69 +199,69 @@ const previousPage = () => {
     currentPage.value--;
   }
 };
-function handleCreate() {
-  operationMode.value = 'create'
-  if (!visibleMode.value) {
-    visibleMode.value = true
-  }
-}
-function handleEdit(id) {
-  visibleMode.value = true;
-  operationMode.value = 'update'
-  shiftId.value = id
-}
-function handleDelete(id) {
-    confirmBox.value = true
-    deleteId.value = id
-}
-const exportExcel = () => {
-  const excelData = filteredData.value.map((item) => {
-    return {
-      id: item.id,
-      name: item.name,
-      timeValidCheckIn: item.timeValidCheckIn,
-      timeValidCheckOut: item.timeValidCheckOut,
-      amount: item.amount,
-    };
-  });
-  const worksheet = utils.json_to_sheet(excelData);
-  const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, worksheet, "ListShift");
-  const excelBuffer = write(workbook, {
-    bookType: "xlsx",
-    type: "array",
-  });
-  const dataBlob = new Blob([excelBuffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  });
-  saveAs(dataBlob, "list_shift.xlsx");
-};
+// function handleCreate() {
+//   operationMode.value = 'create'
+//   if (!visibleMode.value) {
+//     visibleMode.value = true
+//   }
+// }
+// function handleEdit(id) {
+//   visibleMode.value = true;
+//   operationMode.value = 'update'
+//   shiftId.value = id
+// }
+// function handleDelete(id) {
+//     confirmBox.value = true
+//     deleteId.value = id
+// }
+// const exportExcel = () => {
+//   const excelData = filteredData.value.map((item) => {
+//     return {
+//       id: item.id,
+//       name: item.name,
+//       timeValidCheckIn: item.timeValidCheckIn,
+//       timeValidCheckOut: item.timeValidCheckOut,
+//       amount: item.amount,
+//     };
+//   });
+//   const worksheet = utils.json_to_sheet(excelData);
+//   const workbook = utils.book_new();
+//   utils.book_append_sheet(workbook, worksheet, "ListShift");
+//   const excelBuffer = write(workbook, {
+//     bookType: "xlsx",
+//     type: "array",
+//   });
+//   const dataBlob = new Blob([excelBuffer], {
+//     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+//   });
+//   saveAs(dataBlob, "list_shift.xlsx");
+// };
 
-const exportCSV = () => {
-  let csvContent = "data:text/csv;charset=utf-8,";
-  const headers = [
-    "id",
-    "name",
-    "timeValidCheckIn",
-    "timeValidCheckOut",
-    "amount"
-  ];
-  csvContent += headers.join(",") + "\n";
-  filteredData.value.forEach((item) => {
-    const row = headers
-      .map((header) => {
-        return item[header];
-      })
-      .join(",");
-    csvContent += row + "\n";
-  });
+// const exportCSV = () => {
+//   let csvContent = "data:text/csv;charset=utf-8,";
+//   const headers = [
+//     "id",
+//     "name",
+//     "timeValidCheckIn",
+//     "timeValidCheckOut",
+//     "amount"
+//   ];
+//   csvContent += headers.join(",") + "\n";
+//   filteredData.value.forEach((item) => {
+//     const row = headers
+//       .map((header) => {
+//         return item[header];
+//       })
+//       .join(",");
+//     csvContent += row + "\n";
+//   });
 
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `list_shift.csv`);
-  link.click();
-};
+//   const encodedUri = encodeURI(csvContent);
+//   const link = document.createElement("a");
+//   link.setAttribute("href", encodedUri);
+//   link.setAttribute("download", `list_shift.csv`);
+//   link.click();
+// };
 const messages = (type, msg) => {
   alertStore.alert = true;
   alertStore.type = type;
