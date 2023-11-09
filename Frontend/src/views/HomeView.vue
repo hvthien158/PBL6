@@ -3,7 +3,7 @@
     <div class="container">
       <div class="checkin-container">
         <div class="time">
-          <span id="time-span">{{ currentTime }}</span>
+          <Clock></Clock>
         </div>
         <div class="date">
           <span class="date-span">{{ currentDate }}</span>
@@ -15,7 +15,7 @@
             @click="handleCheckIn"
             :disabled="!checkin"
           >
-            Check In
+            Check in
           </button>
           <button
             id="check-out-button"
@@ -23,7 +23,7 @@
             @click="handleCheckOut"
             :disabled="!checkout"
           >
-            Check Out
+            Check out
           </button>
         </div>
         <button @click="router.push({name: 'schedule'})" class="active-button no-underline" style="margin-top: 20px; height: 40px">History</button>
@@ -47,7 +47,6 @@ main {
   min-height: 20px;
   padding: 30px;
   min-width: 50%;
-  background-color: #2b2b2b;
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -56,7 +55,7 @@ main {
 }
 
 .date {
-  margin: 10px 0px 10px 0px;
+  margin: 50px 0 10px 0px;
 }
 
 .date-span {
@@ -81,7 +80,7 @@ main {
 
 .active-button {
   width: 120px;
-  height: 120px;
+  height: 40px;
   margin: 10px;
   cursor: pointer;
   align-items: center;
@@ -117,7 +116,7 @@ main {
 }
 .disable-button{
   width: 120px;
-  height: 120px;
+  height: 40px;
   margin: 10px;
   align-items: center;
   appearance: none;
@@ -161,6 +160,7 @@ import axios from "axios";
 import {useUserStore} from "../stores/user";
 import moment from "moment";
 import schedule from "../assets/image/schedule.png";
+import Clock from "../components/Clock.vue";
 
 const user = useUserStore().user
 if (user.token === '') {
@@ -175,10 +175,10 @@ function getCurrentDate() {
   const now = new Date();
   const options = {
     day: "numeric",
-    month: "short",
+    month: "long",
     year: "numeric",
   };
-  return now.toLocaleString("us-EN", options);
+  return now.toLocaleDateString("en-US", options);
 }
 
 function getCurrentTime() {

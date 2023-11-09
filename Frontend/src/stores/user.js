@@ -14,6 +14,7 @@ export const useUserStore = defineStore('user', () => {
             DOB: '',
             phone_number: '',
             avatar: '',
+            position: '',
             expired: '',
             role: ''
         })
@@ -28,6 +29,7 @@ export const useUserStore = defineStore('user', () => {
         user.value.address = ''
         user.value.DOB = ''
         user.value.avatar = ''
+        user.value.position = ''
         user.value.phone_number = ''
         user.value.expired = ''
         user.value.role = ''

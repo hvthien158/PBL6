@@ -36,8 +36,8 @@ class DatabaseSeeder extends Seeder
                 [
                     'name' => 'Full',
                     'amount' => 1,
-                    'time_valid_check_in' => '08:30:00',
-                    'time_valid_check_out' => '17:45:00',
+                    'time_valid_check_in' => '00:00:01',
+                    'time_valid_check_out' => '23:59:59',
                 ]
             )
         );

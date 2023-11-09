@@ -185,7 +185,7 @@ const dataByMonth = computed(() => {
     } else {
       result.push({
         date: start.format('DD') + '/' + (start.month() + 1).toString().padStart(2, '0') + '/' + start.year(),
-        dayOfWeek: start.format('dddd')
+        dayOfWeek: start.format('dddd'),
       })
     }
     start = start.add(1, 'days')
@@ -200,7 +200,7 @@ const dataByMonth = computed(() => {
   } else {
     result.push({
       date: start.format('DD') + '/' + (start.month() + 1).toString().padStart(2, '0') + '/' + start.year(),
-      dayOfWeek: start.format('dddd')
+      dayOfWeek: start.format('dddd'),
     })
   }
 
