@@ -2,8 +2,7 @@
   <main>
     <SlideBar></SlideBar>
     <div class="department">
-      <el-card>
-        <h2 style="font-size: 32px; font-weight: 700; text-align: center; ">Department management</h2>
+      <span style="font-size: 32px; font-weight: 700; text-align: center; ">Department management</span>
         <div class="title-table">
           <div>
             <el-button type="warning" @click="handleCreate">
@@ -19,8 +18,7 @@
             <el-input v-model="dataSearch" placeholder="Type to search" />
           </div>
         </div>
-        <div class="card-content">
-          <el-table :data="department" height="48vh" border stripe>
+          <el-table :data="department" height="48vh" style="width: 100%;" border stripe>
             <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
             <el-table-column prop="name" label="Department name" min-width="200"></el-table-column>
             <el-table-column prop="address" label="Address" min-width="300"></el-table-column>
@@ -62,23 +60,12 @@
           <NewDepartment @updateData="displayDepartment" @invisible="visibleMode = false" :mode="operationMode"
             :departmentId="departmentId" v-if="visibleMode"></NewDepartment>
         </div>
-      </el-card>
-    </div>
   </main>
 </template>
 <style scoped>
 main {
-  min-height: 80vh;
-  border-top: 0.1em solid black;
   box-sizing: border-box;
   display: flex;
-}
-
-.card-header {
-  text-align: center;
-  background-color: #f3952d;
-  font-size: 20px;
-  font-weight: 700;
 }
 
 .form-department {
@@ -109,10 +96,13 @@ label {
 }
 
 .department {
-  width: 85vw;
+  width: 80vw;
+  margin-top: -40px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  min-height: 85vh;
+  margin-left: 20px;
 }
 
 .title-table {
@@ -153,9 +143,6 @@ import router from "../../../router";
 import { useUserStore } from "../../../stores/user";
 import { useAlertStore } from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
-import { saveAs } from "file-saver";
-import { utils, write } from "xlsx";
-import { debounce } from "lodash";
 import NewDepartment from "../../../components/NewDepartment.vue";
 const user = useUserStore().user;
 const alertStore = useAlertStore();

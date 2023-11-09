@@ -128,22 +128,6 @@ class AdminController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
-    // public function searchDepartment(Request $request)
-    // {
-    //     try {
-    //         $name = $request->input('name');
-    //         $department = Department::whereRaw('LOWER(department_name) like ?', ['%' . $name . '%'])->get();
-    //         $itemsPerPage = 10;
-    //         $totalPage = round(($department->count() / $itemsPerPage), 0);
-    //         $response = [
-    //             'totalPage' => $totalPage,
-    //             'department' => DepartmentResource::collection($department),
-    //         ];
-    //         return response()->json($response);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['message' => $e->getMessage()], 400);
-    //     }
-    // }
     /**
      * @param CreateDepartmentRequest $request
      *

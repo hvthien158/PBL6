@@ -2,8 +2,7 @@
   <main>
     <SlideBar></SlideBar>
     <div class="shift">
-      <el-card>
-        <h2 style="font-size: 32px; font-weight: 700; text-align: center; ">Shift management</h2>
+      <span style="font-size: 32px; font-weight: 700; text-align: center; ">Shift management</span>
         <div class="title-table">
         <div>
           <el-button type="warning" @click="handleCreate">
@@ -17,7 +16,6 @@
           <el-input v-model="dataSearch" placeholder="Type to search" />
         </div>
       </div>
-        <div class="card-content">
           <el-table :data="getCurrentPageData" height="50vh" border stripe>
             <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
             <el-table-column prop="name" label="Shift name" min-width="180"></el-table-column>
@@ -48,14 +46,10 @@
           <NewShift @updateData="displayShift" @invisible="visibleMode = false" :mode="operationMode"
             :shiftId="shiftId" v-if="visibleMode"></NewShift>
         </div>
-      </el-card>
-    </div>
   </main>
 </template>
 <style scoped>
 main {
-  min-height: 80vh;
-  border-top: 0.1em solid black;
   box-sizing: border-box;
   display: flex;
 }
@@ -81,15 +75,15 @@ main {
   justify-content: center;
 }
 .shift {
-  width: 85vw;
+  width: 80vw;
+  margin-top: -40px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  min-height: 85vh;
+  margin-left: 20px;
 }
 
-.el-card {
-  min-width: 100%;
-}
 
 .el-form {
   display: flex;

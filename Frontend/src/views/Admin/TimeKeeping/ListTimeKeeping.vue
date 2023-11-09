@@ -1,9 +1,8 @@
 <template>
   <main>
     <SlideBar></SlideBar>
-    <div class="department">
-      <el-card>
-        <h2 style="font-size: 32px; font-weight: 700; text-align: center; ">TimeKeeping Management</h2>
+    <div class="timekeeping">
+        <span style="font-size: 32px; font-weight: 700; text-align: center;">TimeKeeping Management</span>
         <div class="title-table">
           <div>
             <el-date-picker style="margin-left: 10px" v-model="dataSearch.startDate" type="date"
@@ -22,8 +21,7 @@
           </div>
             
         </div>
-        <div class="card-content">
-          <el-table :data="getCurrentPageData" height="48vh" border stripe>
+          <el-table :data="getCurrentPageData" height="48vh" style="width: 100%;" border stripe>
             <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
             <el-table-column prop="user.name" label="User name" min-width="200"
               @click="router.push({ path: `/admin/list-user/${scope.row.user.id}` })"></el-table-column>
@@ -56,23 +54,12 @@
           <NewTimeKeeping @updateData="displayTimeKeeping" @invisible="visibleMode = false" 
             :timekeepingId="timekeepingId" v-if="visibleMode"></NewTimeKeeping>
         </div>
-      </el-card>
-    </div>
   </main>
 </template>
 <style scoped>
 main {
-  min-height: 80vh;
-  border-top: 0.1em solid black;
   box-sizing: border-box;
   display: flex;
-}
-
-.card-header {
-  text-align: center;
-  background-color: #f3952d;
-  font-size: 20px;
-  font-weight: 700;
 }
 
 .form-department {
@@ -108,11 +95,14 @@ label {
   align-items: center;
 }
 
-.department {
-  width: 85vw;
+.timekeeping {
+  width: 80vw;
+  margin-top: -40px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  min-height: 85vh;
+  margin-left: 20px;
 }
 
 .title-table {
@@ -227,7 +217,7 @@ const filteredData = computed(() => {
     const startDate = formatDate(dataSearch.startDate)
     const endDate = formatDate(dataSearch.endDate)
     search = search.filter((item) => {
-      const datePart = item.date.split("-");
+      const datePart = item.date.split("/");
       const itemDay = datePart[0]
       const itemMonth = datePart[1]
       const itemYear = datePart[2]
