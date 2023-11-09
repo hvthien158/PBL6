@@ -2,58 +2,58 @@
   <main>
     <SlideBar></SlideBar>
     <div class="timekeeping">
-        <span style="font-size: 32px; font-weight: 700; text-align: center;">TimeKeeping Management</span>
-        <div class="title-table">
-          <div>
-            <el-date-picker style="margin-left: 10px" v-model="dataSearch.startDate" type="date"
-              placeholder="For date"></el-date-picker>
-            <el-date-picker style="margin-left: 10px" v-model="dataSearch.endDate" type="date"
-              placeholder="To date"></el-date-picker>
-          </div>
+      <span style="font-size: 32px; font-weight: 700; text-align: center;">TimeKeeping Management</span>
+      <div class="title-table">
+        <div>
+          <el-date-picker style="margin-left: 10px" v-model="dataSearch.startDate" type="date"
+            placeholder="For date"></el-date-picker>
+          <el-date-picker style="margin-left: 10px" v-model="dataSearch.endDate" type="date"
+            placeholder="To date"></el-date-picker>
+        </div>
 
-          <div>
-            <el-select v-model="dataSearch.department" placeholder="Select">
-              <el-option key="0" label="Selected department" value="" />
-              <el-option v-for="item in department" :key="item.id" :label="item.name" :value="item.name"
-                :disabled="item.disabled" />
-            </el-select>
-            <el-input v-model="dataSearch.name" placeholder="Search by username" />
-          </div>
-            
+        <div>
+          <el-select v-model="dataSearch.department" placeholder="Select">
+            <el-option key="0" label="Selected department" :value=null />
+            <el-option v-for="item in department" :key="item.id" :label="item.name" :value="item.name"
+              :disabled="item.disabled" />
+          </el-select>
+          <el-input v-model="dataSearch.name" placeholder="Search by username" />
         </div>
-          <el-table :data="getCurrentPageData" height="48vh" style="width: 100%;" border stripe>
-            <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
-            <el-table-column prop="user.name" label="User name" min-width="200"
-              @click="router.push({ path: `/admin/list-user/${scope.row.user.id}` })"></el-table-column>
-            <el-table-column prop="user.department.name" label="Department name" min-width="300"></el-table-column>
-            <el-table-column prop="date" label="Date" min-width="150"></el-table-column>
-            <el-table-column prop="timeCheckIn" label="Time Check In" min-width="150"></el-table-column>
-            <el-table-column prop="timeCheckOut" label="Time Check Out" min-width="180"></el-table-column>
-            <el-table-column prop="shift.name" label="Shift name" min-width="150"></el-table-column>
-            <el-table-column fixed="right" label="Operations" width="140">
-              <template #default="scope">
-                <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
-                <el-button link type="danger" @click="handleDelete(scope.row.id)">Delete</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="pagination">
-            <el-button @click="previousPage" :disabled="currentPage === 1">
-              Previous
-            </el-button>
-            <span>{{ currentPage }} / {{ getTotalPage }}</span>
-            <el-button @click="nextPage" :disabled="currentPage === getTotalPage">
-              Next
-            </el-button>
-          </div>
-        </div>
-        <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this timekeeping?" @confirm="deleteTimekeeping()"
-          @cancel="confirmBox = false">
-        </ConfirmBox>
-        <div class="form-timekeeping">
-          <NewTimeKeeping @updateData="displayTimeKeeping" @invisible="visibleMode = false" 
-            :timekeepingId="timekeepingId" v-if="visibleMode"></NewTimeKeeping>
-        </div>
+
+      </div>
+      <el-table :data="timekeeping" height="48vh" style="width: 100%;" border stripe>
+        <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
+        <el-table-column prop="user.name" label="User name" min-width="200"
+          @click="router.push({ path: `/admin/list-user/${scope.row.user.id}` })"></el-table-column>
+        <el-table-column prop="user.department.name" label="Department name" min-width="300"></el-table-column>
+        <el-table-column prop="date" label="Date" min-width="150"></el-table-column>
+        <el-table-column prop="timeCheckIn" label="Time Check In" min-width="150"></el-table-column>
+        <el-table-column prop="timeCheckOut" label="Time Check Out" min-width="180"></el-table-column>
+        <el-table-column prop="shift.name" label="Shift name" min-width="150"></el-table-column>
+        <el-table-column fixed="right" label="Operations" width="140">
+          <template #default="scope">
+            <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
+            <el-button link type="danger" @click="handleDelete(scope.row.id)">Delete</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="pagination">
+        <el-button @click="previousPage" :disabled="currentPage === 1">
+          Previous
+        </el-button>
+        <span>{{ currentPage }} / {{ totalPage }}</span>
+        <el-button @click="nextPage" :disabled="currentPage === totalPage">
+          Next
+        </el-button>
+      </div>
+    </div>
+    <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this timekeeping?" @confirm="deleteTimekeeping()"
+      @cancel="confirmBox = false">
+    </ConfirmBox>
+    <div class="form-timekeeping">
+      <NewTimeKeeping @updateData="displayTimeKeeping" @invisible="visibleMode = false" :timekeepingId="timekeepingId"
+        v-if="visibleMode"></NewTimeKeeping>
+    </div>
   </main>
 </template>
 <style scoped>
@@ -66,9 +66,11 @@ main {
   margin-top: 50px;
   max-width: 1138px;
 }
+
 .el-select {
   margin-right: 5px;
 }
+
 .el-form {
   display: flex;
   justify-content: space-between;
@@ -139,7 +141,7 @@ a:hover {
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
-import { ref, onMounted, computed, reactive } from "vue";
+import { ref, onMounted, computed, reactive, watch } from "vue";
 import axios from "axios";
 import router from "../../../router";
 import { useUserStore } from "../../../stores/user";
@@ -152,12 +154,13 @@ const user = useUserStore().user;
 const alertStore = useAlertStore();
 const timekeeping = ref();
 const department = ref()
-const timekeepingId= ref(0)
+const timekeepingId = ref(0)
 const deleteId = ref(0)
-const pageSize = 9
 const visibleMode = ref(false)
 const confirmBox = ref(false)
+const debounceSearch = ref(null);
 let currentPage = ref(1);
+let totalPage = ref(1);
 let dataSearch = reactive({
   name: '',
   startDate: '',
@@ -182,17 +185,37 @@ const displayTimeKeeping = async () => {
   visibleMode.value = false
   try {
     await axios
-      .get("http://127.0.0.1:8000/api/manage-timekeeping", {
+      .post(`http://127.0.0.1:8000/api/manage-timekeeping/${currentPage.value - 1}`, {
+        name: dataSearch.name,
+        startDate: formatDate(dataSearch.startDate),
+        endDate: formatDate(dataSearch.endDate),
+        department: dataSearch.department
+      }, {
         headers: { Authorization: `Bearer ${user.token}` }
       })
       .then(function (response) {
-        timekeeping.value = response.data.data;
-        console.log(timekeeping)
+        console.log(dataSearch.department)
+        timekeeping.value = response.data.timekeeping;
+        totalPage.value = response.data.totalPage
       });
   } catch (e) {
     console.log(e);
   }
 };
+watch(
+  [() => dataSearch.name, () => dataSearch.department, () => dataSearch.startDate, () => dataSearch.endDate],
+  ([name, department, startDate, endDate]) => {
+    console.log(dataSearch.department)
+      if (debounceSearch.value) {
+        clearTimeout(debounceSearch.value);
+      }
+      debounceSearch.value = setTimeout(() => {
+        currentPage.value = 1;
+        displayTimeKeeping();
+      }, 500);
+  },
+  { deep: true }
+);
 const deleteTimekeeping = async () => {
   confirmBox.value = false
   try {
@@ -211,68 +234,27 @@ const deleteTimekeeping = async () => {
   }
   displayTimeKeeping();
 };
-const filteredData = computed(() => {
-  let search = timekeeping.value
-  if ((dataSearch.startDate != '' && dataSearch.endDate != '')) {
-    const startDate = formatDate(dataSearch.startDate)
-    const endDate = formatDate(dataSearch.endDate)
-    search = search.filter((item) => {
-      const datePart = item.date.split("/");
-      const itemDay = datePart[0]
-      const itemMonth = datePart[1]
-      const itemYear = datePart[2]
-      const itemDate = `${itemYear}-${itemMonth}-${itemDay}`;
-      return (itemDate >= startDate && itemDate <= endDate)
-    })
-  }
-  if (dataSearch.name) {
-    let searchText = dataSearch.name.toLowerCase();
-    currentPage.value = 1
-    search = search.filter((item) => {
-      return item.user.name.toLowerCase().includes(searchText);
-    })
-  }
-  if (dataSearch.department) {
-    let searchText = dataSearch.department.toLowerCase();
-    console.log(dataSearch.department)
-    currentPage.value = 1
-    console.log(searchText)
-    search = search.filter((item) => {
-      return item.user.department.name.toLowerCase() === searchText;
-    })
-  }
-  if (dataSearch.name == '' && (dataSearch.startDate == '' || dataSearch.endDate == '') && dataSearch.department == '') {
-    search = timekeeping.value
-  }
-  return search
-})
 const formatDate = (date) => {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${year}-${month}-${day}`;
+  if (date != '') {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  } else {
+    return date;
+  }
 };
-const getTotalPage = computed(() => {
-  if (filteredData.value) {
-    const filteredDataLength = filteredData.value.length
-    return Math.ceil(filteredDataLength / pageSize);
-  }
-})
-const getCurrentPageData = computed(() => {
-  if (filteredData.value) {
-    const startIndex = (currentPage.value - 1) * pageSize
-    const endIndex = startIndex + pageSize;
-    return filteredData.value.slice(startIndex, endIndex);
-  }
-});
+
 const nextPage = () => {
-  if (currentPage.value < getTotalPage.value) {
+  if (currentPage.value < totalPage.value) {
     currentPage.value++;
+    displayTimeKeeping()
   }
 };
 const previousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
+    displayTimeKeeping()
   }
 };
 const messages = (type, msg) => {
