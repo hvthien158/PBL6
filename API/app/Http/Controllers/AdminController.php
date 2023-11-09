@@ -16,11 +16,10 @@ use App\Models\User;
 use App\Models\Systemtime;
 use App\Models\TimeKeeping;
 use App\Http\Requests\DateTimeRequest;
+use App\Http\Resources\DepartmentResource;
 use Carbon\Carbon;
-use GuzzleHttp\Psr7\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PHPUnit\Event\Telemetry\System;
-use Spatie\FlareClient\Time\SystemTime as TimeSystemTime;
 
 class AdminController extends Controller
 {
@@ -100,6 +99,31 @@ class AdminController extends Controller
             } else {
                 return response()->json(['message' => 'User not found'], 400);
             }
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+    /**
+     * @param mixed $id
+     * 
+     * @return object
+     */
+    public function listDepartment($id, Request $request)
+    {
+        try {
+            $itemsPerPage = 10;
+            if ($request->name != '') {
+                $department = Department::whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%'])->skip($id * 10)->take($itemsPerPage)->get();
+                $totalPage = floor(Department::whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%'])->count() / $itemsPerPage) + 1;
+            } else {
+                $totalPage = floor(Department::count() / $itemsPerPage) + 1;
+                $department = Department::skip($id * 10)->take($itemsPerPage)->get();
+            }
+            $response = [
+                'totalPage' => $totalPage,
+                'department' => DepartmentResource::collection($department),
+            ];
+            return response()->json($response);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -307,11 +331,12 @@ class AdminController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
-    public function deleteTimeKeeping($id, TimeKeeping $timekeeping){
+    public function deleteTimeKeeping($id, TimeKeeping $timekeeping)
+    {
         $this->authorize('delete', $timekeeping);
         try {
             $timekeeping = TimeKeeping::find($id);
-            if($timekeeping){
+            if ($timekeeping) {
                 $systemtime = SystemTime::find($id);
                 $systemtime->delete();
                 $timekeeping->delete();
@@ -319,7 +344,7 @@ class AdminController extends Controller
             } else {
                 return response()->json(['message' =>  'Not found time keeping'], 400);
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }

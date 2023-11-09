@@ -2,8 +2,7 @@
   <main>
     <SlideBar></SlideBar>
     <div class="department">
-      <el-card>
-        <h2 style="font-size: 32px; font-weight: 700; text-align: center; ">Department management</h2>
+      <span style="font-size: 32px; font-weight: 700; text-align: center; ">Department management</span>
         <div class="title-table">
           <div>
             <el-button type="warning" @click="handleCreate">
@@ -19,8 +18,7 @@
             <el-input v-model="dataSearch" placeholder="Type to search" />
           </div>
         </div>
-        <div class="card-content">
-          <el-table :data="getCurrentPageData" height="48vh" border stripe>
+          <el-table :data="department" height="48vh" style="width: 100%;" border stripe>
             <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
             <el-table-column prop="name" label="Department name" min-width="200"></el-table-column>
             <el-table-column prop="address" label="Address" min-width="300"></el-table-column>
@@ -49,8 +47,8 @@
             <el-button @click="previousPage" :disabled="currentPage === 1">
               Previous
             </el-button>
-            <span>{{ currentPage }} / {{ getTotalPage }}</span>
-            <el-button @click="nextPage" :disabled="currentPage === getTotalPage">
+            <span>{{ currentPage }} / {{ totalPage }}</span>
+            <el-button @click="nextPage" :disabled="currentPage === totalPage">
               Next
             </el-button>
           </div>
@@ -62,23 +60,12 @@
           <NewDepartment @updateData="displayDepartment" @invisible="visibleMode = false" :mode="operationMode"
             :departmentId="departmentId" v-if="visibleMode"></NewDepartment>
         </div>
-      </el-card>
-    </div>
   </main>
 </template>
 <style scoped>
 main {
-  min-height: 80vh;
-  border-top: 0.1em solid black;
   box-sizing: border-box;
   display: flex;
-}
-
-.card-header {
-  text-align: center;
-  background-color: #f3952d;
-  font-size: 20px;
-  font-weight: 700;
 }
 
 .form-department {
@@ -109,10 +96,13 @@ label {
 }
 
 .department {
-  width: 85vw;
+  width: 80vw;
+  margin-top: -40px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  min-height: 85vh;
+  margin-left: 20px;
 }
 
 .title-table {
@@ -147,26 +137,25 @@ a:hover {
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, watch} from "vue";
 import axios from "axios";
 import router from "../../../router";
 import { useUserStore } from "../../../stores/user";
 import { useAlertStore } from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
-import { saveAs } from "file-saver";
-import { utils, write } from "xlsx";
 import NewDepartment from "../../../components/NewDepartment.vue";
 const user = useUserStore().user;
 const alertStore = useAlertStore();
 const department = ref();
 const departmentId = ref(0)
 const deleteId = ref(0)
-const pageSize = 8
+const totalPage = ref(0)
 const visibleMode = ref(false)
 const operationMode = ref('create')
 const confirmBox = ref(false)
+const debounceSearch = ref(null);
 let currentPage = ref(1);
-let dataSearch = ref(null)
+let dataSearch = ref('')
 onMounted(() => {
   displayDepartment();
 });
@@ -174,14 +163,29 @@ const displayDepartment = async () => {
   visibleMode.value = false
   try {
     await axios
-      .get("http://127.0.0.1:8000/api/department")
+      .post(`http://127.0.0.1:8000/api/list-department/${currentPage.value - 1}`, {
+        name : dataSearch.value.toLowerCase()
+      }, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      })
       .then(function (response) {
-        department.value = response.data.data;
+        console.log(response);
+        department.value = response.data.department;
+        totalPage.value = response.data.totalPage;
       });
   } catch (e) {
     console.log(e);
   }
 };
+watch(dataSearch, () => {
+  if (debounceSearch.value) {
+    clearTimeout(debounceSearch.value);
+  }
+  debounceSearch.value = setTimeout(() => {
+    currentPage.value = 1;
+    displayDepartment();
+  }, 500);
+});
 const deleteDepartment = async () => {
   confirmBox.value = false
   try {
@@ -200,39 +204,16 @@ const deleteDepartment = async () => {
   }
   displayDepartment();
 };
-const filteredData = computed(() => {
-  if (!dataSearch.value) {
-    return department.value
-  } else {
-    let searchText = dataSearch.value.toLowerCase();
-    currentPage.value = 1
-    return department.value.filter((item) => {
-      console.log(searchText)
-      return item.name.toLowerCase().includes(searchText);
-    })
-  }
-})
-const getTotalPage = computed(() => {
-  if (filteredData.value) {
-    const filteredDataLength = filteredData.value.length
-    return Math.ceil(filteredDataLength / pageSize);
-  }
-})
-const getCurrentPageData = computed(() => {
-  if (filteredData.value) {
-    const startIndex = (currentPage.value - 1) * pageSize
-    const endIndex = startIndex + pageSize;
-    return filteredData.value.slice(startIndex, endIndex);
-  }
-});
 const nextPage = () => {
-  if (currentPage.value < getTotalPage.value) {
+  if (currentPage.value < totalPage.value) {
     currentPage.value++;
+    displayDepartment()
   }
 };
 const previousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
+    displayDepartment()
   }
 };
 const messages = (type, msg) => {
