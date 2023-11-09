@@ -9,9 +9,12 @@ use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\TimeKeepingResource;
 use App\Models\Department;
 use App\Models\Shift;
 use App\Models\User;
+use App\Models\TimeKeeping;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -87,7 +90,7 @@ class AdminController extends Controller
         $this->authorize('delete', $user);
         try {
             $user = DB::table('users')->delete($id);
-            if($user == 1){
+            if ($user == 1) {
                 return response()->json(['message' => 'Delete user successfully']);
             } else {
                 return response()->json(['message' => 'User not found'], 400);
@@ -170,7 +173,7 @@ class AdminController extends Controller
             if ($user) {
                 return UserResource::collection($user);
             } else {
-                return response()->json(['message'=> 'Không có user nào']);
+                return response()->json(['message' => 'Không có user nào']);
             }
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -218,6 +221,12 @@ class AdminController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
+    /**
+     * @param mixed $id
+     * @param Shift $shift
+     * 
+     * @return object
+     */
     public function deleteShift($id, Shift $shift)
     {
         $this->authorize('delete', $shift);
@@ -227,7 +236,30 @@ class AdminController extends Controller
                 $shift->delete();
             return response()->json(['message' => 'Delete shift successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 401);
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+    /**
+     * @param null $id
+     * 
+     * @return object
+     */
+    public function manageTimeKeeping($id = null)
+    {
+        $this->authorize('viewAny',  TimeKeeping::class);
+        try {
+            if ($id) {
+                $timekeeping = TimeKeeping::where('id', $id)->get();
+            } else {
+                $timekeeping = TimeKeeping::orderBy('time_check_in','desc')->get();
+            }
+            if ($timekeeping) {
+                return TimeKeepingResource::collection($timekeeping);
+            } else {
+                return response()->json(['message' => 'Not found timekeeping'], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 }
