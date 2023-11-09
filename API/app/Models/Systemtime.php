@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Systemtime extends Model
 {
     use HasFactory;
+
+    protected $guarded = [];
+    protected $fillable = [
+        'id',
+        'time_check_in',
+        'time_check_out',
+    ];
 }

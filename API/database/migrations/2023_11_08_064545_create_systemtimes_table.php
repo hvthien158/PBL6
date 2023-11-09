@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('systemtimes', function (Blueprint $table) {
-            $table->id();
+            $table->bigInteger('id')->unsigned();
+            $table->primary('id');
+            $table->dateTime('time_check_in');
+            $table->dateTime('time_check_out')->nullable();
             $table->timestamps();
         });
     }

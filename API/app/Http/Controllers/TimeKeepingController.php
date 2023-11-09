@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Shift;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class TimeKeepingController extends Controller
 {
@@ -23,6 +24,7 @@ class TimeKeepingController extends Controller
     {
         $this->middleware('auth:api');
     }
+
     /**
      * @return object
      */
@@ -47,6 +49,7 @@ class TimeKeepingController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
+
     /**
      * @param TimeKeeping $timeKeeping
      *
@@ -68,13 +71,13 @@ class TimeKeepingController extends Controller
                         ->where('id', '=', $checkTimeKeeping->id)
                         ->update(['time_check_out' => $currentDate]);
 
-                    $shifts = Shift::orderBy('amount', 'desc')->get();
+                    $shifts = Shift::all();
                     $timeCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_in, $timezone);
                     $timeCheckOut = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_out, $timezone);
                     foreach ($shifts as $shift) {
                         if (
-                            $timeCheckIn->isBefore($shift->time_valid_check_in)
-                            && $timeCheckOut->isAfter($shift->time_valid_check_out)
+                            $timeCheckIn->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
+                            $timeCheckOut->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
                         ) {
                             $checkTimeKeeping->shift_id = $shift->id;
                             $checkTimeKeeping->save();
@@ -90,6 +93,7 @@ class TimeKeepingController extends Controller
             return response()->json(['message' => $e->getMessage()]);
         }
     }
+
     /**
      * @return object
      */
@@ -100,6 +104,7 @@ class TimeKeepingController extends Controller
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->whereDate('time_check_in', $currentDate)->first();
         return response()->json($timeKeeping);
     }
+
     /**
      * @return object
      */
@@ -108,6 +113,7 @@ class TimeKeepingController extends Controller
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->orderBy('time_check_in', 'desc')->get();
         return TimeKeepingResource::collection($timeKeeping);
     }
+
     /**
      * @param TimeRequest $request
      *
@@ -124,6 +130,7 @@ class TimeKeepingController extends Controller
 
         return TimeKeepingResource::collection($timekeepingRecords);
     }
+
     /**
      * @param MonthYearRequest $request
      *
@@ -139,5 +146,85 @@ class TimeKeepingController extends Controller
             $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereYear('time_check_in', $year)->get();
         }
         return $timekeepingRecords;
+    }
+
+    public function updateTimeKeeping(Request $request){
+        $validator = Validator::make($request->all(), [
+            'date' =>'required',
+            'time_check_in' => 'nullable',
+            'time_check_out' => 'nullable',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['data' => $validator->failed(), 'message' => 'Invalid data request'], 422);
+        }
+
+        $date = Carbon::createFromFormat('d/m/Y', $request->get('date'))->format('Y-m-d');
+        $checkin = Carbon::createFromFormat('H:i', $request->get('time_check_in'));
+        $checkout = null;
+        if($request->get('time_check_out')){
+            $checkout = Carbon::createFromFormat('H:i', $request->get('time_check_out'));
+        }
+
+        $timekeep = TimeKeeping::where('user_id', '=', auth()->id())
+            ->where('time_check_in', 'like', $date.'%')->first();
+
+        if($timekeep){
+            $timekeep->update(['time_check_in' =>  $date.' '.$checkin->format('H:i:s')]);
+
+            if($request->get('time_check_out')){
+                $timekeep->update(['time_check_out' => $date.' '.$checkout->format('H:i:s')]);
+            }
+
+            if($checkout){
+                $shifts = Shift::all();
+                foreach ($shifts as $shift) {
+                    if (
+                        $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
+                        $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
+                    ) {
+                        $timekeep->shift_id = $shift->id;
+                        $timekeep->save();
+                        break;
+                    }
+                }
+            }
+        } else {
+            if($checkout){
+                $newtimekeep = TimeKeeping::create([
+                    'user_id' => auth()->id(),
+                    'time_check_in' =>  $date.' '.$checkin->format('H:i:s'),
+                    'time_check_out' => $date.' '.$checkout->format('H:i:s')
+                ]);
+                $shifts = Shift::all();
+                foreach ($shifts as $shift) {
+                    if (
+                        $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
+                        $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
+                    ) {
+                        $newtimekeep->shift_id = $shift->id;
+                        $newtimekeep->save();
+                        break;
+                    }
+                }
+                Systemtime::create([
+                    'id' => $newtimekeep->id,
+                    'time_check_in' => $date.' 00:00:00',
+                    'time_check_out' => $date.' 00:00:00',
+                ]);
+            } else {
+                $newtimekeep = TimeKeeping::create([
+                    'user_id' => auth()->id(),
+                    'time_check_in' =>  $date.' '.$checkin->format('H:i:s'),
+                ]);
+                Systemtime::create([
+                    'id' => $newtimekeep->id,
+                    'time_check_in' => $date.' 00:00:00',
+                    'time_check_out' => $date.' 00:00:00',
+                ]);
+            }
+        }
+
+        return response()->json(['message' => 'Update successfully']);
     }
 }

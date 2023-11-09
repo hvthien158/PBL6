@@ -218,7 +218,7 @@ const getTimeKeeping = async () => {
         },
       })
       .then(function (response) {
-        if (response.status == 200) {
+        if (response.status === 200) {
           if (response.data.time_check_in) {
             if (response.data.time_check_out) {
               checkin.value = false;
@@ -254,7 +254,7 @@ const handleCheckIn = async () => {
         getTimeKeeping();
       });
   } catch (e) {
-    console.log(user.token);
+    console.log(e);
   }
 };
 
@@ -274,7 +274,7 @@ const handleCheckOut = async () => {
           getTimeKeeping();
         });
     } catch (e) {
-      console.log(`Bearer ${user.token}`);
+      console.log(e);
     }
 }
 
