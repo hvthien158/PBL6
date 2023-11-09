@@ -13,7 +13,7 @@
 
         <div>
           <el-select v-model="dataSearch.department" placeholder="Select">
-            <el-option key="0" label="Selected department" :value=null />
+            <el-option key="0" label="Selected department" value="" />
             <el-option v-for="item in department" :key="item.id" :label="item.name" :value="item.name"
               :disabled="item.disabled" />
           </el-select>

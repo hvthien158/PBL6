@@ -3,39 +3,39 @@
     <SlideBar></SlideBar>
     <div class="shift">
       <span style="font-size: 32px; font-weight: 700; text-align: center; ">Shift management</span>
-        <div class="title-table">
-        
+      <div class="title-table">
+
         <div>
           <el-input v-model="dataSearch" placeholder="Type to search" />
         </div>
       </div>
-          <el-table :data="getCurrentPageData" height="50vh" border stripe>
-            <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
-            <el-table-column prop="name" label="Shift name" min-width="180"></el-table-column>
-            <el-table-column prop="timeValidCheckIn" label="Time Valid Check In" min-width="300"></el-table-column>
-            <el-table-column prop="timeValidCheckOut" label="Time Valid Check Out" min-width="300"></el-table-column>
-            <el-table-column prop="amount" min-width="100" label="Amount"></el-table-column>
-            <!-- <el-table-column fixed="right" label="Operations" width="140">
+      <el-table :data="shift" height="50vh" border stripe>
+        <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
+        <el-table-column prop="name" label="Shift name" min-width="180"></el-table-column>
+        <el-table-column prop="timeValidCheckIn" label="Time Valid Check In" min-width="300"></el-table-column>
+        <el-table-column prop="timeValidCheckOut" label="Time Valid Check Out" min-width="300"></el-table-column>
+        <el-table-column prop="amount" min-width="100" label="Amount"></el-table-column>
+        <!-- <el-table-column fixed="right" label="Operations" width="140">
               <template #default="scope">
                 <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
                 <el-button link type="danger" @click="handleDelete(scope.row.id)">Delete</el-button>
               </template>
             </el-table-column> -->
-          </el-table>
-          <div class="pagination">
-            <el-button @click="previousPage" :disabled="currentPage === 1">
-              Previous
-            </el-button>
-            <span>{{ currentPage }} / {{ getTotalPage }}</span>
-            <el-button @click="nextPage" :disabled="currentPage === getTotalPage">
-              Next
-            </el-button>
-          </div>
-        </div>
-        <!-- <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this shift?" @confirm="deleteShift()"
+      </el-table>
+      <div class="pagination">
+        <el-button @click="previousPage" :disabled="currentPage === 1">
+          Previous
+        </el-button>
+        <span>{{ currentPage }} / {{ totalPage }}</span>
+        <el-button @click="nextPage" :disabled="currentPage === totalPage">
+          Next
+        </el-button>
+      </div>
+    </div>
+    <!-- <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this shift?" @confirm="deleteShift()"
           @cancel="confirmBox = false">
         </ConfirmBox> -->
-        <!-- <div class="form-shift">
+    <!-- <div class="form-shift">
           <NewShift @updateData="displayShift" @invisible="visibleMode = false" :mode="operationMode"
             :shiftId="shiftId" v-if="visibleMode"></NewShift>
         </div> -->
@@ -46,27 +46,32 @@ main {
   box-sizing: border-box;
   display: flex;
 }
+
 .form-shift {
   margin-top: 50px;
   max-width: 938px;
 }
+
 .card-header {
   text-align: center;
   background-color: #f3952d;
   font-size: 20px;
   font-weight: 700;
 }
-.title-table{
+
+.title-table {
   width: 100%;
   display: flex;
   justify-content: flex-end;
   margin: 10px 0 10px 0
 }
-.title-table div{
+
+.title-table div {
   display: flex;
   align-items: end;
   justify-content: center;
 }
+
 .shift {
   width: 80vw;
   margin-top: -40px;
@@ -109,7 +114,7 @@ main {
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, watch} from "vue";
 import { useUserStore } from "../../../stores/user";
 import axios from "axios";
 import router from "../../../router";
@@ -117,18 +122,13 @@ import { useAlertStore } from "../../../stores/alert";
 import { saveAs } from "file-saver";
 import { utils, write } from "xlsx";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
-// import NewShift from "../../../components/NewShift.vue";
-let dataSearch = ref(null);
+let dataSearch = ref('');
 let currentPage = ref(1)
-const pageSize = 10
+const totalPage = ref(1)
+const debounceSearch = ref(null);
 const user = useUserStore().user;
 const alertStore = useAlertStore();
 const shift = ref();
-// const shiftId = ref(0)
-// const deleteId = ref(0)
-// const visibleMode = ref(false)
-// const operationMode = ref('create') 
-// const confirmBox = ref(false)
 onMounted(() => {
   if (user.role !== "admin") {
     router.push({ path: "/" });
@@ -139,58 +139,31 @@ onMounted(() => {
 const displayShift = async () => {
   try {
     await axios
-      .get("http://127.0.0.1:8000/api/shift")
+      .post(`http://127.0.0.1:8000/api/list-shift/${currentPage.value - 1}`, {
+        name: dataSearch.value
+      },
+        {
+          headers: { Authorization: `Bearer ${user.token}` }
+        })
       .then(function (response) {
-        shift.value = response.data.data;
+        shift.value = response.data.shift;
+        totalPage.value = response.data.totalPage
       });
   } catch (e) {
     console.log(e);
   }
 }
-const deleteShift = async () => {
-  confirmBox.value = false
-  try {
-    await axios.delete(`http://127.0.0.1:8000/api/delete-shift/${deleteId.value}`, {
-      headers: { Authorization: `Bearer ${user.token}` }
-    }).then(function (response) {
-      if (response.status == 200) {
-        console.log(response)
-        messages('success', response.data.message)
-      }
-    })
-  } catch (e) {
-    console.log(e)
-    messages('error', e.data.message)
+watch(dataSearch, () => {
+  if (debounceSearch.value) {
+    clearTimeout(debounceSearch.value);
   }
-  displayShift()
-}
-const filteredData = computed(() => {
-  if (!dataSearch.value) {
-    return shift.value
-  } else {
-    let searchText = dataSearch.value.toLowerCase();
-    currentPage.value = 1
-    return shift.value.filter((item) => {
-      console.log(searchText)
-      return item.name.toLowerCase().includes(searchText);
-    })
-  }
-})
-const getTotalPage = computed(() => {
-  if (filteredData.value) {
-    const filteredDataLength = filteredData.value.length
-    return Math.ceil(filteredDataLength / pageSize);
-  }
-})
-const getCurrentPageData = computed(() => {
-  if (filteredData.value) {
-    const startIndex = (currentPage.value - 1) * pageSize
-    const endIndex = startIndex + pageSize;
-    return filteredData.value.slice(startIndex, endIndex);
-  }
+  debounceSearch.value = setTimeout(() => {
+    currentPage.value = 1;
+    displayShift();
+  }, 500);
 });
 const nextPage = () => {
-  if (currentPage.value < getTotalPage.value) {
+  if (currentPage.value < totalPage.value) {
     currentPage.value++;
   }
 };
@@ -199,69 +172,6 @@ const previousPage = () => {
     currentPage.value--;
   }
 };
-// function handleCreate() {
-//   operationMode.value = 'create'
-//   if (!visibleMode.value) {
-//     visibleMode.value = true
-//   }
-// }
-// function handleEdit(id) {
-//   visibleMode.value = true;
-//   operationMode.value = 'update'
-//   shiftId.value = id
-// }
-// function handleDelete(id) {
-//     confirmBox.value = true
-//     deleteId.value = id
-// }
-// const exportExcel = () => {
-//   const excelData = filteredData.value.map((item) => {
-//     return {
-//       id: item.id,
-//       name: item.name,
-//       timeValidCheckIn: item.timeValidCheckIn,
-//       timeValidCheckOut: item.timeValidCheckOut,
-//       amount: item.amount,
-//     };
-//   });
-//   const worksheet = utils.json_to_sheet(excelData);
-//   const workbook = utils.book_new();
-//   utils.book_append_sheet(workbook, worksheet, "ListShift");
-//   const excelBuffer = write(workbook, {
-//     bookType: "xlsx",
-//     type: "array",
-//   });
-//   const dataBlob = new Blob([excelBuffer], {
-//     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-//   });
-//   saveAs(dataBlob, "list_shift.xlsx");
-// };
-
-// const exportCSV = () => {
-//   let csvContent = "data:text/csv;charset=utf-8,";
-//   const headers = [
-//     "id",
-//     "name",
-//     "timeValidCheckIn",
-//     "timeValidCheckOut",
-//     "amount"
-//   ];
-//   csvContent += headers.join(",") + "\n";
-//   filteredData.value.forEach((item) => {
-//     const row = headers
-//       .map((header) => {
-//         return item[header];
-//       })
-//       .join(",");
-//     csvContent += row + "\n";
-//   });
-
-//   const encodedUri = encodeURI(csvContent);
-//   const link = document.createElement("a");
-//   link.setAttribute("href", encodedUri);
-//   link.setAttribute("download", `list_shift.csv`);
-//   link.click();
-// };
 const messages = (type, msg) => {
   alertStore.alert = true;
   alertStore.type = type;
