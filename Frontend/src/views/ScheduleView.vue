@@ -1,46 +1,58 @@
 <template>
   <div class="timekeeping-management">
+    <EditTimeKeep
+        style="height: 100%"
+        :date="today.date"
+        :day-of-week="today.dayOfWeek"
+        :checkin="today.timeCheckIn"
+        :checkout="today.timeCheckOut"
+        @update="getListTimeKeeping"
+    ></EditTimeKeep>
     <el-card>
       <div slot="header" class="card-header">
         Time Keeping
       </div>
       <div class="card-content">
         <el-form inline>
-          <el-form-item label="For date">
-            <el-date-picker v-model="dataSearch.startDate" type="date"
-              placeholder="Select date"></el-date-picker>
-          </el-form-item>
-          <el-form-item label="To date">
-            <el-date-picker v-model="dataSearch.endDate" type="date"
-              placeholder="Select date"></el-date-picker>
-          </el-form-item>
+          <el-date-picker
+              style="margin: 40px 30px 0 25%"
+              v-model="filter_value"
+              type="daterange"
+              start-placeholder="Start date"
+              end-placeholder="End date"
+              format="DD/MM/YYYY"
+              value-format="DD/MM/YYYY"
+          />
           <el-form-item>
-            <el-button type="primary" @click="exportExcel">Export Excel</el-button>
-            <el-button type="primary" @click="exportCSV">Export CSV</el-button>
+            <el-button type="warning" @click="exportExcel">Export Excel</el-button>
+            <el-button type="warning" @click="exportCSV">Export CSV</el-button>
           </el-form-item>
         </el-form>
-
-        <el-table :data="getCurrentPageData" border stripe>
+        <div>
+          <div class="pagination">
+            <el-button type="info" @click="previousMonth">
+              Prev
+            </el-button>
+            <span>{{ monthDisplay + 1 }}/{{ yearDisplay }}</span>
+            <el-button type="info" @click="nextMonth">
+              Next
+            </el-button>
+          </div>
+          <el-checkbox v-model="only_show" label="Only show checkin days" size="large" />
+        </div>
+        <el-table :data="only_show ? dataDisplay : dataByMonth" border stripe>
+          <el-table-column prop="dayOfWeek" label="Day of week"></el-table-column>
           <el-table-column prop="date" label="Date"></el-table-column>
-          <el-table-column prop="timeCheckIn" label="Time Checkin"></el-table-column>
-          <el-table-column prop="timeCheckOut" label="Time Checkout"></el-table-column>
-          <el-table-column prop="timeWork" label="Time Work"></el-table-column>
+          <el-table-column prop="timeCheckIn" label="Checkin"></el-table-column>
+          <el-table-column prop="timeCheckOut" label="Checkout"></el-table-column>
+          <el-table-column prop="timeWork" label="Working time"></el-table-column>
           <el-table-column prop="shift.name" label="Shift"></el-table-column>
           <el-table-column label="Request">
             <template #default="scope">
-              <el-button class="el-button--text">Edit</el-button>
+              <el-button class="el-button--text" @click="editTime(scope.$index)">Edit</el-button>
             </template>
           </el-table-column>
         </el-table>
-        <div class="pagination">
-          <el-button @click="previousPage" :disabled="currentPage === 1">
-            Previous
-          </el-button>
-          <span>{{ currentPage }} / {{ getTotalPage }}</span>
-          <el-button @click="nextPage" :disabled="currentPage === getTotalPage">
-            Next
-          </el-button>
-        </div>
       </div>
     </el-card>
   </div>
@@ -63,7 +75,7 @@
 }
 
 .el-card {
-  min-width: 50vw;
+  width: 70vw;
 }
 
 .card-content {
@@ -81,7 +93,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  margin: 10px 0;
 }
 
 .el-form-item {
@@ -94,20 +106,32 @@
 </style>
 
 <script setup>
+import EditTimeKeep from "../components/EditTimeKeep.vue"
 import { saveAs } from "file-saver";
 import { read, utils, write } from "xlsx";
-import { ref, reactive, onMounted, defineProps, computed } from "vue";
+import {ref, reactive, onMounted, defineProps, computed, watchEffect} from "vue";
 import { useUserStore } from "../stores/user";
 import axios from "axios";
+import moment from "moment";
 
 const user = useUserStore().user;
 let dataSearch = reactive({
   startDate: null,
   endDate: null,
 });
-let data = ref()
-let currentPage = ref(1);
-const pageSize = 10;
+let data = ref([])
+const dataDisplay = ref([])
+const monthDisplay = ref(moment().month())
+const yearDisplay = ref(moment().year())
+const only_show = ref(false)
+const filter_value = ref([])
+const today = ref({
+  dayOfWeek: '',
+  date: '',
+  timeCheckIn: '',
+  timeCheckOut: '',
+})
+const first_load = ref(true)
 
 onMounted(() => {
   getListTimeKeeping();
@@ -122,6 +146,10 @@ const getListTimeKeeping = async () => {
       })
       .then(function (response) {
         data.value = response.data.data;
+        if(first_load.value){
+          loadToday()
+          first_load.value = false
+        }
       });
     dataSearch.startDate = null
     dataSearch.endDate = null
@@ -129,12 +157,123 @@ const getListTimeKeeping = async () => {
     console.log(e);
   }
 };
+
+filterByMonth()
+const dataByMonth = computed(() => {
+  let result = []
+
+  let from = {
+    day: filter_value.value[0].slice(0, 2),
+    month: filter_value.value[0].slice(3, 5),
+    year: filter_value.value[0].slice(6, 10),
+  }
+  let to = {
+    day: filter_value.value[1].slice(0, 2),
+    month: filter_value.value[1].slice(3, 5),
+    year: filter_value.value[1].slice(6, 10),
+  }
+  let start = moment('' + from.year + from.month + from.day)
+  let end = moment('' + to.year + to.month + to.day)
+  let limit = 100
+
+  do {
+    let check = data.value.find((element) => {
+      return element.date === start.format('DD') + '/' + (start.month() + 1).toString().padStart(2, '0') + '/' + start.year()
+    })
+    if(check){
+      result.push(check)
+    } else {
+      result.push({
+        date: start.format('DD') + '/' + (start.month() + 1).toString().padStart(2, '0') + '/' + start.year(),
+        dayOfWeek: start.format('dddd')
+      })
+    }
+    start = start.add(1, 'days')
+    limit -= 1
+  } while (start.format('L') !== end.format('L') && limit !== 0)
+  //add last day
+  let check = data.value.find((element) => {
+    return element.date === start.format('DD') + '/' + (start.month() + 1).toString().padStart(2, '0') + '/' + start.year()
+  })
+  if(check){
+    result.push(check)
+  } else {
+    result.push({
+      date: start.format('DD') + '/' + (start.month() + 1).toString().padStart(2, '0') + '/' + start.year(),
+      dayOfWeek: start.format('dddd')
+    })
+  }
+
+  return result
+})
+
+function filterByMonth(){
+  filter_value.value = [
+    '01/' + (monthDisplay.value + 1).toString().padStart(2, '0') + '/' + yearDisplay.value,
+    getDaysInMonth(monthDisplay.value + 1, yearDisplay.value) + '/' + (monthDisplay.value + 1).toString().padStart(2, '0') + '/' + yearDisplay.value
+  ]
+}
+
+function getDaysInMonth(month, year){
+  return moment(year + '-' + month.toString().padStart(2, '0')).daysInMonth()
+}
+
+watchEffect(() => {
+  if(only_show.value === true){
+    dataDisplay.value = dataByMonth.value.filter((data) => {
+      return data.timeCheckIn
+    })
+  } else {
+    dataDisplay.value = []
+  }
+})
+
+function nextMonth(){
+  if(monthDisplay.value === 11){
+    monthDisplay.value = 0
+    yearDisplay.value += 1
+  } else {
+    monthDisplay.value += 1
+  }
+  filterByMonth()
+}
+function previousMonth(){
+  if(monthDisplay.value === 0){
+    monthDisplay.value = 11
+    yearDisplay.value -= 1
+  } else {
+    monthDisplay.value -= 1
+  }
+  filterByMonth()
+}
+
+function loadToday(){
+  let check = data.value.find((element) => {
+    return element.date === moment().format('DD') + '/' + (moment().month() + 1).toString().padStart(2, '0') + '/' + moment().year()
+  })
+  if(check){
+    today.value = check
+  } else {
+    today.value.date = moment().format('DD') + '/' + (moment().month() + 1).toString().padStart(2, '0') + '/' + moment().year()
+    today.value.dayOfWeek = moment().format('dddd')
+  }
+}
+
+function editTime(index){
+  if(only_show.value === true){
+    today.value = dataDisplay.value[index]
+  } else {
+    today.value = dataByMonth.value[index]
+  }
+}
+
 const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
   return `${year}-${month}-${day}`;
 };
+
 const filteredData = computed(() => {
   if (dataSearch.startDate && dataSearch.endDate) {
     const startDate = formatDate(dataSearch.startDate)
@@ -152,104 +291,7 @@ const filteredData = computed(() => {
     return data.value;
   }
 });
-const getTotalPage = computed(() => {
-  if (!(dataSearch.startDate || dataSearch.endDate) && filteredData.value && data.value) {
-    let countTotal = 0;
-    let month = 0;
-    let year = 0;
-    data.value.filter((item) => {
-      const datePart = item.date.split("-");
-      const itemMonth = datePart[1]
-      const itemYear = datePart[2]
-      if (itemMonth != month || itemYear != year) {
-        countTotal += 1
-        month = itemMonth
-        year = itemYear
-      }
-    })
-    return countTotal
-  } else {
-    if (filteredData.value) {
-      const filteredDataLength = filteredData.value.length;
-      return Math.ceil(filteredDataLength / getPageSize.value);
-    }
-  }
-})
-let temp = 0
-const getDistinctMonthsAndYears = () => {
-  const distinctMonthsAndYears = [];
-  let topTime = 1
-  data.value.forEach((item) => {
-    const datePart = item.date.split("-");
-    const itemMonth = parseInt(datePart[1]);
-    const itemYear = parseInt(datePart[2]);
-    const monthYear = { month: itemMonth, year: itemYear, time : topTime };
-    const exists = distinctMonthsAndYears.some(
-      (my) => my.month === itemMonth && my.year === itemYear
-    );
 
-    if (!exists) {
-      distinctMonthsAndYears.push(monthYear);
-      topTime += 1
-      console.log(monthYear)
-    }
-  });
-
-  return distinctMonthsAndYears;
-};
-
-const getPageSize = computed(() => {
-  if (currentPage.value && data.value && !(dataSearch.startDate || dataSearch.endDate)) {
-    const distinctMonthsAndYears = getDistinctMonthsAndYears();
-
-    const currentPageItem = distinctMonthsAndYears.find((item) => item.time === currentPage.value);
-    if (currentPageItem) {
-      const currentMonth = currentPageItem.month;
-      const currentYear = currentPageItem.year;
-      let countPageSize = 0;
-      data.value.forEach((item) => {
-        const datePart = item.date.split("-");
-        const itemMonth = parseInt(datePart[1]);
-        const itemYear = parseInt(datePart[2]);
-        console.log(itemMonth, itemYear)
-        if (itemMonth === currentMonth && itemYear === currentYear) {
-          countPageSize += 1; 
-        }
-      });
-      console.log(countPageSize)
-      return countPageSize;
-    }
-  }
-
-  return pageSize;
-});
-let tempEndIndex
-const getCurrentPageData = computed(() => {
-  if (filteredData.value) {
-    let startIndex = 0
-    if(currentPage.value == 1){
-      startIndex = 0
-    } else {
-      startIndex = tempEndIndex
-    }
-    let endIndex = startIndex + getPageSize.value;
-    tempEndIndex = endIndex
-    
-    return filteredData.value.slice(startIndex, endIndex);
-  }
-});
-const nextPage = () => {
-  if (currentPage.value < getTotalPage.value) {
-    currentPage.value++;
-  }
-};
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-    tempEndIndex = tempEndIndex - getPageSize.value 
-  }
-};
-//
 const exportExcel = () => {
   const excelData = filteredData.value.map((item) => {
     return {
