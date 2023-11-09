@@ -13,18 +13,29 @@
         </div>
         <div class="child">
           <span>Date of birth: </span>
-          <span v-if="!edit_mode">{{user.DOB}}</span>
-          <input type="text" v-else v-model="DOB" placeholder="dd/mm/yyyy">
+          <span v-if="!edit_mode">{{ displayDOB }}</span>
+          <el-date-picker
+              v-else
+              v-model="user.DOB"
+              type="date"
+              placeholder="dd/mm/yyyy"
+              format="DD/MM/YYYY"
+              value-format="YYYY-MM-DD"
+          />
         </div>
         <div class="child">
           <span>Address: </span>
           <span v-if="!edit_mode">{{user.address}}</span>
-          <input type="text" v-else v-model="address" placeholder="Los Angeles">
+          <el-input class="w-50" type="text" v-else v-model="address" placeholder="Da Nang"/>
         </div>
         <div class="child">
           <span>Phone number: </span>
           <span v-if="!edit_mode">{{user.phone_number}}</span>
-          <input type="text" v-else v-model="phone_number" placeholder="xxx-xxxx-xxxx">
+          <el-input class="w-50" type="text" v-else v-model="phone_number" placeholder="xxx-xxxx-xxxx"/>
+        </div>
+        <div class="child">
+          <span>Position: </span>
+          <span>{{user.position}}</span>
         </div>
         <ButtonLoading
             v-if="!edit_mode"
@@ -68,15 +79,6 @@
 .child{
   margin-top: 20px !important;
 }
-input{
-  border: none;
-  border-bottom: 2px #6A679E solid;
-}
-input:active,
-input:focus,
-input:hover {
-  outline: none;
-}
 .inputfile {
   width: 0.1px;
   height: 0.1px;
@@ -105,8 +107,11 @@ import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import ButtonLoading from "../../components/ButtonLoading.vue";
 import axios from "axios";
+import {useAlertStore} from "../../stores/alert";
+import moment from "moment";
 
 const router = useRouter()
+const alertStore = useAlertStore()
 const user = useUserStore().user
 const imgPath = ref(user.avatar? 'http://127.0.0.1:8000/storage/' + user.avatar : null)
 const avatar = ref(undefined)
@@ -117,9 +122,11 @@ const edit_mode = ref(false)
 const DOB = ref('')
 const address = ref('')
 const phone_number = ref('')
+const displayDOB = ref('')
 
 function mapData(){
   DOB.value = user.DOB
+  displayDOB.value = moment(user.DOB).format('DD/MM/YYYY')
   address.value = user.address
   phone_number.value = user.phone_number
 }
@@ -154,6 +161,9 @@ function updateProfile(){
         edit_mode.value = false
       })
       .catch((e) => {
+        alertStore.alert = true
+        alertStore.type = 'error'
+        alertStore.msg = 'Something went wrong'
         console.log(e)
       })
 }

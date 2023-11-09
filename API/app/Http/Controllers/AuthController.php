@@ -201,7 +201,7 @@ class AuthController extends Controller
 
     /**
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function checkEmail(Request $request){

@@ -19,9 +19,10 @@
 
 .main-view {
   margin-top: 60px;
-  background-color: rgb(240, 240, 240);
   min-height: calc(100vh - 120px);
-  display: flex
+  display: flex;
+  background-image: url("assets/background.jpg");
+  background-size: 100%;
 }
 input {
   color: black;

@@ -14,18 +14,20 @@ class UserController extends Controller
     public function __construct(){
         $this->middleware(['auth:api', 'checkrole']);
     }
+
     /**
-     * @param null|int $id
-     * 
+     * @param int|null $id
+     *
      * @return object
      */
-    public function user($id = null){
+    public function user(int $id = null){
         if($id){
             $user = User::where('id',$id)->get();
+            return response()->json(['user' => $user]);
         } else{
             $this->authorize('adminView', User::class);
             $user = User::orderBy('id','asc')->get();
+            return UserResource::collection($user);
         }
-        return UserResource::collection($user);
     }
 }
