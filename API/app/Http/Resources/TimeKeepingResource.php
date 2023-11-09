@@ -45,7 +45,6 @@ class TimeKeepingResource extends JsonResource
         if ($this->time_check_in) {
             $timeCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_in)->format('H:i');
             $systemCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $systemCheck->time_check_in)->format('H:i');
-            $now = Carbon::now()->setTimezone($timezone);
         }
 
         if ($this->time_check_out) {
@@ -62,7 +61,6 @@ class TimeKeepingResource extends JsonResource
             }
             $timeWork = str_pad($timeWorkHours, 2, '0', STR_PAD_LEFT).':'.str_pad($timeWorkMinutes, 2, '0', STR_PAD_LEFT);
         }
-
         return [
             'id' => $this->id,
             'date' => Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_in)->format('d/m/Y'),

@@ -9,10 +9,18 @@ use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\TimeKeepingResource;
 use App\Models\Department;
 use App\Models\Shift;
 use App\Models\User;
+use App\Models\Systemtime;
+use App\Models\TimeKeeping;
+use App\Http\Requests\DateTimeRequest;
+use Carbon\Carbon;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Event\Telemetry\System;
+use Spatie\FlareClient\Time\SystemTime as TimeSystemTime;
 
 class AdminController extends Controller
 {
@@ -87,7 +95,7 @@ class AdminController extends Controller
         $this->authorize('delete', $user);
         try {
             $user = DB::table('users')->delete($id);
-            if($user == 1){
+            if ($user == 1) {
                 return response()->json(['message' => 'Delete user successfully']);
             } else {
                 return response()->json(['message' => 'User not found'], 400);
@@ -170,7 +178,7 @@ class AdminController extends Controller
             if ($user) {
                 return UserResource::collection($user);
             } else {
-                return response()->json(['message'=> 'Không có user nào']);
+                return response()->json(['message' => 'Không có user nào']);
             }
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -218,6 +226,12 @@ class AdminController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
+    /**
+     * @param mixed $id
+     * @param Shift $shift
+     * 
+     * @return object
+     */
     public function deleteShift($id, Shift $shift)
     {
         $this->authorize('delete', $shift);
@@ -227,7 +241,86 @@ class AdminController extends Controller
                 $shift->delete();
             return response()->json(['message' => 'Delete shift successfully']);
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 401);
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+    /**
+     * @param null $id
+     * 
+     * @return object
+     */
+    public function manageTimeKeeping($id = null)
+    {
+        $this->authorize('viewAny',  TimeKeeping::class);
+        try {
+            if ($id) {
+                $timekeeping = TimeKeeping::where('id', $id)->get();
+            } else {
+                $timekeeping = TimeKeeping::orderBy('time_check_in', 'desc')->get();
+            }
+            if ($timekeeping) {
+                return TimeKeepingResource::collection($timekeeping);
+            } else {
+                return response()->json(['message' => 'Not found timekeeping'], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * @param null $id
+     * 
+     * @return object
+     */
+    public function updateTimeKeeping(DateTimeRequest $request, TimeKeeping $timekeeping, $id)
+    {
+        $this->authorize('update', $timekeeping);
+        try {
+            $timekeeping = TimeKeeping::find($id);
+            if ($timekeeping) {
+                $date = Carbon::createFromFormat('Y-m-d H:i:s', $timekeeping->time_check_in)->format('Y-m-d');
+                $timekeeping->update([
+                    'time_check_in' => $date . ' ' . $request->timeCheckIn,
+                    'time_check_out' => $date . ' ' . $request->timeCheckOut
+                ]);
+                if ($timekeeping->time_check_out) {
+                    $checkin = Carbon::createFromFormat('H:i:s', $request->timeCheckIn);
+                    $checkout = Carbon::createFromFormat('H:i:s', $request->timeCheckOut);
+                    $shifts = Shift::all();
+                    foreach ($shifts as $shift) {
+                        if (
+                            $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
+                            $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
+                        ) {
+                            $timekeeping->shift_id = $shift->id;
+                            $timekeeping->save();
+                            break;
+                        }
+                    }
+                }
+                return response()->json(['message' => 'Update successfully']);
+            } else {
+                return response()->json(['message' =>  'Not found time keeping'], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+    public function deleteTimeKeeping($id, TimeKeeping $timekeeping){
+        $this->authorize('delete', $timekeeping);
+        try {
+            $timekeeping = TimeKeeping::find($id);
+            if($timekeeping){
+                $systemtime = SystemTime::find($id);
+                $systemtime->delete();
+                $timekeeping->delete();
+                return response()->json(['message' => 'Delete successfully']);
+            } else {
+                return response()->json(['message' =>  'Not found time keeping'], 400);
+            }
+        } catch(\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 }
