@@ -66,6 +66,8 @@ Route::get('department/{id}', [DepartmentController::class,'index']);
 Route::post('create-user', [AdminController::class,'createUser']);
 Route::put('update-user/{id}', [AdminController::class,'updateUser']);
 Route::delete('delete-user/{id}', [AdminController::class,'deleteUser']);
+Route::post('list-department/{id}',[AdminController::class,'listDepartment']);
+Route::post('search-department',[AdminController::class,'searchDepartment']);
 Route::post('create-department', [AdminController::class,'createDepartment']);
 Route::get('user-department/{name}', [AdminController::class,'getUserDepartment']);
 Route::put('update-department/{id}', [AdminController::class,'updateDepartment']);
