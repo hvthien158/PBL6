@@ -23,7 +23,8 @@ class DateTimeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'time' => ['required','date_format:Y-m-d H:i:s', new TimeRule]
+            'time_check_in' => 'nullable',
+            'time_check_out' => 'nullable'
         ];
     }
    

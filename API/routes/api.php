@@ -77,3 +77,7 @@ Route::put('update-shift/{id}',[AdminController::class,'updateShift']);
 Route::get('shift', [ShiftController::class,'index']);
 Route::get('shift/{id}', [ShiftController::class,'index']);
 Route::delete('delete-shift/{id}',[AdminController::class,'deleteShift']);
+Route::get('manage-timekeeping',[AdminController::class,'manageTimeKeeping']);
+Route::get('manage-timekeeping/{id}',[AdminController::class,'manageTimeKeeping']);
+Route::put('update-timekeeping/{id}',[AdminController::class,'updateTimeKeeping']);
+Route::delete('delete-timekeeping/{id}',[AdminController::class,'deleteTimeKeeping']);

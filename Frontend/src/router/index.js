@@ -46,7 +46,7 @@ const router = createRouter({
       component: ListUser,
     },
     {
-      path: '/admin/list-timekeeping/:id',
+      path: '/admin/list-timekeeping',
       name: 'list-timekeeping',
       component: ListTimeKeeping
     },
