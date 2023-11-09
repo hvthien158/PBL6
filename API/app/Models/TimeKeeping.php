@@ -14,6 +14,7 @@ class TimeKeeping extends Model
     protected $table = 'time_keepings';
     protected $fillable = [
         'time_check_in',
+        'time_check_out',
         'user_id'
     ];
     public $timestamps = false;

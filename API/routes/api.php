@@ -52,10 +52,17 @@ Route::get('time-keeping', [TimeKeepingController::class, 'getTimeKeeping']);
 Route::get('get-list-timekeeping', [TimeKeepingController::class,'getListTimeKeeping']);
 Route::post('search-by-around-time', [TimeKeepingController::class,'searchByAroundTime']);
 Route::post('search-by-month-year', [TimeKeepingController::class,'searchByMonth']);
+Route::post('/timekeeping/update', [TimeKeepingController::class,'updateTimeKeeping']);
+
+//User
 Route::get('user/{id}', [UserController::class, 'user']);
 Route::get('user/', [UserController::class, 'user']);
+
+//Department
 Route::get('department', [DepartmentController::class,'index']);
 Route::get('department/{id}', [DepartmentController::class,'index']);
+
+//Admin
 Route::post('create-user', [AdminController::class,'createUser']);
 Route::put('update-user/{id}', [AdminController::class,'updateUser']);
 Route::delete('delete-user/{id}', [AdminController::class,'deleteUser']);
@@ -63,10 +70,12 @@ Route::post('create-department', [AdminController::class,'createDepartment']);
 Route::get('user-department/{name}', [AdminController::class,'getUserDepartment']);
 Route::put('update-department/{id}', [AdminController::class,'updateDepartment']);
 Route::delete('delete-department/{id}', [AdminController::class,'deleteDepartment']);
-Route::get('shift', [ShiftController::class,'index']);
-Route::get('shift/{id}', [ShiftController::class,'index']);
 Route::post('create-shift', [AdminController::class,'createShift']);
 Route::put('update-shift/{id}',[AdminController::class,'updateShift']);
+
+//Shift
+Route::get('shift', [ShiftController::class,'index']);
+Route::get('shift/{id}', [ShiftController::class,'index']);
 Route::delete('delete-shift/{id}',[AdminController::class,'deleteShift']);
 Route::get('manage-timekeeping',[AdminController::class,'manageTimeKeeping']);
 Route::get('manage-timekeeping/{id}',[AdminController::class,'manageTimeKeeping']);
