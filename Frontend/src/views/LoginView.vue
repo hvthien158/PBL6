@@ -205,6 +205,7 @@ const login = async () => {
               user.DOB = response.data.user.DOB
               user.phone_number = response.data.user.phone_number
               user.avatar = response.data.user.avatar
+              user.position = response.data.user.position
               user.expired = response.data.expires_at
               user.role = response.data.user.role
               //alert success

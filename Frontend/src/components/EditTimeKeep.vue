@@ -27,11 +27,14 @@
         <ButtonLoading @click="updateTimeKeep" style="font-size: 15px; margin-top: 20px" size="large" type="warning" round>Save</ButtonLoading>
       </div>
     </el-card>
+    <Clock style="scale: 0.55; margin-top: 10vh"></Clock>
   </div>
 </template>
 
 <style scoped>
 .edit-timekeep{
+  display: flex;
+  flex-direction: column;
   width: 30vw !important;
   margin-right: 30px;
   position: sticky !important;
@@ -52,6 +55,7 @@ import {computed, ref, watch, watchEffect} from "vue";
 import axios from "axios";
 import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
+import Clock from "./Clock.vue"
 
 const prop = defineProps({
   dayOfWeek: {

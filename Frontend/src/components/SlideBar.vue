@@ -3,14 +3,14 @@
     <div class="sidebar">
       <ul class="sidebar-menu">
         <li @click="router.push({ path : '/admin/list-user'})" :class="{ active: selectedOption === 'user' }">User management</li>
-        <li @click="router.push({ path : '/admin/list-department'})" :class="{ active: selectedOption === 'organization' }">Department manager</li>
-        <li @click="selectedOption = (selectedOption == 'attendance' ? null: 'attendance')" :class="{ active: selectedOption === 'attendance' }">Manager timekeeping</li>
+        <li @click="router.push({ path : '/admin/list-department'})" :class="{ active: selectedOption === 'organization' }">Department management</li>
+        <li @click="selectedOption = (selectedOption === 'attendance' ? null: 'attendance')" :class="{ active: selectedOption === 'attendance' }">Timekeeping management</li>
         <div v-if="selectedOption === 'attendance'" class="sub-menu">
           <button>Add timekeeping</button>
           <button>Edit timekeeping</button>
           <button>Delete timekeeping</button>
         </div>
-        <li @click="router.push({ path : '/admin/list-shift'})" :class="{ active: selectedOption === 'attendance' }">Manager shift</li>
+        <li @click="router.push({ path : '/admin/list-shift'})" :class="{ active: selectedOption === 'attendance' }">Shift management</li>
       </ul>
     </div>
   </div>

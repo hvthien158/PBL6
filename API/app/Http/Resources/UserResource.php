@@ -16,13 +16,18 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        if($this->DOB){
+            $DOB_format = substr($this->DOB, 8, 2).'/'.substr($this->DOB, 5, 2).'/'.substr($this->DOB, 0, 4);
+        } else {
+            $DOB_format = 'none';
+        }
         return [
             'id' => $this->id,
             'name'=> $this->name,
             'email'=> $this->email,
             'avatar'=> $this->avatar,
             'address' => $this->address ?: 'none',
-            'DOB' => $this->DOB ?: 'none',
+            'DOB' => $DOB_format,
             'role' => $this->role ?: 'user',
             'phone_number' => $this->phone_number ?: 'none',
             'salary' => $this->salary ?: 'none',

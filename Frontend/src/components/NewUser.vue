@@ -17,7 +17,7 @@
       <el-input v-model="form.address" style="width: 330px" type="text" placeholder="Address"></el-input>
     </div>
     <div>
-      <el-date-picker v-model="form.DOB" style="width: 130px" type="date" value-format="YYYY-MM-DD" placeholder="Date of birth"></el-date-picker>
+      <el-date-picker v-model="form.DOB" style="width: 130px" type="date" value-format="YYYY-MM-DD" format="DD/MM/YYYY" placeholder="Date of birth"></el-date-picker>
     </div>
     <div>
       <el-input v-model="form.phone_number" style="width: 120px" type="text" placeholder="Phone Number"></el-input>
@@ -180,17 +180,19 @@ function loadUser(){
         Authorization: `Bearer ${user.token}`
       },
     }).then((response) => {
-      form.email = response.data.data[0].email === 'none' ? '' : response.data.data[0].email;
-      form.name = response.data.data[0].name === 'none' ? '' : response.data.data[0].name;
-      form.address = response.data.data[0].address === 'none' ? '' : response.data.data[0].address;
-      form.phone_number = response.data.data[0].phone_number === 'none' ? '' : response.data.data[0].phone_number;
-      form.DOB = response.data.data[0].DOB === 'none' ? '' : response.data.data[0].DOB;
-      form.salary = response.data.data[0].salary === 'none' ? '' : response.data.data[0].salary;
-      form.position = response.data.data[0].position === 'none' ? '' : response.data.data[0].position;
+      console.log(response.data)
+      form.email = response.data.user[0].email === 'none' ? '' : response.data.user[0].email;
+      form.name = response.data.user[0].name === 'none' ? '' : response.data.user[0].name;
+      form.address = response.data.user[0].address === 'none' ? '' : response.data.user[0].address;
+      form.phone_number = response.data.user[0].phone_number === 'none' ? '' : response.data.user[0].phone_number;
+      form.DOB = response.data.user[0].DOB === 'none' ? '' : response.data.user[0].DOB;
+      form.salary = response.data.user[0].salary === 'none' ? '' : response.data.user[0].salary;
+      form.position = response.data.user[0].position === 'none' ? '' : response.data.user[0].position;
       form.role =
-          response.data.data[0].role === "admin" ? "admin" : "user";
-      form.department = response.data.data[0].department.id;
-    }).catch(() => {
+          response.data.user[0].role === "admin" ? "admin" : "user";
+      form.department = response.data.user[0].department_id;
+    }).catch((e) => {
+      console.log(e)
       alertStore.alert = true;
       alertStore.type = 'error';
       alertStore.msg = 'Something wrong'
