@@ -20,6 +20,7 @@
             </el-select>
             <el-input v-model="dataSearch.name" placeholder="Search by username" />
           </div>
+            
         </div>
         <div class="card-content">
           <el-table :data="getCurrentPageData" height="48vh" border stripe>
@@ -27,13 +28,10 @@
             <el-table-column prop="user.name" label="User name" min-width="200"
               @click="router.push({ path: `/admin/list-user/${scope.row.user.id}` })"></el-table-column>
             <el-table-column prop="user.department.name" label="Department name" min-width="300"></el-table-column>
-            <el-table-column prop="date" label="date" min-width="150"></el-table-column>
+            <el-table-column prop="date" label="Date" min-width="150"></el-table-column>
             <el-table-column prop="timeCheckIn" label="Time Check In" min-width="150"></el-table-column>
-            <el-table-column prop="timeCheckIn" label="Time Check In System" min-width="200"></el-table-column>
             <el-table-column prop="timeCheckOut" label="Time Check Out" min-width="180"></el-table-column>
-            <el-table-column prop="timeCheckOut" label="Time Check Out System" min-width="200"></el-table-column>
             <el-table-column prop="shift.name" label="Shift name" min-width="150"></el-table-column>
-            <el-table-column prop="shift.name" label="note" min-width="150"></el-table-column>
             <el-table-column fixed="right" label="Operations" width="140">
               <template #default="scope">
                 <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
@@ -55,7 +53,7 @@
           @cancel="confirmBox = false">
         </ConfirmBox>
         <div class="form-timekeeping">
-          <NewTimeKeeping @updateData="displayTimeKeeping" @invisible="visibleMode = false" :mode="operationMode"
+          <NewTimeKeeping @updateData="displayTimeKeeping" @invisible="visibleMode = false" 
             :timekeepingId="timekeepingId" v-if="visibleMode"></NewTimeKeeping>
         </div>
       </el-card>
@@ -168,7 +166,6 @@ const timekeepingId= ref(0)
 const deleteId = ref(0)
 const pageSize = 9
 const visibleMode = ref(false)
-const operationMode = ref('create')
 const confirmBox = ref(false)
 let currentPage = ref(1);
 let dataSearch = reactive({
@@ -302,7 +299,6 @@ function handleDelete(id) {
   confirmBox.value = true
   deleteId.value = id
 }
-
 // const exportExcel = () => {
 //   const excelData = filteredData.value.map((item) => {
 //     return {

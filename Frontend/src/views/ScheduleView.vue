@@ -282,7 +282,7 @@ const filteredData = computed(() => {
       const datePart = item.date.split("-");
       const itemDay = datePart[0]
       const itemMonth = datePart[1]
-      const itemYear = datePart[2] 
+      const itemYear = datePart[2]
       const itemDate = `${itemYear}-${itemMonth}-${itemDay}`;
       return (itemDate >= startDate && itemDate <= endDate)
     })

@@ -50,14 +50,27 @@ class TimeKeepingPolicy
         $existingTimeKeeping = TimeKeeping::where('user_id', $user->id)
             ->whereDate('time_check_in', $currentDate)
             ->first();
-        return $existingTimeKeeping ? true : false;
+        if ($existingTimeKeeping) {
+            if (auth()->user()->role === 'admin' || auth()->user()->id === $existingTimeKeeping->id);
+            return true;
+        }
+        return  false;
     }
     /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, TimeKeeping $timeKeeping): bool
     {
-        //
+        $timezone = 'Asia/Ho_Chi_Minh';
+        $currentDate = Carbon::now()->setTimezone($timezone)->toDateString();
+        $existingTimeKeeping = TimeKeeping::where('user_id', $user->id)
+            ->whereDate('time_check_in', $currentDate)
+            ->first();
+        if ($existingTimeKeeping) {
+            if (auth()->user()->role === 'admin' || auth()->user()->id === $existingTimeKeeping->id);
+            return true;
+        }
+        return  false;
     }
 
     /**

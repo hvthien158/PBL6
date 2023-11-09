@@ -12,14 +12,6 @@
                 <el-time-picker v-model="form.timeCheckOut" style="min-width: 130px"
                     placeholder="Time Check Out"></el-time-picker>
             </div>
-            <div>
-                <el-time-picker v-model="form.timeCheckInSystem" style="min-width: 130px"
-                    placeholder="Time Check In System"></el-time-picker>
-            </div>
-            <div>
-                <el-time-picker v-model="form.timeCheckOutSystem" style="min-width: 130px"
-                    placeholder="Time Check Out System"></el-time-picker>
-            </div>
     </div>
     
     <div class="operation">
@@ -38,6 +30,7 @@
     overflow-x: scroll;
     padding-left: 8px;
     border-radius: 4px;
+    width: 650px;
 }
 
 .timekeeping-container::-webkit-scrollbar {
@@ -76,12 +69,10 @@ const prop = defineProps({
 })
 const user = useUserStore().user
 const alertStore = useAlertStore()
-const failValidation = ref('')
+let failValidation = ref('')
 const form = reactive({
     timeCheckIn: '',
-    timeCheckOut: '',
-    timeCheckInSystem: '',
-    timeCheckOutSystem: ''
+    timeCheckOut: ''
 })
 const emits = defineEmits(['invisible', 'updateData'])
 const loadTimeKeeping = async () => {
@@ -93,8 +84,6 @@ const loadTimeKeeping = async () => {
         }).then((response) => {
             form.timeCheckIn = formatToDisplay(response.data.data[0].timeCheckIn)
             form.timeCheckOut = formatToDisplay(response.data.data[0].timeCheckOut)
-            form.timeCheckInSystem = formatToDisplay('08:30:00');
-            form.timeCheckOutSystem = formatToDisplay('17:45:00')
         })
     } catch (e) {
         messages('error', e.data.message)
@@ -102,13 +91,10 @@ const loadTimeKeeping = async () => {
 }
 loadTimeKeeping()
 function validate() {
-    if (form.timeCheckIn > form.timeCheckOut) {
-        failValidation = 'Time check out must be bigger than time check in'
+    if (formatToPost(form.timeCheckIn) > formatToPost(form.timeCheckOut)) {
+        failValidation.value = 'Time check out must be bigger than time check in'
         return false
-    } else if (form.timeCheckInSystem > form.timeCheckOutSystem) {
-        failValidation = 'Time check out system must be bigger than time check in system'
-        return false
-    }
+    } 
     return true
 }
 function updateTimeKeeping() {
@@ -118,18 +104,17 @@ function updateTimeKeeping() {
                 `http://127.0.0.1:8000/api/update-timekeeping/${prop.timekeepingId}`,
                 {
                     timeCheckIn: formatToPost(form.timeCheckIn),
-                    timeCheckOut: formatToPost(form.timeCheckOut),
-                    // timeCheckInSystem: form.timeCheckInSystem,
-                    // timeCheckOutSystem: form.timeCheckOutSystem
+                    timeCheckOut: formatToPost(form.timeCheckOut)
                 },
                 {
                     headers: { Authorization: `Bearer ${user.token}` },
                 }
-            ).then(function () {
+            ).then(function (response) {
                 emits('updateData')
-                messages('success', 'Update successfully')
+                console.log(response)
+                messages('success', response.data.message)
             }).catch((e) => {
-                messages('success', 'Something went wrong')
+                messages('error', 'Something went wrong')
                 console.log(e)
             })
     }
