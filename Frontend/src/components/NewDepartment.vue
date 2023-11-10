@@ -1,8 +1,7 @@
 <template>
     <div class="department-container">
         <div>
-            <el-input v-if="prop.departmentId == 0" disabled style="min-width: 50px" type="text" placeholder="ID"></el-input>
-            <el-input v-else v-model = prop.departmentId disabled style="min-width: 50px" type="text" placeholder="ID"></el-input>
+            <el-input disabled style="min-width: 50px" type="text" placeholder="ID"></el-input>
         </div>
         <div>
             <el-input v-model="form.name" style="min-width: 180px;" type="text" placeholder="Name"></el-input>
@@ -27,6 +26,7 @@
   
 <style scoped>
 .department-container {
+    max-width: 80vw;
     background-color: #ccc;
     padding: 10px 0 10px 0;
     display: flex;

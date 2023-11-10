@@ -3,63 +3,64 @@
     <SlideBar></SlideBar>
     <div class="department">
       <span style="font-size: 32px; font-weight: 700; text-align: center; ">Department management</span>
-        <div class="title-table">
-          <div>
-            <el-button type="warning" @click="handleCreate">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg"
-                viewBox="0 0 16 16">
-                <path fill-rule="evenodd"
-                  d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
-              </svg>
-              New
-            </el-button>
-          </div>
-          <div>
-            <el-input v-model="dataSearch" placeholder="Type to search" />
-          </div>
+      <div class="title-table">
+        <div>
+          <el-button type="warning" @click="handleCreate">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg"
+              viewBox="0 0 16 16">
+              <path fill-rule="evenodd"
+                d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
+            </svg>
+            New
+          </el-button>
         </div>
-          <el-table :data="department" height="48vh" style="width: 100%;" border stripe>
-            <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
-            <el-table-column prop="name" label="Department name" min-width="200"></el-table-column>
-            <el-table-column prop="address" label="Address" min-width="300"></el-table-column>
-            <el-table-column prop="phoneNumber" label="Phone number" min-width="150"></el-table-column>
-            <el-table-column prop="email" label="Email" min-width="200"></el-table-column>
-            <el-table-column prop="quantityUser" label="Quantity staff" min-width="150"></el-table-column>
-            <el-table-column label="Staff" min-width="100">
-              <template #default="scope">
-                <el-button class="el-button--text" v-if="scope.row.quantityUser === 0"
-                  @click="messages('error', 'There are no employees at this department')">View
-                  Staff</el-button>
-                <el-button class="el-button--text" v-else
-                  @click="router.push({ path: `/admin/list-user/${scope.row.name}` })">View
-                  Staff</el-button>
-              </template>
-            </el-table-column>
-            <el-table-column fixed="right" label="Operations" width="140">
-              <template #default="scope">
-                <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
-                <el-button link type="danger"
-                  @click="handleDelete(scope.row.id, scope.row.quantityUser)">Delete</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="pagination">
-            <el-button @click="previousPage" :disabled="currentPage === 1">
-              Previous
-            </el-button>
-            <span>{{ currentPage }} / {{ totalPage }}</span>
-            <el-button @click="nextPage" :disabled="currentPage === totalPage">
-              Next
-            </el-button>
-          </div>
+        <div>
+          <el-input v-model="dataSearch" placeholder="Type to search" />
         </div>
-        <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this department?" @confirm="deleteDepartment()"
-          @cancel="confirmBox = false">
-        </ConfirmBox>
-        <div class="form-department">
-          <NewDepartment @updateData="displayDepartment" @invisible="visibleMode = false" :mode="operationMode"
-            :departmentId="departmentId" v-if="visibleMode"></NewDepartment>
-        </div>
+      </div>
+      <el-table :data="department" height="48vh" style="width: 100%;" border stripe>
+        <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
+        <el-table-column prop="name" label="Department name" min-width="200"></el-table-column>
+        <el-table-column prop="address" label="Address" min-width="300"></el-table-column>
+        <el-table-column prop="phoneNumber" label="Phone number" min-width="150"></el-table-column>
+        <el-table-column prop="email" label="Email" min-width="200"></el-table-column>
+        <el-table-column prop="quantityUser" label="Quantity staff" min-width="150"></el-table-column>
+        <el-table-column label="Staff" min-width="100">
+          <template #default="scope">
+            <el-button class="el-button--text" v-if="scope.row.quantityUser === 0"
+              @click="messages('error', 'There are no employees at this department')">View
+              Staff</el-button>
+            <el-button class="el-button--text" v-else
+              @click="router.push({ path: `/admin/list-user/${scope.row.name}` })">View
+              Staff</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" label="Operations" width="140">
+          <template #default="scope">
+            <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
+            <el-button link type="danger" @click="handleDelete(scope.row.id, scope.row.quantityUser)">Delete</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="pagination">
+        <el-button @click="previousPage" :disabled="currentPage === 1">
+          Previous
+        </el-button>
+        <span>{{ currentPage }} / {{ totalPage }}</span>
+        <el-button @click="nextPage" :disabled="currentPage === totalPage">
+          Next
+        </el-button>
+      </div>
+      <div class="form-department">
+        <NewDepartment @updateData="displayDepartment" @invisible="visibleMode = false" :mode="operationMode"
+          :departmentId="departmentId" v-if="visibleMode"></NewDepartment>
+      </div>
+    </div>
+    
+    <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this department?" @confirm="deleteDepartment()"
+      @cancel="confirmBox = false">
+    </ConfirmBox>
+
   </main>
 </template>
 <style scoped>
@@ -71,6 +72,8 @@ main {
 .form-department {
   margin-top: 50px;
   max-width: 1138px;
+  position: absolute;
+  bottom: 0%;
 }
 
 .el-form {
@@ -103,6 +106,7 @@ label {
   align-items: center;
   justify-content: center;
   margin-left: 20px;
+  position: relative;
 }
 
 .title-table {
@@ -137,7 +141,7 @@ a:hover {
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
-import { ref, onMounted, watch} from "vue";
+import { ref, onMounted, watch } from "vue";
 import axios from "axios";
 import router from "../../../router";
 import { useUserStore } from "../../../stores/user";
@@ -164,7 +168,7 @@ const displayDepartment = async () => {
   try {
     await axios
       .post(`http://127.0.0.1:8000/api/list-department/${currentPage.value - 1}`, {
-        name : dataSearch.value.toLowerCase()
+        name: dataSearch.value.toLowerCase()
       }, {
         headers: { Authorization: `Bearer ${user.token}` }
       })

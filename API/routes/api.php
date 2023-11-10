@@ -72,6 +72,7 @@ Route::post('create-department', [AdminController::class,'createDepartment']);
 Route::get('user-department/{name}', [AdminController::class,'getUserDepartment']);
 Route::put('update-department/{id}', [AdminController::class,'updateDepartment']);
 Route::delete('delete-department/{id}', [AdminController::class,'deleteDepartment']);
+Route::post('list-shift/{id}', [AdminController::class,'listShift']);
 Route::post('create-shift', [AdminController::class,'createShift']);
 Route::put('update-shift/{id}',[AdminController::class,'updateShift']);
 

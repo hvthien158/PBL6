@@ -23,6 +23,7 @@
   
 <style scoped>
 .timekeeping-container {
+    max-width: 80vw;
     background-color: #ccc;
     padding: 10px 0 10px 0;
     display: flex;

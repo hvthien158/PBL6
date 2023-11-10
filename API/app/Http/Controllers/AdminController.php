@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\TimeKeepingResource;
+use App\Http\Resources\ShiftResource;
 use App\Models\Department;
 use App\Models\Shift;
 use App\Models\User;
@@ -117,7 +118,7 @@ class AdminController extends Controller
                 $totalPage = floor(Department::whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%'])->count() / $itemsPerPage) + 1;
             } else {
                 $totalPage = floor(Department::count() / $itemsPerPage) + 1;
-                $department = Department::skip($id * 10)->take($itemsPerPage)->get();
+                $department = Department::skip($id * $itemsPerPage)->take($itemsPerPage)->get();
             }
             $response = [
                 'totalPage' => $totalPage,
@@ -209,6 +210,32 @@ class AdminController extends Controller
         }
     }
     /**
+     * @param mixed $id
+     * @param Request $request
+     * 
+     * @return object
+     */
+    public function listShift($id, Request $request)
+    {
+        try {
+            $itemsPerPage = 10;
+            if ($request->name != '') {
+                $shift = Shift::whereRaw('LOWER(name) like ?', ['%' . $request->name . '%'])->skip($id * 10)->take($itemsPerPage)->get();
+                $totalPage = floor(Shift::whereRaw('LOWER(name) like ?', ['%' . $request->name . '%'])->count() / $itemsPerPage) + 1;
+            } else {
+                $totalPage = floor(Shift::count() / $itemsPerPage) + 1;
+                $shift = Shift::skip($id * $itemsPerPage)->take($itemsPerPage)->get();
+            }
+            $response = [
+                'totalPage' => $totalPage,
+                'shift' => ShiftResource::collection($shift),
+            ];
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+    /**
      * @param CreateShiftRequest $request
      *
      * @return object
@@ -287,7 +314,7 @@ class AdminController extends Controller
             if ($request->startDate != '' && $request->endDate != '') {
                 $query->whereRaw('DATE(time_check_in) BETWEEN ? AND ?', [$request->startDate, $request->endDate]);
             }
-            if ($request->department != '' && $request->department != null) {
+            if ($request->department != '' ) {
                 $query->whereHas('user.department', function ($subQuery) use ($request) {
                     $subQuery->where('department_name', '=', $request->department);
                 });
