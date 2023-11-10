@@ -13,7 +13,7 @@
 
         <div>
           <el-select v-model="dataSearch.department" placeholder="Select">
-            <el-option key="0" label="Selected department" :value=null />
+            <el-option key="0" label="Selected department" value="" />
             <el-option v-for="item in department" :key="item.id" :label="item.name" :value="item.name"
               :disabled="item.disabled" />
           </el-select>
@@ -46,14 +46,15 @@
           Next
         </el-button>
       </div>
+      <div class="form-timekeeping">
+      <NewTimeKeeping @updateData="displayTimeKeeping" @invisible="visibleMode = false" :timekeepingId="timekeepingId"
+        v-if="visibleMode"></NewTimeKeeping>
+    </div>
     </div>
     <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this timekeeping?" @confirm="deleteTimekeeping()"
       @cancel="confirmBox = false">
     </ConfirmBox>
-    <div class="form-timekeeping">
-      <NewTimeKeeping @updateData="displayTimeKeeping" @invisible="visibleMode = false" :timekeepingId="timekeepingId"
-        v-if="visibleMode"></NewTimeKeeping>
-    </div>
+    
   </main>
 </template>
 <style scoped>
@@ -65,6 +66,8 @@ main {
 .form-department {
   margin-top: 50px;
   max-width: 1138px;
+  position: absolute;
+  bottom: 0%;
 }
 
 .el-select {
@@ -92,6 +95,7 @@ label {
 
 .pagination {
   margin-top: 20px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -99,12 +103,12 @@ label {
 
 .timekeeping {
   width: 80vw;
-  margin-top: -40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-left: 20px;
+  position: relative;
 }
 
 .title-table {
