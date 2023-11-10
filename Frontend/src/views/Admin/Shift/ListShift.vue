@@ -50,6 +50,8 @@ main {
 .form-shift {
   margin-top: 50px;
   max-width: 938px;
+  position: absolute;
+  bottom: 0%;
 }
 
 .card-header {
