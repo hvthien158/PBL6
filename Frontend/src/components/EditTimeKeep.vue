@@ -81,14 +81,10 @@ const user = useUserStore().user
 const alertStore = useAlertStore()
 const emit = defineEmits(['update'])
 
-watch(() => prop.checkin,
+watch(() => prop.date,
     () => {
+          check_out_format.value = prop.checkout.slice(0, 5)
           check_in_format.value = prop.checkin.slice(0, 5)
-    })
-
-watch(() => prop.checkout,
-    () => {
-      check_out_format.value = prop.checkout.slice(0, 5)
     })
 
 function updateTimeKeep(){

@@ -253,9 +253,10 @@ function loadToday(){
   })
   if(check){
     today.value = check
+    today.value.dayOfWeek = moment().format('dddd') + ' (Today)'
   } else {
     today.value.date = moment().format('DD') + '/' + (moment().month() + 1).toString().padStart(2, '0') + '/' + moment().year()
-    today.value.dayOfWeek = moment().format('dddd')
+    today.value.dayOfWeek = moment().format('dddd') + ' (Today)'
   }
 }
 

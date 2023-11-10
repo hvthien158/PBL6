@@ -95,6 +95,7 @@ main {
 .form-input {
   display: block;
   padding: 50px;
+  background-color: white;
   border-radius: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 400px;

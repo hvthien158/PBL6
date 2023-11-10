@@ -16,7 +16,7 @@
           <span v-if="!edit_mode">{{ displayDOB }}</span>
           <el-date-picker
               v-else
-              v-model="user.DOB"
+              v-model="DOB"
               type="date"
               placeholder="dd/mm/yyyy"
               format="DD/MM/YYYY"
@@ -144,6 +144,7 @@ function updateProfile(){
   if(avatar.value){
     formData.append('avatar', avatar.value)
   }
+  console.log(DOB.value)
   axios.post('http://127.0.0.1:8000/api/update-profile', formData,
       {
         headers: {
@@ -159,6 +160,9 @@ function updateProfile(){
         mapData()
 
         edit_mode.value = false
+        alertStore.alert = true
+        alertStore.type = 'success'
+        alertStore.msg = 'Update success'
       })
       .catch((e) => {
         alertStore.alert = true
