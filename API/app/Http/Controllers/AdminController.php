@@ -113,16 +113,29 @@ class AdminController extends Controller
     {
         try {
             $itemsPerPage = 10;
+            $department = Department::orderBy('id','asc')->with('users')->with('manager');
             if ($request->name != '') {
-                $department = Department::whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%'])->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
-                $totalPage = ceil(Department::whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%'])->count() / $itemsPerPage);
-            } else {
-                $totalPage = ceil(Department::count() / $itemsPerPage);
-                $department = Department::skip($id * $itemsPerPage)->take($itemsPerPage)->get();
+                $department->whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%']);
+            } if($request->manager != ''){
+                $department->whereHas('manager', function ($subQuery) use ($request) {
+                    $subQuery->where('name', 'like', '%'.$request->manager.'%');
+                });
+            } if ($request->address != '') {
+                $department->whereRaw('LOWER(address) like ?', ['%' . $request->address . '%']);
+            } if ($request->email != '') {
+                $department->whereRaw('LOWER(email) like ?', ['%' . $request->email . '%']);
+            } if ($request->phoneNumber != '') {
+                $department->whereRaw('LOWER(phone_number) like ?', ['%' . $request->phoneNumber . '%']);
+            } if($request->minStaff != 0){
+                $department->has('users','>=', $request->minStaff);
+            } if($request->maxStaff != 0){
+                $department->has('users','<=', $request->maxStaff);
             }
+            $totalPage = ceil($department->count() / $itemsPerPage);
+            $departments = $department->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
             $response = [
                 'totalPage' => $totalPage,
-                'department' => DepartmentResource::collection($department),
+                'department' => DepartmentResource::collection($departments),
             ];
             return response()->json($response);
         } catch (\Exception $e) {
@@ -316,7 +329,7 @@ class AdminController extends Controller
             if ($request->startDate != '' && $request->endDate != '') {
                 $query->whereRaw('DATE(time_check_in) BETWEEN ? AND ?', [$request->startDate, $request->endDate]);
             }
-            if ($request->department != '' ) {
+            if ($request->department != '') {
                 $query->whereHas('user.department', function ($subQuery) use ($request) {
                     $subQuery->where('department_name', '=', $request->department);
                 });
