@@ -1,9 +1,9 @@
 <template>
-    <el-dialog v-model="prop.visible" :show-close="false">
-        <template #header="{ titleId, titleClass }">
+    <el-dialog v-model="prop.visible" :show-close="false" width="30%" >
+        <template #header>
             <div class="my-header">
-                <h4 :id="titleId" :class="titleClass" v-if="prop.mode === 'create'">Create Department</h4>
-                <h4 :id="titleId" :class="titleClass" v-else>Update Department</h4>
+                <h4 v-if="prop.mode === 'create'">Create Department</h4>
+                <h4 v-else>Update Department</h4>
                 <el-button type="danger" @click="$emit('invisible')">
                     <el-icon class="el-icon--left">
                         <CircleCloseFilled />
@@ -34,7 +34,12 @@
                 <el-input v-model="form.phoneNumber" autocomplete="off" />
                 <small>{{ checkLanding.checkPhoneNumber }}</small>
             </el-form-item>
-
+            <el-form-item label="Department Manager" :label-width="formLabelWidth">
+                <el-select v-model="form.manager" type="text" >
+                    <el-option label="Select Manager" :value="0"></el-option>
+                    <el-option v-for="item in dataUser" :label="item.name" :value="item.id"></el-option>
+                </el-select>
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -60,10 +65,12 @@
     overflow-x: auto;
     border-radius: 4px;
 }
-.my-header{
+
+.my-header {
     display: flex;
     justify-content: space-between;
 }
+
 small {
     color: red;
     margin-top: 0.1rem;
@@ -124,7 +131,7 @@ span {
 </style>
   
 <script setup>
-import { reactive, ref, watch, defineProps} from "vue";
+import { reactive, ref, watch, defineProps } from "vue";
 import axios from "axios";
 import { useUserStore } from "../stores/user";
 import { useAlertStore } from "../stores/alert";
@@ -143,23 +150,19 @@ const prop = defineProps({
 const formLabelWidth = "150px";
 const user = useUserStore().user
 const alertStore = useAlertStore()
-const trueDialog = true;
-const checkName = ref('')
-const checkEmail = ref('')
-const checkAddress = ref('')
-const checkPhoneNumber = ref('')
-let typeMode = typeof prop.mode
+const dataUser = ref()
 const form = reactive({
     name: '',
     email: '',
     address: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    manager: 0
 })
 const checkLanding = reactive({
     checkName: '',
     checkEmail: '',
     checkAddress: '',
-    checkPhoneNumber: ''
+    checkPhoneNumber: '',
 })
 const emits = defineEmits(['invisible', 'updateData'])
 watch(() => prop.departmentId,
@@ -174,6 +177,7 @@ watch(() => prop.mode,
             form.email = ''
             form.address = ''
             form.phoneNumber = ''
+            form.manager = ''
         }
     })
 const loadDepartment = async () => {
@@ -188,7 +192,7 @@ const loadDepartment = async () => {
                 form.name = response.data.data[0].name
                 form.address = response.data.data[0].address
                 form.phoneNumber = response.data.data[0].phoneNumber
-                console.log(response)
+                form.manager = response.data.data[0].manager.id
             })
         } catch (e) {
             console.log(e)
@@ -196,9 +200,23 @@ const loadDepartment = async () => {
         }
     }
 }
+const displayUser = async () => {
+    try {
+        await axios
+            .get("http://127.0.0.1:8000/api/user", {
+                headers: { Authorization: `Bearer ${user.token}` },
+            })
+            .then(function (response) {
+                dataUser.value = response.data.data;
+            });
+    } catch (e) {
+        console.log(e);
+    }
+};
 if (prop.mode === 'update') {
     loadDepartment()
 }
+displayUser()
 const isEmail = (email) => {
     let filter =
         /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -232,13 +250,15 @@ function validate() {
 
 function createDepartment() {
     if (validate()) {
+        let manager = form.manager === 0 ? null : form.manager
         axios.post(
             `http://127.0.0.1:8000/api/create-department/`,
             {
                 departmentName: form.name,
                 address: form.address,
                 email: form.email,
-                phoneNumber: form.phoneNumber
+                phoneNumber: form.phoneNumber,
+                manager : manager
             },
             {
                 headers: { Authorization: `Bearer ${user.token}` },
@@ -249,6 +269,7 @@ function createDepartment() {
             form.name = ''
             form.address = ''
             form.phoneNumber = ''
+            form.manager = 0
             messages('success', 'Create success')
         }).catch((e) => {
             messages('error', e.response.data.message)
@@ -258,8 +279,9 @@ function createDepartment() {
 }
 
 function updateDepartment() {
-    console.log(validate())
     if (validate()) {
+        let manager = form.manager === 0 ? null : form.manager
+        console.log(manager)
         axios
             .put(
                 `http://127.0.0.1:8000/api/update-department/${prop.departmentId}`,
@@ -267,13 +289,15 @@ function updateDepartment() {
                     departmentName: form.name,
                     address: form.address,
                     email: form.email,
-                    phoneNumber: form.phoneNumber
+                    phoneNumber: form.phoneNumber,
+                    manager: manager
                 },
                 {
                     headers: { Authorization: `Bearer ${user.token}` },
                 }
-            ).then(function () {
+            ).then(function (response) {
                 emits('updateData')
+                console.log(response)
                 messages('success', 'Update successfully')
             }).catch((e) => {
                 messages('success', 'Something went wrong')

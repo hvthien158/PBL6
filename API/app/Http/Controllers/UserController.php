@@ -23,7 +23,7 @@ class UserController extends Controller
     public function user(int $id = null){
         if($id){
             $user = User::where('id',$id)->get();
-            return response()->json(['user' => $user]);
+            return UserResource::collection($user);
         } else{
             $this->authorize('adminView', User::class);
             $user = User::orderBy('id','asc')->get();

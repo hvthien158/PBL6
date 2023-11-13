@@ -18,13 +18,23 @@
           <el-input v-model="dataSearch" placeholder="Type to search" />
         </div>
       </div>
-      <el-table :data="department" height="48vh" style="width: 100%;" border stripe>
+      <el-table :data="department" height="58vh" style="width: 100%;" border stripe>
         <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
-        <el-table-column prop="name" label="Department name" min-width="200"></el-table-column>
+        <el-table-column prop="name" label="Department name" min-width="180"></el-table-column>
+        <el-table-column prop="manager.name" label="Department Manager" min-width="200">
+          <template #default="scope">
+            <el-button class="el-button--text" v-if="scope.row.manager.name != 'none'" @click="handleViewManager(scope.row.manager.id)">
+              {{ scope.row.manager.name }}
+            </el-button>
+            <el-button class="el-button--text" style="color:#F56C6C" v-else @click="handleEdit(scope.row.id)">
+              Set Department Manager
+            </el-button>
+          </template>
+        </el-table-column>
         <el-table-column prop="address" label="Address" min-width="300"></el-table-column>
-        <el-table-column prop="phoneNumber" label="Phone number" min-width="150"></el-table-column>
-        <el-table-column prop="email" label="Email" min-width="200"></el-table-column>
-        <el-table-column prop="quantityUser" label="Quantity staff" min-width="150"></el-table-column>
+        <el-table-column prop="phoneNumber" label="Phone number" min-width="130"></el-table-column>
+        <el-table-column prop="email" label="Email" min-width="250"></el-table-column>
+        <el-table-column prop="quantityUser" label="Quantity staff" width="115"></el-table-column>
         <el-table-column label="Staff" min-width="100">
           <template #default="scope">
             <el-button class="el-button--text" v-if="scope.row.quantityUser === 0"
@@ -55,8 +65,12 @@
         <NewDepartment @updateData="displayDepartment" @invisible="visibleMode = false" :mode="operationMode"
           :departmentId="departmentId" :visible="visibleMode" v-if="visibleMode"></NewDepartment>
       </div>
+      <div class="form-department">
+        <User @updateData="displayDepartment" @invisible="managerMode = false" 
+          :userId="userId" :visible="managerMode" v-if="managerMode"></User>
+      </div>
     </div>
-    
+
     <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this department?" @confirm="deleteDepartment()"
       @cancel="confirmBox = false">
     </ConfirmBox>
@@ -68,6 +82,7 @@ main {
   box-sizing: border-box;
   display: flex;
 }
+
 .form-department {
   margin-top: 50px;
   max-width: 1138px;
@@ -99,7 +114,7 @@ label {
 
 .department {
   width: 80vw;
-  margin-top: -40px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -146,6 +161,7 @@ import router from "../../../router";
 import { useUserStore } from "../../../stores/user";
 import { useAlertStore } from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
+import User from '../../../components/User.vue'
 import NewDepartment from "../../../components/NewDepartment.vue";
 const user = useUserStore().user;
 const alertStore = useAlertStore();
@@ -157,6 +173,8 @@ const visibleMode = ref(false)
 const operationMode = ref('create')
 const confirmBox = ref(false)
 const debounceSearch = ref(null);
+const userId = ref(null)
+const managerMode = ref(false)
 let currentPage = ref(1);
 let dataSearch = ref('')
 onMounted(() => {
@@ -230,7 +248,6 @@ function handleCreate() {
     visibleMode.value = true
   }
 }
-
 function handleEdit(id) {
   visibleMode.value = true;
   operationMode.value = 'update'
@@ -244,7 +261,10 @@ function handleDelete(id, isHasStaff) {
     messages("error", "Please move staff to another department");
   }
 }
-
+const handleViewManager = (id) => {
+  managerMode.value = true;
+  userId.value = id
+}
 // const exportExcel = () => {
 //   const excelData = filteredData.value.map((item) => {
 //     return {
