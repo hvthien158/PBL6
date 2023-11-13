@@ -14,16 +14,21 @@
             New
           </el-button>
         </div>
-        <div>
-          <el-input v-model="dataSearch" placeholder="Type to search" />
-        </div>
+        <el-input v-model="dataSearch.name" placeholder="Search by department name" />
+        <el-input v-model="dataSearch.manager" placeholder="Search by department manager" />
+        <el-input v-model="dataSearch.address" placeholder="Search by address" />
+        <el-input v-model="dataSearch.email" placeholder="Search by email" />
+        <el-input v-model="dataSearch.phoneNumber" placeholder="Search by phone number" />
+        <el-input-number v-model="dataSearch.minStaff" controls-position="right" :min="0" placeholder="Min staff"/>
+        <el-input-number v-model="dataSearch.maxStaff" controls-position="right" :min="dataSearch.minStaff" placeholder="Max staff"/>
       </div>
       <el-table :data="department" height="58vh" style="width: 100%;" border stripe>
         <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
         <el-table-column prop="name" label="Department name" min-width="180"></el-table-column>
         <el-table-column prop="manager.name" label="Department Manager" min-width="200">
           <template #default="scope">
-            <el-button class="el-button--text" v-if="scope.row.manager.name != 'none'" @click="handleViewManager(scope.row.manager.id)">
+            <el-button class="el-button--text" v-if="scope.row.manager.name != 'none'"
+              @click="handleViewManager(scope.row.manager.id)">
               {{ scope.row.manager.name }}
             </el-button>
             <el-button class="el-button--text" style="color:#F56C6C" v-else @click="handleEdit(scope.row.id)">
@@ -66,8 +71,8 @@
           :departmentId="departmentId" :visible="visibleMode" v-if="visibleMode"></NewDepartment>
       </div>
       <div class="form-department">
-        <User @updateData="displayDepartment" @invisible="managerMode = false" 
-          :userId="userId" :visible="managerMode" v-if="managerMode"></User>
+        <User @updateData="displayDepartment" @invisible="managerMode = false" :userId="userId" :visible="managerMode"
+          v-if="managerMode"></User>
       </div>
     </div>
 
@@ -103,6 +108,15 @@ label {
 
 .el-card {
   min-width: 100%;
+}
+
+.title-table .el-input {
+  margin-left: 10px;
+  width: 15%;
+}
+
+.el-input-number {
+  margin-left: 10px;
 }
 
 .pagination {
@@ -155,7 +169,7 @@ a:hover {
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, reactive } from "vue";
 import axios from "axios";
 import router from "../../../router";
 import { useUserStore } from "../../../stores/user";
@@ -176,7 +190,15 @@ const debounceSearch = ref(null);
 const userId = ref(null)
 const managerMode = ref(false)
 let currentPage = ref(1);
-let dataSearch = ref('')
+let dataSearch = reactive({
+  name: '',
+  manager: '',
+  address: '',
+  email: '',
+  phoneNumber: '',
+  minStaff: 0,
+  maxStaff: 0
+})
 onMounted(() => {
   displayDepartment();
 });
@@ -185,7 +207,13 @@ const displayDepartment = async () => {
   try {
     await axios
       .post(`http://127.0.0.1:8000/api/list-department/${currentPage.value - 1}`, {
-        name: dataSearch.value.toLowerCase()
+        name: dataSearch.name.toLowerCase(),
+        address: dataSearch.address.toLowerCase(),
+        phoneNumber: dataSearch.phoneNumber,
+        email: dataSearch.email.toLowerCase(),
+        manager: dataSearch.manager,
+        minStaff: dataSearch.minStaff,
+        maxStaff: dataSearch.maxStaff
       }, {
         headers: { Authorization: `Bearer ${user.token}` }
       })
@@ -265,54 +293,4 @@ const handleViewManager = (id) => {
   managerMode.value = true;
   userId.value = id
 }
-// const exportExcel = () => {
-//   const excelData = filteredData.value.map((item) => {
-//     return {
-//       id: item.id,
-//       name: item.name,
-//       address: item.address,
-//       phoneNumber: item.phoneNumber,
-//       email: item.email,
-//       quantityUser: item.quantityUser
-//     };
-//   });
-//   const worksheet = utils.json_to_sheet(excelData);
-//   const workbook = utils.book_new();
-//   utils.book_append_sheet(workbook, worksheet, "ListDepartment");
-//   const excelBuffer = write(workbook, {
-//     bookType: "xlsx",
-//     type: "array",
-//   });
-//   const dataBlob = new Blob([excelBuffer], {
-//     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-//   });
-//   saveAs(dataBlob, "list_department.xlsx");
-// };
-
-// const exportCSV = () => {
-//   let csvContent = "data:text/csv;charset=utf-8,";
-//   const headers = [
-//     "id",
-//     "name",
-//     "address",
-//     "phoneNumber",
-//     "email",
-//     "quantityUser"
-//   ];
-//   csvContent += headers.join(",") + "\n";
-//   filteredData.value.forEach((item) => {
-//     const row = headers
-//       .map((header) => {
-//         return item[header];
-//       })
-//       .join(",");
-//     csvContent += row + "\n";
-//   });
-
-//   const encodedUri = encodeURI(csvContent);
-//   const link = document.createElement("a");
-//   link.setAttribute("href", encodedUri);
-//   link.setAttribute("download", `list_department.csv`);
-//   link.click();
-// };
 </script>
