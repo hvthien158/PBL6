@@ -1,39 +1,115 @@
 <template>
-    <div class="department-container">
-        <div>
-            <el-input disabled style="min-width: 50px" type="text" placeholder="ID"></el-input>
-        </div>
-        <div>
-            <el-input v-model="form.name" style="min-width: 180px;" type="text" placeholder="Name"></el-input>
-        </div>
-        <div>
-            <el-input v-model="form.email" style="min-width: 330px" type="text" placeholder="Email"></el-input>
-        </div>
-        <div>
-            <el-input v-model="form.address" style="min-width: 330px" type="text" placeholder="Address"></el-input>
-        </div>
-        <div>
-            <el-input v-model="form.phoneNumber" style="min-width: 200px" type="text" placeholder="Phone Number"></el-input>
-        </div>
-    </div> 
-    <div class="operation">
-        <el-button v-if="prop.mode === 'create'" type="primary" plain @click="createDepartment">Add</el-button>
-        <el-button v-else type="primary" plain @click="updateDepartment">Change</el-button>
-        <el-button @click="$emit('invisible')">Cancel</el-button>
-        <span style="color: red; margin-top: 0.1rem; margin-left: 16px">{{ fail_validation }}</span>
-    </div>
+    <el-dialog v-model="prop.visible" :show-close="false">
+        <template #header="{ titleId, titleClass }">
+            <div class="my-header">
+                <h4 :id="titleId" :class="titleClass" v-if="prop.mode === 'create'">Create Department</h4>
+                <h4 :id="titleId" :class="titleClass" v-else>Update Department</h4>
+                <el-button type="danger" @click="$emit('invisible')">
+                    <el-icon class="el-icon--left">
+                        <CircleCloseFilled />
+                    </el-icon>
+                    Close
+                </el-button>
+            </div>
+        </template>
+        <el-form :model="form">
+            <el-form-item v-if="prop.mode === 'update'" label="ID" :label-width="formLabelWidth">
+                <el-input v-model="prop.departmentId" autocomplete="off" disabled />
+            </el-form-item>
+            <el-form-item label="Department name" :label-width="formLabelWidth">
+                <el-input v-model="form.name" autocomplete="off" />
+                <small>{{ checkLanding.checkName }}</small>
+            </el-form-item>
+            <el-form-item label="Address" :label-width="formLabelWidth">
+                <el-input v-model="form.address" autocomplete="off" />
+                <small>{{ checkLanding.checkAddress }}</small>
+            </el-form-item>
+
+            <el-form-item label="Email" :label-width="formLabelWidth">
+                <el-input v-model="form.email" autocomplete="off" />
+                <small>{{ checkLanding.checkEmail }}</small>
+            </el-form-item>
+
+            <el-form-item label="Phone Number" :label-width="formLabelWidth">
+                <el-input v-model="form.phoneNumber" autocomplete="off" />
+                <small>{{ checkLanding.checkPhoneNumber }}</small>
+            </el-form-item>
+
+        </el-form>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="$emit('invisible')">Cancel</el-button>
+                <el-button v-if="prop.mode === 'create'" type="primary" @click="createDepartment">
+                    Create
+                </el-button>
+                <el-button v-else type="primary" @click="updateDepartment">
+                    Update
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
   
 <style scoped>
 .department-container {
-    max-width: 80vw;
+    width: 100%;
     background-color: #ccc;
-    padding: 10px 0 10px 0;
+    padding: 10px 0;
+    display: block;
+    align-items: center;
+    overflow-x: auto;
+    border-radius: 4px;
+}
+.my-header{
+    display: flex;
+    justify-content: space-between;
+}
+small {
+    color: red;
+    margin-top: 0.1rem;
+    margin-left: 16px;
+    font-size: 14px;
+    color: red;
+    margin-top: 0.1rem;
+    margin-left: 0 px;
+    font-size: 14px;
+}
+
+.form-item {
     display: flex;
     align-items: center;
-    overflow-x: scroll;
-    padding-left: 8px;
-    border-radius: 4px;
+    margin-right: 16px;
+}
+
+.form-label {
+    margin-right: 8px;
+}
+
+.el-button--text {
+    margin-right: 15px;
+}
+
+.el-input {
+    width: 100%;
+}
+
+.dialog-footer {
+    margin-top: 16px;
+}
+
+.dialog-footer button:first-child {
+    margin-right: 10px;
+}
+
+.dialog-footer button {
+    margin-right: 8px;
+}
+
+span {
+    display: block;
+    color: red;
+    margin-top: 0.5rem;
+    margin-left: 16px;
 }
 
 .department-container::-webkit-scrollbar {
@@ -45,23 +121,10 @@
     height: 6px;
     background-color: #e0e0e0;
 }
-
-.department-container div input {
-    padding: 0 8px;
-}
-
-.department-container div {
-    padding-right: 4px;
-}
-
-.operation {
-    display: flex;
-    padding: 12px;
-}
 </style>
   
 <script setup>
-import { reactive, ref, watch, defineProps } from "vue";
+import { reactive, ref, watch, defineProps} from "vue";
 import axios from "axios";
 import { useUserStore } from "../stores/user";
 import { useAlertStore } from "../stores/alert";
@@ -72,16 +135,31 @@ const prop = defineProps({
     },
     departmentId: {
         type: Number
+    },
+    visible: {
+        type: Boolean
     }
 })
+const formLabelWidth = "150px";
 const user = useUserStore().user
 const alertStore = useAlertStore()
-const fail_validation = ref('')
+const trueDialog = true;
+const checkName = ref('')
+const checkEmail = ref('')
+const checkAddress = ref('')
+const checkPhoneNumber = ref('')
+let typeMode = typeof prop.mode
 const form = reactive({
     name: '',
     email: '',
     address: '',
     phoneNumber: ''
+})
+const checkLanding = reactive({
+    checkName: '',
+    checkEmail: '',
+    checkAddress: '',
+    checkPhoneNumber: ''
 })
 const emits = defineEmits(['invisible', 'updateData'])
 watch(() => prop.departmentId,
@@ -90,6 +168,7 @@ watch(() => prop.departmentId,
     })
 watch(() => prop.mode,
     () => {
+        typeMode = typeof prop
         if (prop.mode === 'create') {
             form.name = ''
             form.email = ''
@@ -131,26 +210,24 @@ const isPhoneNumber = (phoneNumber) => {
 };
 function validate() {
     if (form.name === '') {
-        fail_validation.value = 'Please enter name'
-        return false
-    } else if (form.address === '') {
-        fail_validation.value = 'Please enter address'
-        return false
+        checkLanding.checkName = 'Please enter name'
+    } if (form.address === '') {
+        checkLanding.checkAddress = 'Please enter address'
     }
-    else if (form.email === '') {
-        fail_validation.value = 'Please enter email'
-        return false
-    } else if (!isEmail(form.email)) {
-        fail_validation.value = 'Invalid email'
-        return false
-    } else if (form.phoneNumber === '') {
-        fail_validation.value = 'Please enter phone number'
-        return false
-    } else if (isPhoneNumber(form.isPhoneNumber)) {
-        fail_validation.value = 'Invalid phone number'
-        return false
+    if (form.email === '') {
+        checkLanding.checkEmail = 'Please enter email'
+    } if (!isEmail(form.email)) {
+        checkLanding.checkEmail = 'Invalid email'
+    } if (form.phoneNumber === '') {
+        checkLanding.checkPhoneNumber = 'Please enter phone number'
+    } if (isPhoneNumber(form.isPhoneNumber)) {
+        checkLanding.checkPhoneNumber = 'Invalid phone number'
     }
-    return true
+    if (checkLanding.checkName == '' && checkLanding.checkAddress == '' && checkLanding.checkPhoneNumber == '' && checkLanding.checkEmail == '') {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function createDepartment() {
@@ -181,6 +258,7 @@ function createDepartment() {
 }
 
 function updateDepartment() {
+    console.log(validate())
     if (validate()) {
         axios
             .put(

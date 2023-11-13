@@ -53,7 +53,7 @@
       </div>
       <div class="form-department">
         <NewDepartment @updateData="displayDepartment" @invisible="visibleMode = false" :mode="operationMode"
-          :departmentId="departmentId" v-if="visibleMode"></NewDepartment>
+          :departmentId="departmentId" :visible="visibleMode" v-if="visibleMode"></NewDepartment>
       </div>
     </div>
     
@@ -68,7 +68,6 @@ main {
   box-sizing: border-box;
   display: flex;
 }
-
 .form-department {
   margin-top: 50px;
   max-width: 1138px;
