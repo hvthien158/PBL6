@@ -4,7 +4,7 @@
       <input type="file" name="file" id="file" class="inputfile" @input="onFileChange"/>
       <label for="file">
         <img style="height: 150px; width: 150px; border-radius: 50%; margin: 20px"
-             :src="imgPath ? imgPath : 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg'">
+             :src="imgPath">
       </label>
       <div style="display:flex; flex-direction: column">
         <div style="display: flex">
@@ -113,7 +113,7 @@ import moment from "moment";
 const router = useRouter()
 const alertStore = useAlertStore()
 const user = useUserStore().user
-const imgPath = ref(user.avatar? 'http://127.0.0.1:8000/storage/' + user.avatar : null)
+const imgPath = ref(user.avatar)
 const avatar = ref(undefined)
 const formData = new FormData()
 
@@ -152,11 +152,12 @@ function updateProfile(){
         },
       })
       .then((response) => {
+        console.log(response)
         user.address = response.data.user[0].address
         user.phone_number = response.data.user[0].phone_number
         user.DOB = response.data.user[0].DOB
         user.avatar = response.data.user[0].avatar
-        imgPath.value = 'http://127.0.0.1:8000/storage/' + user.avatar
+        imgPath.value = user.avatar
         mapData()
 
         edit_mode.value = false

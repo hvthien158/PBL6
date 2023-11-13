@@ -37,7 +37,7 @@ class UserResource extends JsonResource
             'phone_number' => $this->phone_number ?: 'none',
             'salary' => $this->salary ?: 'none',
             'position' => $this->position ?: 'none',
-            'department' => new DepartmentResource($this->department),
+            'department' => new DepartmentResource($this->department),  
         ];
     }
 }
