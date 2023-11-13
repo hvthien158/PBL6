@@ -19,6 +19,11 @@
       <el-table :data="filterTableData" height="48vh" style="width: 100%">
         <el-table-column prop="id" label="ID" width="50" />
         <el-table-column prop="name" label="Name" width="180" />
+        <el-table-column prop="avatar" label="avatar" width="220">
+          <template #default="scope">
+            <el-avatar :src="scope.row.avatar" :size="40"/>
+          </template>
+        </el-table-column>
         <el-table-column prop="email" label="Email" width="220" />
         <el-table-column prop="address" label="Address" width="300"/>
         <el-table-column prop="DOB" label="Date of birth" width="120" />

@@ -196,18 +196,19 @@ const login = async () => {
             if(response.data.verify_quest){
               verifyQuest.value = true
             } else {
-              user.id = response.data.user.id
+              console.log(response)
+              user.id = response.data.user[0].id
               user.token = response.data.access_token
-              user.name = response.data.user.name
-              user.email = response.data.user.email
-              user.password = response.data.user.password
-              user.address = response.data.user.address
-              user.DOB = response.data.user.DOB
-              user.phone_number = response.data.user.phone_number
-              user.avatar = response.data.user.avatar
-              user.position = response.data.user.position
+              user.name = response.data.user[0].name
+              user.email = response.data.user[0].email
+              user.password = response.data.user[0].password
+              user.address = response.data.user[0].address
+              user.DOB = response.data.user[0].DOB
+              user.phone_number = response.data.user[0].phone_number
+              user.avatar = response.data.user[0].avatar
+              user.position = response.data.user[0].position
               user.expired = response.data.expires_at
-              user.role = response.data.user.role
+              user.role = response.data.user[0].role
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'

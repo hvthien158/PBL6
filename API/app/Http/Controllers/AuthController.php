@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Str;
 use function Laravel\Prompts\table;
 
@@ -106,11 +107,12 @@ class AuthController extends Controller
      */
     protected function createNewToken($token)
     {
+        $user = User::where('id', auth()->id())->get();
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_at' => Carbon::now('Asia/Ho_Chi_Minh')->add('second', 3600)->toDateTimeString(),
-            'user' => auth()->user()
+            'user' => UserResource::collection($user)
         ]);
     }
 
@@ -175,10 +177,10 @@ class AuthController extends Controller
         } else {
             $user->update(array_merge($validator->validated()));
         }
-
+        $user = User::where('id', auth()->id())->get();
         return response()->json([
             'message' => 'Successfully updated profile',
-            'user' => $user->get()
+            'user' => UserResource::collection($user)
         ], 201);
     }
 
