@@ -15,6 +15,13 @@ class DepartmentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $manager = [
+            'id' => 0,
+            'name' => 'none'
+        ];
+        if($this->department_manager_id){
+            $manager = User::where('id',$this->department_manager_id)->first(['id', 'name']);
+        }
         return [
             "id"=> $this->id,
             "name"=> $this->department_name,
@@ -22,6 +29,7 @@ class DepartmentResource extends JsonResource
             'email' => $this->email,
             'phoneNumber' => $this->phone_number,
             'quantityUser' => User::where('department_id',$this->id)->count(),
+            'manager' => $manager
         ];
     }
 }

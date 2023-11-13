@@ -15,7 +15,8 @@ class Department extends Model
         'department_name',
         'address',
         'email',
-        'phone_number'
+        'phone_number',
+        'department_manager_id'
     ];
     public $timestamps = false;
     public function users(): HasMany

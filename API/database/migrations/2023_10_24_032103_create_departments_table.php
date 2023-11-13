@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('address');
             $table->string('email');
             $table->string('phone_number');
+            $table->unsignedBigInteger('department_manager_id')->nullable()->comment('id of people who manage this department');
         });
     }
 

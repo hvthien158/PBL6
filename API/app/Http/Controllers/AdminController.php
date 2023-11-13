@@ -114,10 +114,10 @@ class AdminController extends Controller
         try {
             $itemsPerPage = 10;
             if ($request->name != '') {
-                $department = Department::whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%'])->skip($id * 10)->take($itemsPerPage)->get();
-                $totalPage = floor(Department::whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%'])->count() / $itemsPerPage) + 1;
+                $department = Department::whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%'])->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
+                $totalPage = ceil(Department::whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%'])->count() / $itemsPerPage);
             } else {
-                $totalPage = floor(Department::count() / $itemsPerPage) + 1;
+                $totalPage = ceil(Department::count() / $itemsPerPage);
                 $department = Department::skip($id * $itemsPerPage)->take($itemsPerPage)->get();
             }
             $response = [
@@ -142,7 +142,8 @@ class AdminController extends Controller
                 'department_name' => $request->departmentName,
                 'address' => $request->address,
                 'email' => $request->email,
-                'phone_number' => $request->phoneNumber
+                'phone_number' => $request->phoneNumber,
+                'department_manager_id' => $request->manager
             ]);
             return response()->json(['message' => 'Create department successfully']);
         } catch (\Exception $e) {
@@ -164,7 +165,8 @@ class AdminController extends Controller
                 'department_name' => $request->departmentName,
                 'address' => $request->address,
                 'email' => $request->email,
-                'phone_number' => $request->phoneNumber
+                'phone_number' => $request->phoneNumber,
+                'department_manager_id' => $request->manager
             ]);
             return response()->json(['message' => 'Update department successfully']);
         } catch (\Exception $e) {
