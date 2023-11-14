@@ -16,7 +16,7 @@ class TimeKeepingPolicy
      */
     public function viewAny(User $user): bool
     {
-        return auth()->user()->role === 'admin' ? true : false;
+        return auth()->user()->role === 'admin';
     }
 
     /**
@@ -28,16 +28,11 @@ class TimeKeepingPolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the user can create model.
      */
     public function create(User $user): bool
     {
-        $timezone = 'Asia/Ho_Chi_Minh';
-        $currentDate = Carbon::now()->setTimezone($timezone)->toDateString();
-        $existingTimeKeeping = TimeKeeping::where('user_id', $user->id)
-            ->whereDate('time_check_in', $currentDate)
-            ->first();
-        return !$existingTimeKeeping;
+        return true;
     }
 
     /**
@@ -48,7 +43,7 @@ class TimeKeepingPolicy
         $timezone = 'Asia/Ho_Chi_Minh';
         $currentDate = Carbon::now()->setTimezone($timezone)->toDateString();
         $existingTimeKeeping = TimeKeeping::where('user_id', $user->id)
-            ->whereDate('time_check_in', $currentDate)
+            ->whereDate('date', $currentDate)
             ->first();
         if ($existingTimeKeeping) {
             if (auth()->user()->role === 'admin' || auth()->user()->id === $existingTimeKeeping->id);
@@ -64,7 +59,7 @@ class TimeKeepingPolicy
         $timezone = 'Asia/Ho_Chi_Minh';
         $currentDate = Carbon::now()->setTimezone($timezone)->toDateString();
         $existingTimeKeeping = TimeKeeping::where('user_id', $user->id)
-            ->whereDate('time_check_in', $currentDate)
+            ->whereDate('date', $currentDate)
             ->first();
         if ($existingTimeKeeping) {
             if (auth()->user()->role === 'admin' || auth()->user()->id === $existingTimeKeeping->id);

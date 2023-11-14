@@ -26,8 +26,13 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/schedule/',
+      path: '/schedule',
       name: 'schedule',
+      component: ScheduleView
+    },
+    {
+      path: '/admin/schedule/:userID',
+      name: 'admin-schedule',
       component: ScheduleView
     },
     {
