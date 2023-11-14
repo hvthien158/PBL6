@@ -41,5 +41,15 @@ class DatabaseSeeder extends Seeder
                 ]
             )
         );
+        DB::table('departments')->insert(
+            array(
+                [
+                    'department_name' => 'Đà Nẵng',
+                    'address' => '363 Nguyễn Hữu Thọ, Khuê Trung, Cẩm Lệ, Đà Nẵng',
+                    'email' => 'contact.dn@kiaisoft.com',
+                    'phone_number' => ' (+84)982-851-486',
+                ],
+            )
+        );
     }
 }

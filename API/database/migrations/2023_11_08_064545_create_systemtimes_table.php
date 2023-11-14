@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('systemtimes', function (Blueprint $table) {
             $table->bigInteger('id')->unsigned();
             $table->primary('id');
-            $table->dateTime('time_check_in');
-            $table->dateTime('time_check_out')->nullable();
+            $table->date('_date');
+            $table->time('time_check_in')->default('00:00');
+            $table->time('time_check_out')->default('00:00');
             $table->timestamps();
         });
     }
