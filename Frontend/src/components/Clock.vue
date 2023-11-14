@@ -219,7 +219,7 @@
 </style>
 
 <script setup>
-import {onMounted} from "vue";
+import {onMounted, onUnmounted} from "vue";
 import moment from "moment"
 
 function getTimeSegmentElements(segmentElement) {
@@ -319,11 +319,15 @@ function updateAllSegments() {
   updateTimeSection('hours', moment().hour());
 }
 
-setInterval(() => {
+const interval = setInterval(() => {
   updateAllSegments();
 }, 1000);
 
 onMounted(() => {
   updateAllSegments();
+})
+
+onUnmounted(() => {
+  clearInterval(interval)
 })
 </script>

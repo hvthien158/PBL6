@@ -219,8 +219,8 @@ const getTimeKeeping = async () => {
       })
       .then(function (response) {
         if (response.status === 200) {
-          if (response.data.time_check_in) {
-            if (response.data.time_check_out) {
+          if (response.data.time_check_in && response.data.time_check_in !== '00:00:00') {
+            if (response.data.time_check_out && response.data.time_check_out !== '00:00:00') {
               checkin.value = false;
               checkout.value = false;
             } else {

@@ -15,15 +15,10 @@ class TimeKeepingResource extends JsonResource
     public function toArray($request): array
     {
         if (!$this->shift) {
-            $shift = [
-                'id' => 0,
-                'name' => 'OFF',
-                'amount' => 0,
-                'TimeValidCheckIn' => '00:00/00:00',
-                'TimeValidCheckOut' => '00:00/00:00',
-            ];
+            $shift = 'OFF';
         } else {
             $shift = new ShiftResource($this->shift);
+            $shift = $shift->name;
         }
 
         $timezone = 'Asia/Ho_Chi_Minh';
@@ -43,14 +38,15 @@ class TimeKeepingResource extends JsonResource
         ];
         $systemCheck = DB::table('systemtimes')->where('id', '=', $this->id)->first();
         if ($this->time_check_in) {
-            $timeCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_in)->format('H:i');
-            $systemCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $systemCheck->time_check_in)->format('H:i');
+            $timeCheckIn = Carbon::createFromFormat('H:i:s', $this->time_check_in)->format('H:i');
+            $systemCheckIn = Carbon::createFromFormat('H:i:s', $systemCheck->time_check_in)->format('H:i');
+        }
+        if ($this->time_check_out) {
+            $timeCheckOut = Carbon::createFromFormat('H:i:s', $this->time_check_out)->format('H:i');
+            $systemCheckOut = Carbon::createFromFormat('H:i:s', $systemCheck->time_check_out)->format('H:i');
         }
 
-        if ($this->time_check_out) {
-            $timeCheckOut = Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_out)->format('H:i');
-            $systemCheckOut = Carbon::createFromFormat('Y-m-d H:i:s', $systemCheck->time_check_out)->format('H:i');
-
+        if($timeCheckIn && $timeCheckOut){
             $carbonCheckIn = Carbon::createFromFormat('H:i', $timeCheckIn);
             $carbonCheckOut = Carbon::createFromFormat('H:i', $timeCheckOut);
             $timeWorkHours = $carbonCheckOut->diffInHours($carbonCheckIn);
@@ -63,13 +59,15 @@ class TimeKeepingResource extends JsonResource
         }
         return [
             'id' => $this->id,
-            'date' => Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_in)->format('d/m/Y'),
-            'dayOfWeek' => $weekMap[Carbon::createFromFormat('Y-m-d H:i:s', $this->time_check_in)->dayOfWeek],
-            'timeCheckIn' => $timeCheckIn.' ('.$systemCheckIn.')',
+            'date' => $this->_date,
+            'dayOfWeek' => $weekMap[Carbon::createFromFormat('Y-m-d', $this->_date)->dayOfWeek],
+            'timeCheckIn' => $timeCheckIn ? $timeCheckIn.' ('.$systemCheckIn.')' : '',
             'timeCheckOut' => $timeCheckOut ? $timeCheckOut.' ('.$systemCheckOut.')' : '',
-            'timeWork' => $timeWork,
-            'user' => new UserResource($this->user),
-            'shift' => $shift
+            'timeWork' => $timeCheckOut ? $timeWork : '',
+            'status_AM' => $this->status_am,
+            'status_PM' => $this->status_pm,
+            'user' => $this->user->name,
+            'shift' => $timeCheckOut ? $shift : '',
         ];
     }
 }

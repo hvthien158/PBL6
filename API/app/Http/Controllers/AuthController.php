@@ -132,7 +132,7 @@ class AuthController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        if (!Hash::check($request->old_password, auth()->user()->getAuthPassword())){
+        if (!Hash::check($request->old_password, auth()->user()->getAuthPassword())) {
             return response()->json(['error' => 'Current password is incorrect'], 400);
         }
 
@@ -142,14 +142,14 @@ class AuthController extends Controller
             ['password' => bcrypt($request->new_password)]
         );
 
-        if($check == 1){
+        if ($check == 1) {
             return response()->json([
                 'message' => 'User successfully changed password',
             ], 201);
         }
         return response()->json([
-        'error' => 'Error change password',
-    ], 400);
+            'error' => 'Error change password',
+        ], 400);
     }
 
     /**
@@ -157,7 +157,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function updateProfile(Request $request){
+    public function updateProfile(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'address' => 'string|nullable',
             'DOB' => 'nullable',
@@ -170,9 +171,9 @@ class AuthController extends Controller
         }
 
         $user = DB::table('users')->where('id', '=', auth()->id());
-        if($request->hasFile('avatar')) {
+        if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');
-            $path = Storage::disk('public')->put('avatar/'.auth()->id(), $avatar);
+            $path = Storage::disk('public')->put('avatar/' . auth()->id(), $avatar);
             $user->update(array_merge($validator->validated(), ['avatar' => $path]));
         } else {
             $user->update(array_merge($validator->validated()));
@@ -189,7 +190,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function forgotPassword(Request $request){
+    public function forgotPassword(Request $request)
+    {
         $request->validate(['email' => 'required|email']);
 
         $status = Password::sendResetLink(
@@ -206,11 +208,12 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function checkEmail(Request $request){
+    public function checkEmail(Request $request)
+    {
         $request->validate(['email' => 'required|email']);
 
         $email = DB::table('users')->where('email', '=', $request->input('email'))->first();
-        if($email){
+        if ($email) {
             return response()->json([], 200);
         } else {
             return response()->json([], 404);
@@ -222,7 +225,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function resetPassword(Request $request){
+    public function resetPassword(Request $request)
+    {
         $request->validate([
             'token' => 'required',
             'email' => 'email|required',

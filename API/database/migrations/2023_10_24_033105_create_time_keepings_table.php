@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration 
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('time_keepings', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('time_check_in');
-            $table->dateTime('time_check_out')->nullable();
+            $table->date('_date');
+            $table->time('time_check_in')->nullable();
+            $table->time('time_check_out')->nullable();
+            //0: Working, 1: Remote, 2: Not work
+            $table->integer('status_am')->default(0);
+            $table->integer('status_pm')->default(0);
             $table->text('note')->nullable();
             $table->foreignId('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('shift_id')->nullable();

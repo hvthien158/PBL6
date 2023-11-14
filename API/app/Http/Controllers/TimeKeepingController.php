@@ -7,6 +7,7 @@ use App\Http\Requests\TimeRequest;
 use App\Http\Resources\TimeKeepingResource;
 use App\Models\Systemtime;
 use App\Models\TimeKeeping;
+use App\Models\User;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -25,71 +26,84 @@ class TimeKeepingController extends Controller
     }
 
     /**
-     * @return object
+     * @return \Illuminate\Http\JsonResponse
      */
     public function checkIn()
     {
         try {
             $timezone = 'Asia/Ho_Chi_Minh';
-            $today = Carbon::now(new DateTimeZone($timezone));
-            if ($this->authorize('create', TimeKeeping::class)) {
-                $timekeep = TimeKeeping::create([
+            $date = Carbon::now(new DateTimeZone($timezone))->format('Y-m-d');
+            $now = Carbon::now(new DateTimeZone($timezone))->format('H:i:s');
+
+            $checkTimeKeeping = TimeKeeping::where('user_id', auth()->id())
+                ->whereDate('_date', Carbon::now()->setTimezone($timezone)->toDateString())->first();
+            if ($checkTimeKeeping) {
+                $checkTimeKeeping->time_check_in = $now;
+                $checkTimeKeeping->save();
+
+                DB::table('systemtimes')
+                    ->where('id', '=', $checkTimeKeeping->id)
+                    ->update(['time_check_in' => $now]);
+            } else {
+                $timekeep = DB::table('time_keepings')->insertGetId([
                     'user_id' => auth()->id(),
-                    'time_check_in' => $today
+                    '_date' => $date,
+                    'time_check_in' => $now
                 ]);
-                Systemtime::create([
-                    'id' => $timekeep->id,
-                    'time_check_in' => $today
+                $check = DB::table('systemtimes')->insert([
+                    'id' => $timekeep,
+                    '_date' => $date,
+                    'time_check_in' => $now
                 ]);
-                return response()->json(['message' => 'Check In Thành Công']);
+                if (!$check) {
+                    return response()->json(['message' => 'Cannot create system time'], 400);
+                }
             }
-            return response()->json(['error' => 'No role'], 400);
+            return response()->json(['message' => 'Checkin success']);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 
     /**
-     * @param TimeKeeping $timeKeeping
-     *
-     * @return mixed
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function checkOut(TimeKeeping $timeKeeping)
+    public function checkOut()
     {
         try {
-            if ($this->authorize('update', $timeKeeping)) {
-                $timezone = 'Asia/Ho_Chi_Minh';
-                $currentDate = Carbon::now()->setTimezone($timezone);
-                $checkTimeKeeping = TimeKeeping::where('user_id', auth()->id())
-                    ->whereDate('time_check_in', Carbon::now()->setTimezone($timezone)->toDateString())->first();
-                if ($checkTimeKeeping && $currentDate->isAfter($checkTimeKeeping->time_check_in)) {
-                    $checkTimeKeeping->time_check_out = $currentDate;
-                    $checkTimeKeeping->save();
+            $timezone = 'Asia/Ho_Chi_Minh';
+            $now = Carbon::now()->setTimezone($timezone);
+            $checkTimeKeeping = TimeKeeping::where('user_id', auth()->id())
+                ->whereDate('_date', $now->toDateString())->first();
+            if ($checkTimeKeeping && $now->isAfter($checkTimeKeeping->_date)) {
+                $checkTimeKeeping->time_check_out = $now->toTimeString();
+                $checkTimeKeeping->save();
 
-                    DB::table('systemtimes')
-                        ->where('id', '=', $checkTimeKeeping->id)
-                        ->update(['time_check_out' => $currentDate]);
+                DB::table('systemtimes')
+                    ->where('id', '=', $checkTimeKeeping->id)
+                    ->update([
+                        'time_check_out' => $now->format('H:i:s')
+                    ]);
 
-                    $shifts = Shift::all();
-                    $timeCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_in, $timezone);
-                    $timeCheckOut = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_out, $timezone);
-                    foreach ($shifts as $shift) {
-                        if (
-                            $timeCheckIn->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
-                            $timeCheckOut->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
-                        ) {
-                            $checkTimeKeeping->shift_id = $shift->id;
-                            $checkTimeKeeping->save();
-                            break;
-                        }
+                $shifts = Shift::all();
+                $timeCheckIn = Carbon::createFromFormat('H:i:s', $checkTimeKeeping->time_check_in, $timezone);
+                $timeCheckOut = Carbon::createFromFormat('H:i:s', $checkTimeKeeping->time_check_out, $timezone);
+                foreach ($shifts as $shift) {
+                    if (
+                        $timeCheckIn->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
+                        $timeCheckOut->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
+                    ) {
+                        $checkTimeKeeping->shift_id = $shift->id;
+                        $checkTimeKeeping->save();
+                        break;
                     }
-                    return response()->json(['message' => 'Check Out Thành Công']);
-                } else {
-                    return response()->json(['message' => 'Thời gian checkout không hợp lệ'], 400);
                 }
+                return response()->json(['message' => 'Checkout success']);
+            } else {
+                return response()->json(['message' => 'Thời gian checkout không hợp lệ'], 400);
             }
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()]);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 
@@ -100,17 +114,48 @@ class TimeKeepingController extends Controller
     {
         $timezone = 'Asia/Ho_Chi_Minh';
         $currentDate = Carbon::now()->setTimezone($timezone)->toDateString();
-        $timeKeeping = TimeKeeping::where('user_id', auth()->id())->whereDate('time_check_in', $currentDate)->first();
-        return response()->json($timeKeeping);
+        $timeKeeping = TimeKeeping::where('user_id', auth()->id())->whereDate('_date', $currentDate)->first();
+        $systemTime = Systemtime::where('id', $timeKeeping->id)->first();
+        return response()->json($systemTime);
     }
 
     /**
      * @return object
      */
-    public function getListTimeKeeping()
+    public function getListTimeKeeping($from, $to, $user_id = null)
     {
-        $timeKeeping = TimeKeeping::where('user_id', auth()->id())->orderBy('time_check_in', 'desc')->get();
-        return TimeKeepingResource::collection($timeKeeping);
+        $validator = Validator::make(['from' => $from, 'to' => $to], [
+            'from' => 'required|date',
+            'to' => 'required|date',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['failed_data' => $validator->failed()], 400);
+        }
+
+        if(!$user_id){
+            $timeKeeping = TimeKeeping::where('user_id', auth()->id())
+                ->whereBetween('_date', [$from, $to])
+                ->orderBy('_date', 'desc')->get();
+            return TimeKeepingResource::collection($timeKeeping);
+        }
+        if(auth()->user()->role == 'admin'){
+            $timeKeeping = TimeKeeping::where('user_id', $user_id)
+                ->whereBetween('_date', [$from, $to])
+                ->orderBy('_date', 'desc')->get();
+            if(count($timeKeeping) == 0){
+                return response()->json([
+                    'data' => [
+                        [
+                            'user' => DB::table('users')
+                                ->where('id', '=', $user_id)
+                                ->first()->name
+                        ]
+                    ]
+                ]);
+            }
+            return TimeKeepingResource::collection($timeKeeping);
+        }
     }
 
     /**
@@ -125,7 +170,7 @@ class TimeKeepingController extends Controller
         $startDateTime = date('Y-m-d H:i:s', strtotime($startDate . ' 00:00:00'));
         $endDateTime = date('Y-m-d H:i:s', strtotime($endDate . ' 23:59:59'));
 
-        $timekeepingRecords = Timekeeping::whereBetween('time_check_in', [$startDateTime, $endDateTime])->get();
+        $timekeepingRecords = Timekeeping::whereBetween('_date', [$startDateTime, $endDateTime])->get();
 
         return TimeKeepingResource::collection($timekeepingRecords);
     }
@@ -140,87 +185,109 @@ class TimeKeepingController extends Controller
         $month = $request->month;
         $year = $request->year;
         if ($month && $year) {
-            $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereMonth('time_check_in', $month)->whereYear('time_check_in', $year)->get();
-        } else if($year) {
-            $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereYear('time_check_in', $year)->get();
+            $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereMonth('_date', $month)->whereYear('_date', $year)->get();
+        } else if ($year) {
+            $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereYear('_date', $year)->get();
         }
         return $timekeepingRecords;
     }
 
-    public function updateTimeKeeping(Request $request){
+    public function updateTimeKeeping(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'date' =>'required',
+            'date' => 'required',
             'time_check_in' => 'nullable',
             'time_check_out' => 'nullable',
+            'status_am' => 'nullable|integer|between:0,2',
+            'status_pm' => 'nullable|integer|between:0,2',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['data' => $validator->failed(), 'message' => 'Invalid data request'], 422);
         }
+        $status_am = $request->get('status_am');
+        $status_pm = $request->get('status_pm');
 
-        $date = Carbon::createFromFormat('d/m/Y', $request->get('date'))->format('Y-m-d');
-        $checkin = Carbon::createFromFormat('H:i', $request->get('time_check_in'));
+        $date = $request->get('date');
+        $checkin = null;
         $checkout = null;
-        if($request->get('time_check_out')){
+
+        if ($request->get('time_check_in')) {
+            $checkin = Carbon::createFromFormat('H:i', $request->get('time_check_in'));
+        }
+        if ($request->get('time_check_out')) {
             $checkout = Carbon::createFromFormat('H:i', $request->get('time_check_out'));
         }
 
-        $timekeep = TimeKeeping::where('user_id', '=', auth()->id())
-            ->where('time_check_in', 'like', $date.'%')->first();
+        $timekeep = DB::table('time_keepings')->where('user_id', '=', auth()->id())
+            ->where('_date', '=', $date)->first();
 
-        if($timekeep){
-            $timekeep->update(['time_check_in' =>  $date.' '.$checkin->format('H:i:s')]);
+        if ($timekeep) {
+            DB::table('time_keepings')->where('user_id', '=', auth()->id())
+                ->where('_date', '=', $date)
+                ->update([
+                    'time_check_in' => $checkin ? $checkin->format('H:i:s') : $timekeep->time_check_in,
+                    'time_check_out' => $checkout ? $checkout->format('H:i:s') : $timekeep->time_check_out,
+                    'status_am' => $status_am >= 0 ? $status_am : $timekeep->status_am,
+                    'status_pm' => $status_pm >= 0 ? $status_pm : $timekeep->status_pm,
+                ]);
 
-            if($request->get('time_check_out')){
-                $timekeep->update(['time_check_out' => $date.' '.$checkout->format('H:i:s')]);
-            }
 
-            if($checkout){
-                $shifts = Shift::all();
+            $shifts = Shift::all();
+            if ($timekeep->time_check_in && $checkout) {
+                $timekeep_checkin = Carbon::createFromFormat('H:i:s', $timekeep->time_check_in);
+                foreach ($shifts as $shift) {
+                    if (
+                        $timekeep_checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
+                        $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
+                    ) {
+                        DB::table('time_keepings')->where('user_id', '=', auth()->id())
+                            ->where('_date', '=', $date)->update(['shift_id' => $shift->id]);
+                        break;
+                    }
+                }
+            } else if ($timekeep->time_check_out && $checkin) {
+                $timekeep_checkout = Carbon::createFromFormat('H:i:s', $timekeep->time_check_out);
                 foreach ($shifts as $shift) {
                     if (
                         $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
-                        $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
+                        $timekeep_checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
                     ) {
-                        $timekeep->shift_id = $shift->id;
-                        $timekeep->save();
+                        DB::table('time_keepings')->where('user_id', '=', auth()->id())
+                            ->where('_date', '=', $date)->update(['shift_id' => $shift->id]);
                         break;
                     }
                 }
             }
         } else {
-            if($checkout){
-                $newtimekeep = TimeKeeping::create([
-                    'user_id' => auth()->id(),
-                    'time_check_in' =>  $date.' '.$checkin->format('H:i:s'),
-                    'time_check_out' => $date.' '.$checkout->format('H:i:s')
-                ]);
+            $newtimekeep = DB::table('time_keepings')->insertGetId([
+                'user_id' => auth()->id(),
+                '_date' => $date,
+                'time_check_in' => $checkin ? $checkin->format('H:i:s') : null,
+                'time_check_out' => $checkout ? $checkout->format('H:i:s') : null,
+                'status_am' => $status_am ?: 0,
+                'status_pm' => $status_pm ?: 0,
+            ]);
+            $check = DB::table('systemtimes')->insert([
+                'id' => $newtimekeep,
+                '_date' => $date,
+                'time_check_in' => '00:00:00',
+                'time_check_out' => '00:00:00',
+            ]);
+            if (!$check) {
+                return response()->json(['error' => 'Cannot create systemtime'], 400);
+            }
+            if ($checkin && $checkout) {
                 $shifts = Shift::all();
                 foreach ($shifts as $shift) {
                     if (
                         $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
                         $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
                     ) {
-                        $newtimekeep->shift_id = $shift->id;
-                        $newtimekeep->save();
+                        DB::table('time_keepings')->where('id', '=', $newtimekeep)->update(['shift_id' => $shift->id]);
                         break;
                     }
                 }
-                Systemtime::create([
-                    'id' => $newtimekeep->id,
-                    'time_check_in' => $date.' 00:00:00',
-                    'time_check_out' => $date.' 00:00:00',
-                ]);
-            } else {
-                $newtimekeep = TimeKeeping::create([
-                    'user_id' => auth()->id(),
-                    'time_check_in' =>  $date.' '.$checkin->format('H:i:s'),
-                ]);
-                Systemtime::create([
-                    'id' => $newtimekeep->id,
-                    'time_check_in' => $date.' 00:00:00',
-                    'time_check_out' => $date.' 00:00:00',
-                ]);
             }
         }
 
