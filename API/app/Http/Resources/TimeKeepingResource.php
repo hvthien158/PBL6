@@ -63,11 +63,11 @@ class TimeKeepingResource extends JsonResource
             'dayOfWeek' => $weekMap[Carbon::createFromFormat('Y-m-d', $this->_date)->dayOfWeek],
             'timeCheckIn' => $timeCheckIn ? $timeCheckIn.' ('.$systemCheckIn.')' : '',
             'timeCheckOut' => $timeCheckOut ? $timeCheckOut.' ('.$systemCheckOut.')' : '',
-            'timeWork' => $timeWork,
+            'timeWork' => $timeCheckOut ? $timeWork : '',
             'status_AM' => $this->status_am,
             'status_PM' => $this->status_pm,
             'user' => $this->user->name,
-            'shift' => $shift
+            'shift' => $timeCheckOut ? $shift : '',
         ];
     }
 }
