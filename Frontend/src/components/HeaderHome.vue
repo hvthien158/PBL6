@@ -7,14 +7,15 @@
     </div>
     <span v-if="user.token" style="font-weight: bold; margin-right: 20px">
       <el-dropdown>
-        <span class="el-dropdown-link" style="line-height: 44px; font-size: larger">
-          {{user.name}}
+        <span class="el-dropdown-link">
+          <span style="line-height: 44px; font-size: larger">{{user.name}} </span>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item @click="updateProfile">Thông tin cá nhân</el-dropdown-item>
-            <el-dropdown-item @click="changePass">Đổi mật khẩu</el-dropdown-item>
-            <el-dropdown-item @click="logout">Đăng xuất</el-dropdown-item>
+            <el-dropdown-item v-if="user.role === 'admin'" @click="router.push({name: 'listUser'})">Admin Page</el-dropdown-item>
+            <el-dropdown-item @click="myProfile">My profile</el-dropdown-item>
+            <el-dropdown-item @click="changePass">Change password</el-dropdown-item>
+            <el-dropdown-item @click="logout">Logout</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -22,7 +23,7 @@
   </header>
 </template>
 
-<style>
+<style scoped>
 * {
   margin: 0;
   padding: 0;
@@ -31,9 +32,9 @@
 
 header {
   width: 100vw;
-  height: 9vh;
+  height: 60px;
   padding: 12px;
-  background-color: #313335;
+  background-color: black;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -57,9 +58,12 @@ header {
 .el-dropdown-link{
   cursor: pointer;
   border: none;
+  color: white;
+  outline: none;
 }
 .el-dropdown-link:hover{
   color: #f3952d;
+  outline: none;
 }
 </style>
 <script setup>
@@ -74,9 +78,9 @@ import {useAlertStore} from "../stores/alert";
 const alertStore = useAlertStore()
 const user = useUserStore().user
 
-function updateProfile(){
+function myProfile(){
   router.push({
-    name: 'update-profile',
+    name: 'my-profile',
   })
 }
 
@@ -99,7 +103,7 @@ const logout = async () => {
           //alert success
           alertStore.alert = true
           alertStore.type = 'success'
-          alertStore.msg = 'Đã đăng xuất'
+          alertStore.msg = 'Logged out'
 
           router.push({ path: "/login" });
         }

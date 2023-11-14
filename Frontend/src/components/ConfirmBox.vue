@@ -1,19 +1,19 @@
 <template>
   <div class='dialog-overlay'>
     <div class='dialog'>
-      <header>
+      <div class="header">
         <h3>{{ props.title }}</h3>
         <i class='fa fa-close'></i>
-      </header>
+      </div>
       <div class='dialog-msg'>
         <p>{{ props.msg }}</p>
       </div>
-      <footer>
+      <div class="footer">
         <div class='controls'>
           <button class='button button-danger' @click="confirmHandle">Confirm</button>
           <button class='button button-default' @click="cancelHandle">Cancel</button>
         </div>
-      </footer>
+      </div>
     </div>
   </div>
 </template>
@@ -33,21 +33,21 @@
   margin: 100px auto 0;
   background-color: #fff;
   box-shadow: 0 0 20px rgba(0,0,0,.2);
-  border-radius: 3px;
+  border-radius: 16px;
   overflow: hidden
 }
-.dialog-overlay .dialog header {
+.dialog-overlay .dialog .header {
   padding: 10px 8px;
   background-color: #f6f7f9;
   border-bottom: 1px solid #e5e5e5
 }
-.dialog-overlay .dialog header h3 {
-  font-size: 14px;
+.dialog-overlay .dialog .header h3 {
+  font-size: 20px;
   margin: 0;
   color: #555;
   display: inline-block
 }
-.dialog-overlay .dialog header .fa-close {
+.dialog-overlay .dialog .header .fa-close {
   float: right;
   color: #c4c5c7;
   cursor: pointer;
@@ -55,10 +55,10 @@
   padding: 0 2px;
   border-radius: 1px
 }
-.dialog-overlay .dialog header .fa-close:hover {
+.dialog-overlay .dialog .header .fa-close:hover {
   color: #b9b9b9
 }
-.dialog-overlay .dialog header .fa-close:active {
+.dialog-overlay .dialog .header .fa-close:active {
   box-shadow: 0 0 5px #673AB7;
   color: #a2a2a2
 }
@@ -70,14 +70,14 @@
   font-size: 15px;
   color: #333
 }
-.dialog-overlay .dialog footer {
+.dialog-overlay .dialog .footer {
   border-top: 1px solid #e5e5e5;
   padding: 8px 10px
 }
-.dialog-overlay .dialog footer .controls {
+.dialog-overlay .dialog .footer .controls {
   direction: rtl
 }
-.dialog-overlay .dialog footer .controls .button {
+.dialog-overlay .dialog .footer .controls .button {
   padding: 5px 15px;
   border-radius: 3px
 }

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Str;
 use function Laravel\Prompts\table;
 
@@ -20,12 +21,12 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword', 'checkEmail']]);
     }
 
     /**
      * @param LoginRequest $request
-     * 
+     *
      * @return object
      */
     public function login(LoginRequest $request)
@@ -46,7 +47,7 @@ class AuthController extends Controller
 
     /**
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function register(Request $request)
@@ -101,22 +102,23 @@ class AuthController extends Controller
 
     /**
      * @param string $token
-     * 
+     *
      * @return object
      */
     protected function createNewToken($token)
     {
+        $user = User::where('id', auth()->id())->get();
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_at' => Carbon::now('Asia/Ho_Chi_Minh')->add('second', 3600)->toDateTimeString(),
-            'user' => auth()->user()
+            'user' => UserResource::collection($user)
         ]);
     }
 
     /**
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function changePassword(Request $request)
@@ -152,7 +154,7 @@ class AuthController extends Controller
 
     /**
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function updateProfile(Request $request){
@@ -175,16 +177,16 @@ class AuthController extends Controller
         } else {
             $user->update(array_merge($validator->validated()));
         }
-
+        $user = User::where('id', auth()->id())->get();
         return response()->json([
             'message' => 'Successfully updated profile',
-            'user' => $user->get()
+            'user' => UserResource::collection($user)
         ], 201);
     }
 
     /**
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function forgotPassword(Request $request){
@@ -201,14 +203,30 @@ class AuthController extends Controller
 
     /**
      * @param Request $request
-     * 
+     *
+     * @return object
+     */
+    public function checkEmail(Request $request){
+        $request->validate(['email' => 'required|email']);
+
+        $email = DB::table('users')->where('email', '=', $request->input('email'))->first();
+        if($email){
+            return response()->json([], 200);
+        } else {
+            return response()->json([], 404);
+        }
+    }
+
+    /**
+     * @param Request $request
+     *
      * @return object
      */
     public function resetPassword(Request $request){
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'email' => 'email|required',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $status = Password::reset(

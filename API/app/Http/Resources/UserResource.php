@@ -16,18 +16,28 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        if($this->DOB){
+            $DOB_format = substr($this->DOB, 8, 2).'/'.substr($this->DOB, 5, 2).'/'.substr($this->DOB, 0, 4);
+        } else {
+            $DOB_format = 'none';
+        }
+        if($this->avatar){
+            $avatar = env('STORAGE_URL').$this->avatar;
+        } else {
+            $avatar = 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg';
+        }
         return [
             'id' => $this->id,
             'name'=> $this->name,
             'email'=> $this->email,
-            'avatar'=> $this->avatar,
-            'address' => $this->address,
-            'DOB' => $this->DOB,
-            'role' => $this->role,
-            'phoneNumber' => $this->phone_number,
-            'salary' => $this->salary,
-            'position' => $this->position,
-            'department' => new DepartmentResource($this->department),
+            'avatar'=> $avatar,
+            'address' => $this->address ?: 'none',
+            'DOB' => $DOB_format,
+            'role' => $this->role ?: 'user',
+            'phone_number' => $this->phone_number ?: 'none',
+            'salary' => $this->salary ?: 'none',
+            'position' => $this->position ?: 'none',
+            'department' => new DepartmentResource($this->department),  
         ];
     }
 }

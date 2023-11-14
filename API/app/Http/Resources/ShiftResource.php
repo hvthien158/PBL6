@@ -18,8 +18,8 @@ class ShiftResource extends JsonResource
             'id' => $this->id,
             'amount' => $this->amount,
             'name' => $this->name,
-            'TimeValidCheckIn' => $this->time_valid_check_in,
-            'TimeValidCheckOut' => $this->time_valid_check_out
+            'timeValidCheckIn' => $this->time_valid_check_in,
+            'timeValidCheckOut' => $this->time_valid_check_out
         ];
     }
 }

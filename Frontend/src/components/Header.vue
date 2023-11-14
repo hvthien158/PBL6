@@ -12,7 +12,7 @@
   header {
     width: 100vw;
     height: 10vh;
-    background-color: #313335;
+    background-color: black;
     display: flex;
     justify-content: center;
     padding-top: 10px;

@@ -24,8 +24,8 @@ class CreateDepartmentRequest extends FormRequest
         return [
             'departmentName' => 'required|string|unique:departments,department_name',
             'address'=> 'required|string',
-            'email' =>'required|email|unique:departments',
-            'phoneNumber' => 'required|string|unique:departments,phone_number'
+            'email' =>'required|email',
+            'phoneNumber' => 'required|string'
         ];
     }
     /**
@@ -34,7 +34,7 @@ class CreateDepartmentRequest extends FormRequest
     public function messages(): array 
     {
         return [
-            'departmentName.unique' => 'Tên đã tồn tại'
+            'departmentName.unique' => 'Name was exists'
         ];
     }
 }

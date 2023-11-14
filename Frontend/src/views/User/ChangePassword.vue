@@ -2,51 +2,81 @@
   <main>
     <div class="container">
       <div class="form-container">
-        <h3>Đổi mật khẩu</h3>
         <div class="form-input">
-          <div class="form-info">
-            <div class="label-info">
-              <label>Mật khẩu cũ</label>
-            </div>
-            <div class="input-info">
-              <input v-model="info.old_password" type="password" />
-              <h5>{{ checkOldPassword }}</h5>
-            </div>
+          <h3 style="text-align: center; font-weight: 700; color: #e06230">CHANGE PASSWORD</h3>
+          <div class="login__field">
+            <i class="login__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              </svg>
+            </i>
+            <input
+                v-model="info.old_password"
+                type="password"
+                class="login__input"
+                placeholder="Current password"
+                @blur="checkpass"
+                @input="checkpass"
+                @keyup.enter="new_pass_input.focus()"
+            >
+            <span class="error">{{ password_error }}</span>
           </div>
-          <div class="form-info">
-            <div class="label-info">
-              <label>Mật khẩu mới</label>
-            </div>
-            <div class="input-info">
-              <input v-model="info.new_password" type="password" />
-              <h5>{{ checkNewPassword }}</h5>
-            </div>
+          <div class="login__field">
+            <i class="login__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              </svg>
+            </i>
+            <input
+                ref="new_pass_input"
+                v-model="info.new_password"
+                type="password"
+                class="login__input"
+                placeholder="New password"
+                @blur="checkNewpass"
+                @input="checkNewpass"
+                @keyup.enter="confirm_input.focus()"
+            >
+            <span class="error">{{ new_password_error }}</span>
           </div>
-          <div class="form-info">
-            <div class="label-info">
-              <label>Nhập lại mật khẩu</label>
-            </div>
-            <div class="input-info">
-              <input v-model="info.new_password_confirm" type="password" />
-              <h5>{{ checkNewPasswordConfirm }}</h5>
-            </div>
+          <div class="login__field">
+            <i class="login__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+              </svg>
+            </i>
+            <input
+                ref="confirm_input"
+                v-model="info.new_password_confirm"
+                type="password"
+                class="login__input"
+                placeholder="Confirm"
+                @blur="checkConfirm"
+                @input="checkConfirm"
+                @keyup.enter="openConfirmBox"
+            >
+            <span class="error">{{ confirm_error }}</span>
           </div>
-          <div class="btn-submit">
-            <button type="submit" @click="login">Đổi mật khẩu</button>
+          <div class="login__field" style="display: flex; justify-content: center">
+            <ButtonLoading :loading="loading" @click="openConfirmBox" style="font-size: 15px;" size="large" type="warning" round>Change password</ButtonLoading>
           </div>
-        </div>
-        <div v-if="fail_change">
-          <span style="color: red">Sai mật khẩu</span>
+          <p class="fail-change" v-if="fail_change">Wrong current password</p>
         </div>
       </div>
     </div>
+    <ConfirmBox
+        v-if="confirm_box"
+        title="Confirm"
+        msg="Change new password?"
+        @confirm="changePass"
+        @cancel="handleCancelConfirmBox"
+    ></ConfirmBox>
   </main>
 </template>
 
 <style scoped>
 main {
   max-width: 100vw;
-  min-height: 100vh;
 }
 .container {
   display: flex;
@@ -61,81 +91,57 @@ main {
   justify-content: center;
   align-items: center;
 }
-.additional-content {
-  text-align: center;
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.additional-content p {
-  margin-bottom: 10px;
-}
 
 .form-input {
   display: block;
-  padding: 20px;
-  background-color: #313335;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 400px;
 }
 
-.form-info {
-  display: flex;
-  margin-bottom: 10px;
+.login__field {
+  padding: 20px 0;
+  position: relative;
 }
 
-.form-info .label-info {
-  display: flex;
-  align-items: center;
-  width: 150px;
-  padding-right: 5px;
-  color: #333333;
-  font-weight: bold;
+.login__icon {
+  position: absolute;
+  top: 30px;
+  color: #7875B5;
 }
 
-.form-input input {
-  padding: 10px;
-  width: 100%;
-  border-radius: 2px;
-  display: block;
-  border: 1px solid #999999;
-  transition: border-color 0.3s ease-in-out;
-}
-
-.form-input input:focus {
-  outline: none;
-  border-color: #62d58c;
-}
-
-.btn-submit {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.btn-submit button {
-  width: 100%;
-  height: 40px;
-  border-radius: 5px;
-  background-color: #62d58c;
-  color: #ffffff;
-  font-weight: bold;
-  cursor: pointer;
+.login__input {
   border: none;
-  transition: background-color 0.3s ease-in-out;
+  border-bottom: 2px solid #D1D1D4;
+  background: none;
+  padding: 10px 10px 10px 24px;
+  width: 95%;
+  font-weight: 700;
+  transition: .2s;
 }
 
-.btn-submit button:hover {
-  background-color: #3ca66e;
+.login__input:active,
+.login__input:focus,
+.login__input:hover {
+  outline: none;
+  border-bottom-color: #6A679E;
 }
 
-h5 {
-  margin-top: 5px;
-  color: rgb(214, 34, 34);
+.error{
+  color: red;
+  font-size: small;
+  position: absolute;
+  left: 25px;
+  top: 66px;
+}
+.fail-change{
+  color: red;
   font-size: 14px;
+  text-align: center;
+  position: absolute;
+  left: calc(50% - 80px);
 }
 </style>
 
@@ -146,10 +152,19 @@ import router from "../../router";
 import {ref} from "vue";
 import {useUserStore} from "../../stores/user";
 import {useAlertStore} from "../../stores/alert";
+import ButtonLoading from "../../components/ButtonLoading.vue";
+import ConfirmBox from "../../components/ConfirmBox.vue";
 
 const alertStore = useAlertStore()
 const user = useUserStore().user
 const fail_change = ref(false)
+const password_error = ref('')
+const new_password_error = ref('')
+const confirm_error = ref('')
+const new_pass_input = ref(null)
+const confirm_input = ref(null)
+const loading = ref(false)
+const confirm_box = ref(false)
 
 if(user.token === ''){
   router.push({name : 'login'})
@@ -160,34 +175,29 @@ let info = reactive({
   new_password_confirm: "",
 });
 
-const checkOldPassword = computed(() => {
-  if (info.old_password.length === 0) {
-    return "Vui lòng nhập mật khẩu cũ";
-  } else {
-    return "";
-  }
-});
+function checkpass() {
+  password_error.value = (info.old_password.length === 0) ? 'Please enter your password' : ''
+}
 
-const checkNewPassword = computed(() => {
-  if (info.new_password.length === 0) {
-    return "Vui lòng nhập mật khẩu mới";
-  } else {
-    return "";
-  }
-});
+function checkNewpass(){
+  new_password_error.value = (info.new_password.length === 0) ? 'Please enter new password' : ''
+}
 
-const checkNewPasswordConfirm = computed(() => {
-  if (info.new_password_confirm.length === 0) {
-    return "Vui lòng nhập mật khẩu xác nhận";
-  } else if(info.new_password_confirm !== info.new_password){
-    return "Mật khẩu xác nhận không trùng khớp"
-  } else {
-    return "";
-  }
-});
+function checkConfirm(){
+  confirm_error.value = (info.new_password_confirm.length === 0) ? 'Please enter confirmation password'
+      : (info.new_password_confirm !== info.new_password) ? 'Confirm password not match'
+          : ''
+}
 
-const login = async () => {
-  if (checkOldPassword.value === '' && checkNewPassword.value === '' && checkNewPasswordConfirm.value === '') {
+function openConfirmBox(){
+  loading.value = true
+  confirm_box.value = true
+}
+
+const changePass = async () => {
+  loading.value = true;
+  confirm_box.value = false
+  if (password_error.value === '' && new_password_error.value === '' && confirm_error.value === '') {
     try {
       await axios
           .post('http://127.0.0.1:8000/api/change-password', {
@@ -203,15 +213,20 @@ const login = async () => {
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'
-              alertStore.msg = 'Đổi mật khẩu thành công'
+              alertStore.msg = 'Success: Change pass'
 
               useUserStore().logout()
               router.push({ name: 'login' });
           });
     } catch (e) {
       fail_change.value = true
-      console.log(e);
+      loading.value = false
     }
   }
 };
+
+function handleCancelConfirmBox(){
+  loading.value = false
+  confirm_box.value = false
+}
 </script>

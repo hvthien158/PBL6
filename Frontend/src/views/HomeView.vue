@@ -3,7 +3,7 @@
     <div class="container">
       <div class="checkin-container">
         <div class="time">
-          <span id="time-span">{{ currentTime }}</span>
+          <Clock></Clock>
         </div>
         <div class="date">
           <span class="date-span">{{ currentDate }}</span>
@@ -15,7 +15,7 @@
             @click="handleCheckIn"
             :disabled="!checkin"
           >
-            Check In
+            Check in
           </button>
           <button
             id="check-out-button"
@@ -23,12 +23,10 @@
             @click="handleCheckOut"
             :disabled="!checkout"
           >
-            Check Out
+            Check out
           </button>
         </div>
-        <router-link to="/schedule">
-          <button class="active-button" style="margin-top: 20px; height: 40px">History</button>
-        </router-link>
+        <button @click="router.push({name: 'schedule'})" class="active-button no-underline" style="margin-top: 20px; height: 40px">History</button>
       </div>
     </div>
   </main>
@@ -36,7 +34,6 @@
 <style scoped>
 main {
   max-width: 100vw;
-  min-height: 82vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -50,7 +47,6 @@ main {
   min-height: 20px;
   padding: 30px;
   min-width: 50%;
-  background-color: #2b2b2b;
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -59,7 +55,7 @@ main {
 }
 
 .date {
-  margin: 10px 0px 10px 0px;
+  margin: 50px 0 10px 0px;
 }
 
 .date-span {
@@ -84,7 +80,7 @@ main {
 
 .active-button {
   width: 120px;
-  height: 120px;
+  height: 40px;
   margin: 10px;
   cursor: pointer;
   align-items: center;
@@ -120,11 +116,11 @@ main {
 }
 .disable-button{
   width: 120px;
-  height: 120px;
+  height: 40px;
   margin: 10px;
   align-items: center;
   appearance: none;
-  background-image: radial-gradient(100% 100% at 100% 0, #FCFCFD 0, #9ca3af 100%);;
+  background-image: radial-gradient(100% 100% at 100% 0, #FCFCFD 0, #9ca3af 100%);
   border-radius: 4px;
   border-width: 0;
   box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
@@ -164,6 +160,7 @@ import axios from "axios";
 import {useUserStore} from "../stores/user";
 import moment from "moment";
 import schedule from "../assets/image/schedule.png";
+import Clock from "../components/Clock.vue";
 
 const user = useUserStore().user
 if (user.token === '') {
@@ -178,10 +175,10 @@ function getCurrentDate() {
   const now = new Date();
   const options = {
     day: "numeric",
-    month: "short",
+    month: "long",
     year: "numeric",
   };
-  return now.toLocaleString("us-EN", options);
+  return now.toLocaleDateString("en-US", options);
 }
 
 function getCurrentTime() {
@@ -221,7 +218,7 @@ const getTimeKeeping = async () => {
         },
       })
       .then(function (response) {
-        if (response.status == 200) {
+        if (response.status === 200) {
           if (response.data.time_check_in) {
             if (response.data.time_check_out) {
               checkin.value = false;
@@ -257,7 +254,7 @@ const handleCheckIn = async () => {
         getTimeKeeping();
       });
   } catch (e) {
-    console.log(user.token);
+    console.log(e);
   }
 };
 
@@ -277,7 +274,7 @@ const handleCheckOut = async () => {
           getTimeKeeping();
         });
     } catch (e) {
-      console.log(`Bearer ${user.token}`);
+      console.log(e);
     }
 }
 

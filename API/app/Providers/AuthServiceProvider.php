@@ -4,6 +4,7 @@ namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
 use Gate;
+use http\Url;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -37,7 +38,7 @@ class AuthServiceProvider extends ServiceProvider
                 ->action('Verify Email Address', $url);
         });
         ResetPassword::createUrlUsing(function (User $user, string $token) {
-            return 'http://localhost:5173/reset-password?token='.$token.'&email='.$user->getEmailForPasswordReset();
+            return 'http://localhost:5173/reset-password/'.$token;
         });
         $this->registerPolicies();
     }

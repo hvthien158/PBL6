@@ -2,38 +2,51 @@
   <main>
     <div class="container">
       <div v-if="verifyQuest">
-        <p style="font-weight: bold">Thư xác nhận đã được gửi đến email của bạn, vui lòng xác nhận để tiếp tục...</p>
+        <p style="font-weight: bold">A confirmation email has been sent to your email, please confirm to continue...</p>
       </div>
       <div class="form-container" v-else>
-        <h3>Login</h3>
         <div class="form-input">
-          <div class="form-info">
-            <div class="label-info">
-              <label>Email</label>
-            </div>
-            <div class="input-info">
-              <input @keyup.enter="passwordInput.focus()" v-model="info.email" type="text" />
-              <h5>{{ checkEmail }}</h5>
-            </div>
+          <h3 style="text-align: center; font-weight: 700">LOGIN</h3>
+          <div class="login__field">
+            <i class="login__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+              </svg>
+            </i>
+            <input
+                v-model="info.email"
+                type="text"
+                class="login__input"
+                placeholder="Email"
+                @blur="checkmail"
+                @input="checkmail"
+                @keyup.enter="passwordInput.focus()"
+            >
+            <span class="error">{{ email_error }}</span>
           </div>
-          <div class="form-info">
-            <div class="label-info">
-              <label>Password</label>
-            </div>
-            <div class="input-info">
-              <input @keyup.enter="login" ref="passwordInput" v-model="info.password" type="password" />
-              <h5>{{ checkPassword }}</h5>
-            </div>
+          <div class="login__field">
+            <i class="login__icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              </svg>
+            </i>
+            <input
+                ref="passwordInput"
+                v-model="info.password"
+                type="password"
+                class="login__input"
+                placeholder="Password"
+                @blur="checkpass"
+                @input="checkpass"
+                @keyup.enter="login"
+            >
+            <span class="error">{{ password_error }}</span>
           </div>
-          <div class="btn-submit">
-            <button type="submit" @click="login">Login</button>
+          <div class="login__field">
+            <ButtonLoading :loading="loading" @click="login" style="font-size: 15px" size="large" type="warning" round>Login</ButtonLoading>
+            <span @click="goToForgot" class="login__forgot">Forgot password?</span>
           </div>
-        </div>
-        <div v-if="fail_login">
-          <span style="color: red">Email or password incorrect</span>
-        </div>
-        <div>
-          <p id="forgot" @click="goToForgot">Forgot password?</p>
+          <p class="fail-login" v-if="fail_login">Wrong email or password</p>
         </div>
       </div>
     </div>
@@ -43,7 +56,6 @@
 <style scoped>
 main {
   max-width: 100vw;
-  min-height: 100vh;
 }
 .container {
   display: flex;
@@ -62,92 +74,70 @@ main {
   color: #e06230;
   margin-bottom: 20px
 }
-.additional-content {
-  text-align: center;
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.additional-content p {
-  margin-bottom: 10px;
-}
-
 .form-input {
   display: block;
-  padding: 20px;
-  background-color: #313335;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 400px;
 }
 
-.form-info {
-  display: flex;
-  margin-bottom: 10px;
+.login__field {
+  padding: 20px 0;
+  position: relative;
 }
 
-.form-info .label-info {
-  display: flex;
-  align-items: center;
-  width: 150px;
-  padding-right: 5px;
-  color: #333333;
-  font-weight: bold;
+.login__icon {
+  position: absolute;
+  top: 30px;
+  color: #7875B5;
 }
 
-.form-input input {
-  padding: 10px;
-  width: 100%;
-  border-radius: 2px;
-  display: block;
-  border: 1px solid #999999;
-  transition: border-color 0.3s ease-in-out;
-}
-
-.form-input input:focus {
-  outline: none;
-  background-image: radial-gradient(100% 100% at 100% 0, #e7ba76 0, #c27354 100%);
-}
-
-.btn-submit {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.btn-submit button {
-  width: 100%;
-  height: 40px;
-  border-radius: 5px;
-  background-image: radial-gradient(100% 100% at 100% 0, #d3a053 0, #d06237 100%);
-  color: #ffffff;
-  font-weight: bold;
-  cursor: pointer;
+.login__input {
   border: none;
-  transition: background-color 0.3s ease-in-out;
+  border-bottom: 2px solid #D1D1D4;
+  background: none;
+  padding: 10px 10px 10px 24px;
+  width: 95%;
+  font-weight: 700;
+  transition: .2s;
 }
 
-.btn-submit button:hover {
-  
-  background-image: radial-gradient(100% 100% at 100% 0, #f9ac38 0, #f05112 100%);
+.login__input:active,
+.login__input:focus,
+.login__input:hover {
+  outline: none;
+  border-bottom-color: #6A679E;
 }
 
-h5 {
-  margin-top: 5px;
-  color: rgb(214, 34, 34);
-  font-size: 14px;
+.login__forgot{
+  position: absolute;
+  right: 0;
+  bottom: 30px;
+  font-size: 15px;
+  font-weight: 600;
 }
-#forgot{
-  margin-top: 10px;
-  color: coral;
-  font-weight: 500;
-}
-#forgot:hover{
-  font-weight: 800;
-  color: rgb(255, 123, 0);
+
+.login__forgot:hover{
+  color: #7875B5;
   cursor: pointer;
+}
+
+.error{
+  color: red;
+  font-size: small;
+  position: absolute;
+  left: 25px;
+  top: 66px;
+}
+
+.fail-login{
+  color: red;
+  font-size: 14px;
+  text-align: center;
+  position: absolute;
+  left: calc(50% - 80px);
 }
 </style>
 
@@ -158,12 +148,16 @@ import router from "../router";
 import {ref} from "vue";
 import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
+import ButtonLoading from "../components/ButtonLoading.vue";
 
 const verifyQuest = ref(false)
 const alertStore = useAlertStore()
 const user = useUserStore().user
 const fail_login = ref(false)
 const passwordInput = ref(null)
+const email_error = ref('')
+const password_error = ref('')
+const loading = ref(false)
 
 if(user.token !== ''){
   router.push({name : 'home'})
@@ -172,27 +166,26 @@ let info = reactive({
   email: "",
   password: "",
 });
-const checkEmail = computed(() => {
-  if (!isEmail(info.email)) {
-    return "Email Invalid";
-  } else {
-    return "";
-  }
-});
-const checkPassword = computed(() => {
-  if (info.password.length === 0) {
-    return "Password Invalid";
-  } else {
-    return "";
-  }
-});
 const isEmail = (email) => {
   let filter =
       /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return filter.test(email);
 };
+
+function checkmail() {
+  email_error.value = (info.email.length === 0) ? 'Please enter your email' : ''
+}
+
+function checkpass() {
+  password_error.value = (info.password.length === 0) ? 'Please enter your password' : ''
+}
+
 const login = async () => {
-  if (checkEmail.value === '' && checkPassword.value === '') {
+  loading.value = true
+  if(!isEmail(info.email)){
+    email_error.value = 'Invalid email'
+    loading.value = false
+  } else if (email_error.value === '' && password_error.value === '') {
     try {
       await axios
           .post('http://127.0.0.1:8000/api/login', {
@@ -204,26 +197,28 @@ const login = async () => {
               verifyQuest.value = true
             } else {
               console.log(response)
-              user.id = response.data.user.id
+              user.id = response.data.user[0].id
               user.token = response.data.access_token
-              user.name = response.data.user.name
-              user.email = response.data.user.email
-              user.password = response.data.user.password
+              user.name = response.data.user[0].name
+              user.email = response.data.user[0].email
+              user.password = response.data.user[0].password
+              user.address = response.data.user[0].address
+              user.DOB = response.data.user[0].DOB
+              user.phone_number = response.data.user[0].phone_number
+              user.avatar = response.data.user[0].avatar
+              user.position = response.data.user[0].position
               user.expired = response.data.expires_at
-              user.role = response.data.user.role
+              user.role = response.data.user[0].role
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'
               alertStore.msg = 'Login success'
-              if(user.role == 'admin') 
-              router.push({ path: "/admin" })
-              else
-              router.push({ path: "/" });
+              router.push({ name: "home" });
             }
           });
     } catch (e) {
       fail_login.value = true
-      console.log(e);
+      loading.value = false
     }
   }
 };

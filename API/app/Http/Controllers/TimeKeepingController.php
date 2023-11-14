@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DateTimeRequest;
 use App\Http\Requests\MonthYearRequest;
 use App\Http\Requests\TimeRequest;
 use App\Http\Resources\TimeKeepingResource;
+use App\Models\Systemtime;
 use App\Models\TimeKeeping;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Shift;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class TimeKeepingController extends Controller
 {
@@ -21,6 +23,7 @@ class TimeKeepingController extends Controller
     {
         $this->middleware('auth:api');
     }
+
     /**
      * @return object
      */
@@ -30,8 +33,12 @@ class TimeKeepingController extends Controller
             $timezone = 'Asia/Ho_Chi_Minh';
             $today = Carbon::now(new DateTimeZone($timezone));
             if ($this->authorize('create', TimeKeeping::class)) {
-                TimeKeeping::create([
+                $timekeep = TimeKeeping::create([
                     'user_id' => auth()->id(),
+                    'time_check_in' => $today
+                ]);
+                Systemtime::create([
+                    'id' => $timekeep->id,
                     'time_check_in' => $today
                 ]);
                 return response()->json(['message' => 'Check In Thành Công']);
@@ -41,9 +48,10 @@ class TimeKeepingController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
+
     /**
      * @param TimeKeeping $timeKeeping
-     * 
+     *
      * @return mixed
      */
     public function checkOut(TimeKeeping $timeKeeping)
@@ -57,13 +65,18 @@ class TimeKeepingController extends Controller
                 if ($checkTimeKeeping && $currentDate->isAfter($checkTimeKeeping->time_check_in)) {
                     $checkTimeKeeping->time_check_out = $currentDate;
                     $checkTimeKeeping->save();
-                    $shift = Shift::orderBy('amount', 'desc')->get();
+
+                    DB::table('systemtimes')
+                        ->where('id', '=', $checkTimeKeeping->id)
+                        ->update(['time_check_out' => $currentDate]);
+
+                    $shifts = Shift::all();
                     $timeCheckIn = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_in, $timezone);
                     $timeCheckOut = Carbon::createFromFormat('Y-m-d H:i:s', $checkTimeKeeping->time_check_out, $timezone);
-                    foreach ($shift as $shift) {
+                    foreach ($shifts as $shift) {
                         if (
-                            $timeCheckIn->isBefore($shift->time_valid_check_in)
-                            && $timeCheckOut->isAfter($shift->time_valid_check_out)
+                            $timeCheckIn->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
+                            $timeCheckOut->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
                         ) {
                             $checkTimeKeeping->shift_id = $shift->id;
                             $checkTimeKeeping->save();
@@ -79,6 +92,7 @@ class TimeKeepingController extends Controller
             return response()->json(['message' => $e->getMessage()]);
         }
     }
+
     /**
      * @return object
      */
@@ -89,6 +103,7 @@ class TimeKeepingController extends Controller
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->whereDate('time_check_in', $currentDate)->first();
         return response()->json($timeKeeping);
     }
+
     /**
      * @return object
      */
@@ -97,9 +112,10 @@ class TimeKeepingController extends Controller
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->orderBy('time_check_in', 'desc')->get();
         return TimeKeepingResource::collection($timeKeeping);
     }
+
     /**
      * @param TimeRequest $request
-     * 
+     *
      * @return object
      */
     public function searchByAroundTime(TimeRequest $request)
@@ -113,9 +129,10 @@ class TimeKeepingController extends Controller
 
         return TimeKeepingResource::collection($timekeepingRecords);
     }
+
     /**
      * @param MonthYearRequest $request
-     * 
+     *
      * @return object
      */
     public function searchByMonth(MonthYearRequest $request)
@@ -126,7 +143,87 @@ class TimeKeepingController extends Controller
             $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereMonth('time_check_in', $month)->whereYear('time_check_in', $year)->get();
         } else if($year) {
             $timekeepingRecords = Timekeeping::where('user_id', auth()->id())->whereYear('time_check_in', $year)->get();
-        } 
+        }
         return $timekeepingRecords;
+    }
+
+    public function updateTimeKeeping(Request $request){
+        $validator = Validator::make($request->all(), [
+            'date' =>'required',
+            'time_check_in' => 'nullable',
+            'time_check_out' => 'nullable',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['data' => $validator->failed(), 'message' => 'Invalid data request'], 422);
+        }
+
+        $date = Carbon::createFromFormat('d/m/Y', $request->get('date'))->format('Y-m-d');
+        $checkin = Carbon::createFromFormat('H:i', $request->get('time_check_in'));
+        $checkout = null;
+        if($request->get('time_check_out')){
+            $checkout = Carbon::createFromFormat('H:i', $request->get('time_check_out'));
+        }
+
+        $timekeep = TimeKeeping::where('user_id', '=', auth()->id())
+            ->where('time_check_in', 'like', $date.'%')->first();
+
+        if($timekeep){
+            $timekeep->update(['time_check_in' =>  $date.' '.$checkin->format('H:i:s')]);
+
+            if($request->get('time_check_out')){
+                $timekeep->update(['time_check_out' => $date.' '.$checkout->format('H:i:s')]);
+            }
+
+            if($checkout){
+                $shifts = Shift::all();
+                foreach ($shifts as $shift) {
+                    if (
+                        $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
+                        $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
+                    ) {
+                        $timekeep->shift_id = $shift->id;
+                        $timekeep->save();
+                        break;
+                    }
+                }
+            }
+        } else {
+            if($checkout){
+                $newtimekeep = TimeKeeping::create([
+                    'user_id' => auth()->id(),
+                    'time_check_in' =>  $date.' '.$checkin->format('H:i:s'),
+                    'time_check_out' => $date.' '.$checkout->format('H:i:s')
+                ]);
+                $shifts = Shift::all();
+                foreach ($shifts as $shift) {
+                    if (
+                        $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
+                        $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
+                    ) {
+                        $newtimekeep->shift_id = $shift->id;
+                        $newtimekeep->save();
+                        break;
+                    }
+                }
+                Systemtime::create([
+                    'id' => $newtimekeep->id,
+                    'time_check_in' => $date.' 00:00:00',
+                    'time_check_out' => $date.' 00:00:00',
+                ]);
+            } else {
+                $newtimekeep = TimeKeeping::create([
+                    'user_id' => auth()->id(),
+                    'time_check_in' =>  $date.' '.$checkin->format('H:i:s'),
+                ]);
+                Systemtime::create([
+                    'id' => $newtimekeep->id,
+                    'time_check_in' => $date.' 00:00:00',
+                    'time_check_out' => $date.' 00:00:00',
+                ]);
+            }
+        }
+
+        return response()->json(['message' => 'Update successfully']);
     }
 }
