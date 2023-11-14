@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use App\Models\Shift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use League\CommonMark\Parser\Block\ParagraphParser;
 
 class TimeKeepingController extends Controller
 {
@@ -115,8 +116,12 @@ class TimeKeepingController extends Controller
         $timezone = 'Asia/Ho_Chi_Minh';
         $currentDate = Carbon::now()->setTimezone($timezone)->toDateString();
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->whereDate('_date', $currentDate)->first();
-        $systemTime = Systemtime::where('id', $timeKeeping->id)->first();
-        return response()->json($systemTime);
+        if($timeKeeping){
+            $systemTime = Systemtime::where('id', $timeKeeping->id)->first();
+            return response()->json($systemTime);
+        } else {
+            return response()->json([]);
+        }
     }
 
     /**

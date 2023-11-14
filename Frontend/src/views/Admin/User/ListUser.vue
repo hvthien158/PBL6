@@ -130,7 +130,6 @@ onMounted(() => {
   if (user.role !== "admin") {
     router.push({ path: "/" });
   } else {
-    console.log(route)
     if (route.params.id) {
       userDepartment(route.params.id);
     } else {
