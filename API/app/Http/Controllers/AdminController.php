@@ -209,14 +209,13 @@ class AdminController extends Controller
      *
      * @return object
      */
-    public function getUserDepartment($name, Department $department)
+    public function getUserDepartment($id, Department $department)
     {
         $this->authorize('viewUser', $department);
         try {
-            $department = Department::where('department_name', $name)->first();
-            $user = User::where('department_id', $department->id)->get();
-            if ($user) {
-                return UserResource::collection($user);
+            $userDepartment = Department::find($id)->users()->get();
+            if ($userDepartment) {
+                return UserResource::collection($userDepartment);
             } else {
                 return response()->json(['message' => 'Không có user nào']);
             }

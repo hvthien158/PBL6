@@ -130,8 +130,9 @@ onMounted(() => {
   if (user.role !== "admin") {
     router.push({ path: "/" });
   } else {
-    if (route.params.departmentName) {
-      userDepartment(route.params.departmentName);
+    console.log(route)
+    if (route.params.id) {
+      userDepartment(route.params.id);
     } else {
       displayUser();
     }
@@ -141,7 +142,7 @@ const displayUser = async () => {
   visible_mode.value = false
   try {
     await axios
-      .get("http://127.0.0.1:8000/api/user/", {
+      .get("http://127.0.0.1:8000/api/user", {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then(function (response) {
@@ -151,10 +152,10 @@ const displayUser = async () => {
     console.log(e);
   }
 };
-const userDepartment = async (departmentName) => {
+const userDepartment = async (id) => {
   try {
     await axios
-      .get(`http://127.0.0.1:8000/api/user-department/${departmentName}`, {
+      .get(`http://127.0.0.1:8000/api/user-department/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then(function (response) {
