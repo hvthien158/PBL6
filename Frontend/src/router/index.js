@@ -72,7 +72,7 @@ const router = createRouter({
       component: ListDepartment
     },
     {
-      path: '/admin/list-user/:departmentName',
+      path: '/admin/list-user/department/:id',
       name: 'userDepartment',
       component: ListUser
     },
