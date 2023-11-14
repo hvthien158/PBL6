@@ -8,7 +8,7 @@
         :checkout="today.timeCheckOut"
         :status_AM_prop="today.status_AM"
         :status_PM_prop="today.status_PM"
-        @update="getListTimeKeeping"
+        @update="getListTimeKeeping(filter_value[0], filter_value[1])"
     ></EditTimeKeep>
     <el-card>
       <div slot="header" class="card-header">
@@ -126,7 +126,7 @@
 import EditTimeKeep from "../components/EditTimeKeep.vue"
 import { saveAs } from "file-saver";
 import { read, utils, write } from "xlsx";
-import {ref, reactive, onMounted, defineProps, computed, watchEffect} from "vue";
+import {ref, reactive, onMounted, defineProps, computed, watchEffect, watch} from "vue";
 import { useUserStore } from "../stores/user";
 import axios from "axios";
 import moment from "moment";
@@ -152,14 +152,11 @@ const today = ref({
 const first_load = ref(true)
 const admin_view = ref('')
 
-onMounted(() => {
-  getListTimeKeeping();
-});
-const getListTimeKeeping = async () => {
+const getListTimeKeeping = async (from, to) => {
   if(router.currentRoute.value.fullPath === '/schedule'){
     try {
       await axios
-          .get("http://127.0.0.1:8000/api/get-list-timekeeping", {
+          .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to, {
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
@@ -180,7 +177,7 @@ const getListTimeKeeping = async () => {
     let userID = router.currentRoute.value.params.userID
     try {
       await axios
-          .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + userID, {
+          .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to + '/' + userID, {
             headers: {
               Authorization: `Bearer ${user.token}`,
             },
@@ -200,6 +197,10 @@ const getListTimeKeeping = async () => {
     }
   }
 };
+
+watch(() => filter_value.value, () => {
+  getListTimeKeeping(filter_value.value[0], filter_value.value[1])
+})
 
 filterByMonth()
 const dataByMonth = computed(() => {
@@ -328,6 +329,11 @@ function loadToday(){
 }
 
 function rowStyle ({ row }){
+  if(row.date === moment().format('YYYY-MM-DD')){
+    return {
+      'background-color': 'rgba(255,153,41,0.37)'
+    }
+  }
   if(row.dayOfWeek === 'Sunday' || row.dayOfWeek === 'Saturday'){
     return {
       'background-color': 'rgba(204,204,204,0.42)',
@@ -335,7 +341,7 @@ function rowStyle ({ row }){
   }
   if(row.date === today.value.date){
     return {
-      'background-color': 'rgba(255,153,41,0.37)'
+      'background-color': 'rgba(41,255,248,0.37)'
     }
   }
 }

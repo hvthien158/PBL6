@@ -115,22 +115,44 @@ class TimeKeepingController extends Controller
         $timezone = 'Asia/Ho_Chi_Minh';
         $currentDate = Carbon::now()->setTimezone($timezone)->toDateString();
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->whereDate('_date', $currentDate)->first();
-        return response()->json($timeKeeping);
+        $systemTime = Systemtime::where('id', $timeKeeping->id)->first();
+        return response()->json($systemTime);
     }
 
     /**
      * @return object
      */
-    public function getListTimeKeeping($user_id = null)
+    public function getListTimeKeeping($from, $to, $user_id = null)
     {
+        $validator = Validator::make(['from' => $from, 'to' => $to], [
+            'from' => 'required|date',
+            'to' => 'required|date',
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['failed_data' => $validator->failed()], 400);
+        }
+
         if(!$user_id){
-            $timeKeeping = TimeKeeping::where('user_id', auth()->id())->orderBy('_date', 'desc')->get();
+            $timeKeeping = TimeKeeping::where('user_id', auth()->id())
+                ->whereBetween('_date', [$from, $to])
+                ->orderBy('_date', 'desc')->get();
             return TimeKeepingResource::collection($timeKeeping);
         }
         if(auth()->user()->role == 'admin'){
-            $timeKeeping = TimeKeeping::where('user_id', $user_id)->orderBy('_date', 'desc')->get();
+            $timeKeeping = TimeKeeping::where('user_id', $user_id)
+                ->whereBetween('_date', [$from, $to])
+                ->orderBy('_date', 'desc')->get();
             if(count($timeKeeping) == 0){
-                return response()->json(['data' => [['user' => DB::table('users')->where('id', '=', $user_id)->first()->name]]]);
+                return response()->json([
+                    'data' => [
+                        [
+                            'user' => DB::table('users')
+                                ->where('id', '=', $user_id)
+                                ->first()->name
+                        ]
+                    ]
+                ]);
             }
             return TimeKeepingResource::collection($timeKeeping);
         }

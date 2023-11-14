@@ -60,6 +60,7 @@ header {
   border: none;
   color: white;
   outline: none;
+  margin-right: 2vw;
 }
 .el-dropdown-link:hover{
   color: #f3952d;
