@@ -287,6 +287,9 @@ const displayTimeKeeping = async () => {
           timekeeping.value = response.data.data
           user_quantity.value = response.data.quantity
           totalPage.value = Math.ceil(user_quantity.value / 10)
+          if(totalPage.value === 0){
+            totalPage.value = 1
+          }
           updateTableDescription()
         });
   } catch (e) {

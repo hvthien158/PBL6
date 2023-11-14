@@ -200,6 +200,7 @@ class TimeKeepingController extends Controller
     public function updateTimeKeeping(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'user_id' => 'required',
             'date' => 'required',
             'time_check_in' => 'nullable',
             'time_check_out' => 'nullable',
@@ -224,11 +225,11 @@ class TimeKeepingController extends Controller
             $checkout = Carbon::createFromFormat('H:i', $request->get('time_check_out'));
         }
 
-        $timekeep = DB::table('time_keepings')->where('user_id', '=', auth()->id())
+        $timekeep = DB::table('time_keepings')->where('user_id', '=', $request->user_id)
             ->where('_date', '=', $date)->first();
 
         if ($timekeep) {
-            DB::table('time_keepings')->where('user_id', '=', auth()->id())
+            DB::table('time_keepings')->where('user_id', '=', $request->user_id)
                 ->where('_date', '=', $date)
                 ->update([
                     'time_check_in' => $checkin ? $checkin->format('H:i:s') : $timekeep->time_check_in,
@@ -246,7 +247,7 @@ class TimeKeepingController extends Controller
                         $timekeep_checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
                         $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
                     ) {
-                        DB::table('time_keepings')->where('user_id', '=', auth()->id())
+                        DB::table('time_keepings')->where('user_id', '=', $request->user_id)
                             ->where('_date', '=', $date)->update(['shift_id' => $shift->id]);
                         break;
                     }
@@ -258,7 +259,7 @@ class TimeKeepingController extends Controller
                         $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
                         $timekeep_checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
                     ) {
-                        DB::table('time_keepings')->where('user_id', '=', auth()->id())
+                        DB::table('time_keepings')->where('user_id', '=', $request->user_id)
                             ->where('_date', '=', $date)->update(['shift_id' => $shift->id]);
                         break;
                     }
@@ -266,7 +267,7 @@ class TimeKeepingController extends Controller
             }
         } else {
             $newtimekeep = DB::table('time_keepings')->insertGetId([
-                'user_id' => auth()->id(),
+                'user_id' => $request->user_id,
                 '_date' => $date,
                 'time_check_in' => $checkin ? $checkin->format('H:i:s') : null,
                 'time_check_out' => $checkout ? $checkout->format('H:i:s') : null,

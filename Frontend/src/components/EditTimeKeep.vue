@@ -76,6 +76,10 @@ import moment from "moment";
 import StatusButton from "./StatusButton.vue";
 
 const prop = defineProps({
+  user_id: {
+    type: Number,
+    default: 0,
+  },
   dayOfWeek: {
     type: String,
     default: 'Sunday'
@@ -123,6 +127,7 @@ watch(() => prop.date,
 
 function updateTimeKeep(){
   axios.post('http://127.0.0.1:8000/api/timekeeping/update', {
+    'user_id': prop.user_id,
     'date': prop.date,
     'time_check_in': check_in_format.value,
     'time_check_out': check_out_format.value,

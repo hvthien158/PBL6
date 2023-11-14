@@ -2,6 +2,7 @@
   <div class="timekeeping-management">
     <EditTimeKeep
         style="height: 100%"
+        :user_id="user_id"
         :date="today.date"
         :day-of-week="today.dayOfWeek"
         :checkin="today.timeCheckIn"
@@ -151,6 +152,7 @@ const today = ref({
 })
 const first_load = ref(true)
 const admin_view = ref('')
+const user_id = ref(user.id)
 
 const getListTimeKeeping = async (from, to) => {
   if(router.currentRoute.value.fullPath === '/schedule'){
@@ -175,6 +177,7 @@ const getListTimeKeeping = async (from, to) => {
     }
   } else {
     let userID = router.currentRoute.value.params.userID
+    user_id.value = userID
     try {
       await axios
           .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to + '/' + userID, {
