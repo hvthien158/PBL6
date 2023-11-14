@@ -17,7 +17,7 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         if($this->DOB){
-            $DOB_format = substr($this->DOB, 8, 2).'/'.substr($this->DOB, 5, 2).'/'.substr($this->DOB, 0, 4);
+            $DOB_format = $this->DOB;
         } else {
             $DOB_format = 'none';
         }

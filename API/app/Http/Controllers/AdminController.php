@@ -31,6 +31,44 @@ class AdminController extends Controller
     {
         $this->middleware(['auth:api']);
     }
+    public function listUser(Request $request, $id)
+    {
+        try {
+            $itemsPerPage = 8;
+            $user = User::orderBy('id', 'asc');
+            if($request->name != '') {
+                $user->whereRaw('LOWER(name) like ?' , ['%'.$request->name.'%']);
+            } 
+            if($request->email != '') {
+                $user->whereRaw('LOWER(email) like ?' , ['%'.$request->email.'%']);
+            }
+            if($request->address != '') {
+                $user->whereRaw('LOWER(address) like ?' , ['%'.$request->address.'%']);
+            }
+            if($request->phoneNumber != '') {
+                $user->whereRaw('LOWER(phone_number) like ?' , ['%'.$request->phoneNumber.'%']);
+            } 
+            if($request->position != '') {
+                $user->where('position', $request->position);
+            }
+            if($request->role != '') {
+                $user->where('role', $request->role);
+            }
+            if($request->department != '') {
+                $user->where('department_id', $request->department);
+            }
+            $totalPage = ceil($user->count() / $itemsPerPage);
+            $user = $user->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
+            $response = [
+                'totalPage' => $totalPage,
+                'user' => UserResource::collection($user)
+            ];
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+
+        }
+    }
     /**
      * @param CreateUserRequest $request
      *
@@ -113,23 +151,29 @@ class AdminController extends Controller
     {
         try {
             $itemsPerPage = 10;
-            $department = Department::orderBy('id','asc')->with('users')->with('manager');
+            $department = Department::orderBy('id', 'asc')->with('users')->with('manager');
             if ($request->name != '') {
                 $department->whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%']);
-            } if($request->manager != ''){
+            }
+            if ($request->manager != '') {
                 $department->whereHas('manager', function ($subQuery) use ($request) {
-                    $subQuery->where('name', 'like', '%'.$request->manager.'%');
+                    $subQuery->where('name', 'like', '%' . $request->manager . '%');
                 });
-            } if ($request->address != '') {
+            }
+            if ($request->address != '') {
                 $department->whereRaw('LOWER(address) like ?', ['%' . $request->address . '%']);
-            } if ($request->email != '') {
+            }
+            if ($request->email != '') {
                 $department->whereRaw('LOWER(email) like ?', ['%' . $request->email . '%']);
-            } if ($request->phoneNumber != '') {
+            }
+            if ($request->phoneNumber != '') {
                 $department->whereRaw('LOWER(phone_number) like ?', ['%' . $request->phoneNumber . '%']);
-            } if($request->minStaff != 0){
-                $department->has('users','>=', $request->minStaff);
-            } if($request->maxStaff != 0){
-                $department->has('users','<=', $request->maxStaff);
+            }
+            if ($request->minStaff != 0) {
+                $department->has('users', '>=', $request->minStaff);
+            }
+            if ($request->maxStaff != 0) {
+                $department->has('users', '<=', $request->maxStaff);
             }
             $totalPage = ceil($department->count() / $itemsPerPage);
             $departments = $department->skip($id * $itemsPerPage)->take($itemsPerPage)->get();

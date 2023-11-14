@@ -46,7 +46,7 @@
               @click="messages('error', 'There are no employees at this department')">View
               Staff</el-button>
             <el-button class="el-button--text" v-else
-              @click="router.push({ path: `/admin/list-user/department/${scope.row.id}` })">View
+              @click="router.push({ path: `/admin/list-user/`, query: {department: scope.row.id} })">View
               Staff</el-button>
           </template>
         </el-table-column>
