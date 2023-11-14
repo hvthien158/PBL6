@@ -50,12 +50,10 @@ class TimeKeepingResource extends JsonResource
             $carbonCheckIn = Carbon::createFromFormat('H:i', $timeCheckIn);
             $carbonCheckOut = Carbon::createFromFormat('H:i', $timeCheckOut);
             $timeWorkHours = $carbonCheckOut->diffInHours($carbonCheckIn);
-            if($timeWorkHours != 0){
-                $timeWorkMinutes = $carbonCheckOut->diffInMinutes($carbonCheckIn) - $timeWorkHours*60;
-            } else {
-                $timeWorkMinutes = $carbonCheckOut->diffInMinutes($carbonCheckIn);
-            }
-            $timeWork = str_pad($timeWorkHours, 2, '0', STR_PAD_LEFT).':'.str_pad($timeWorkMinutes, 2, '0', STR_PAD_LEFT);
+            $timeWorkMinutes = $carbonCheckOut->diffInMinutes($carbonCheckIn) - $timeWorkHours*60;
+            $timeWork = str_pad($timeWorkHours, 2, '0', STR_PAD_LEFT)
+                .':'
+                .str_pad($timeWorkMinutes, 2, '0', STR_PAD_LEFT);
         }
         return [
             'id' => $this->id,

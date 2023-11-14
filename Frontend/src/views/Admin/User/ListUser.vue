@@ -175,6 +175,27 @@ const operation_mode = ref('create')
 const userID_update = ref(0)
 const department = ref()
 const confirm_box = ref(false)
+<<<<<<< Frontend/src/views/Admin/User/ListUser.vue
+const search = ref('')
+
+const filterTableData = computed(() =>
+    data.value.filter(
+        (data) =>
+            !search.value ||
+            data.name.toLowerCase().includes(search.value.toLowerCase())
+    )
+)
+
+onMounted(() => {
+  if (user.role !== "admin") {
+    router.push({ path: "/" });
+  } else {
+    if (route.params.id) {
+      userDepartment(route.params.id);
+    } else {
+      displayUser();
+    }
+=======
 const totalPage = ref(0)
 const debounceSearch = ref(null);
 let currentPage = ref(1);
@@ -195,6 +216,7 @@ const role = [
   {
     name: "Admin",
     value: "admin",
+>>>>>>> Frontend/src/views/Admin/User/ListUser.vue
   }
 ];
 const position = [

@@ -77,11 +77,11 @@ Route::delete('delete-department/{id}', [AdminController::class,'deleteDepartmen
 Route::post('list-shift/{id}', [AdminController::class,'listShift']);
 Route::post('create-shift', [AdminController::class,'createShift']);
 Route::put('update-shift/{id}',[AdminController::class,'updateShift']);
+Route::delete('delete-shift/{id}',[AdminController::class,'deleteShift']);
+Route::post('manage-timekeeping/{skip}',[AdminController::class,'manageTimeKeeping']);
+Route::put('update-timekeeping/{id}',[AdminController::class,'updateTimeKeeping']);
+Route::delete('delete-timekeeping/{id}',[AdminController::class,'deleteTimeKeeping']);
 
 //Shift
 Route::get('shift', [ShiftController::class,'index']);
 Route::get('shift/{id}', [ShiftController::class,'index']);
-Route::delete('delete-shift/{id}',[AdminController::class,'deleteShift']);
-Route::post('manage-timekeeping/{id}',[AdminController::class,'manageTimeKeeping']);
-Route::put('update-timekeeping/{id}',[AdminController::class,'updateTimeKeeping']);
-Route::delete('delete-timekeeping/{id}',[AdminController::class,'deleteTimeKeeping']);

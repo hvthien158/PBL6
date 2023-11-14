@@ -27,7 +27,7 @@
         <el-table-column prop="name" label="Department name" min-width="180"></el-table-column>
         <el-table-column prop="manager.name" label="Department Manager" min-width="200">
           <template #default="scope">
-            <el-button class="el-button--text" v-if="scope.row.manager.name != 'none'"
+            <el-button class="el-button--text" v-if="scope.row.manager.name !== 'none'"
               @click="handleViewManager(scope.row.manager.id)">
               {{ scope.row.manager.name }}
             </el-button>
@@ -244,7 +244,7 @@ const deleteDepartment = async () => {
       })
       .then(function (response) {
         console.log(response);
-        if (response.status == 200) {
+        if (response.status === 200) {
           messages("success", response.data.message);
         }
       });
