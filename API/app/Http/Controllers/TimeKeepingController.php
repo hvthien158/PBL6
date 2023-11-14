@@ -116,14 +116,13 @@ class TimeKeepingController extends Controller
         $timezone = 'Asia/Ho_Chi_Minh';
         $currentDate = Carbon::now()->setTimezone($timezone)->toDateString();
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->whereDate('_date', $currentDate)->first();
-        if($timeKeeping){
+        if ($timeKeeping) {
             $systemTime = Systemtime::where('id', $timeKeeping->id)->first();
             return response()->json($systemTime);
         } else {
             return response()->json([]);
         }
     }
-
     /**
      * @return object
      */
@@ -134,21 +133,21 @@ class TimeKeepingController extends Controller
             'to' => 'required|date',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['failed_data' => $validator->failed()], 400);
         }
 
-        if(!$user_id){
+        if (!$user_id) {
             $timeKeeping = TimeKeeping::where('user_id', auth()->id())
                 ->whereBetween('_date', [$from, $to])
                 ->orderBy('_date', 'desc')->get();
             return TimeKeepingResource::collection($timeKeeping);
         }
-        if(auth()->user()->role == 'admin'){
+        if (auth()->user()->role == 'admin') {
             $timeKeeping = TimeKeeping::where('user_id', $user_id)
                 ->whereBetween('_date', [$from, $to])
                 ->orderBy('_date', 'desc')->get();
-            if(count($timeKeeping) == 0){
+            if (count($timeKeeping) == 0) {
                 return response()->json([
                     'data' => [
                         [
