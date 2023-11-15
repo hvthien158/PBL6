@@ -118,9 +118,26 @@ class TimeKeepingController extends Controller
         $timeKeeping = TimeKeeping::where('user_id', auth()->id())->whereDate('_date', $currentDate)->first();
         if ($timeKeeping) {
             $systemTime = Systemtime::where('id', $timeKeeping->id)->first();
-            return response()->json($systemTime);
+            return response()->json(
+                [
+                    'data' => $systemTime,
+                    'status_AM' => $timeKeeping->status_am,
+                    'status_PM' => $timeKeeping->status_pm
+                ]
+            );
         } else {
-            return response()->json([]);
+            $dayOfWeek = Carbon::now()->dayOfWeek;
+            if($dayOfWeek == 5 || $dayOfWeek == 6){
+                $status_AM = 2;
+                $status_PM = 2;
+            } else {
+                $status_AM = 0;
+                $status_PM = 0;
+            }
+            return response()->json([
+                'status_AM' => $status_AM,
+                'status_PM' => $status_PM,
+            ]);
         }
     }
     /**

@@ -359,14 +359,8 @@ const custom_status_css = function (status_AM, status_PM){
 }
 function cellStyle({rowIndex, columnIndex}){
   if(!only_show.value && columnIndex === 2){
-    if(dataByMonth.value[rowIndex].dayOfWeek === 'Sunday' || dataByMonth.value[rowIndex].dayOfWeek === 'Saturday'){
-      return custom_status_css(2, 2)
-    }
     return custom_status_css(dataByMonth.value[rowIndex].status_AM, dataByMonth.value[rowIndex].status_PM)
   } else if(columnIndex === 2){
-    if(dataDisplay.value[rowIndex].dayOfWeek === 'Sunday' || dataDisplay.value[rowIndex].dayOfWeek === 'Saturday'){
-      return custom_status_css(2, 2)
-    }
     return custom_status_css(dataDisplay.value[rowIndex].status_AM, dataDisplay.value[rowIndex].status_PM)
   }
 

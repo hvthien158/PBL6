@@ -4,8 +4,10 @@ namespace App\Http\Resources;
 
 use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 class UserResource extends JsonResource
 {
@@ -26,6 +28,27 @@ class UserResource extends JsonResource
         } else {
             $avatar = 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg';
         }
+
+        $now = Carbon::now()->format('Y-m-d');
+        $dayOfWeek = Carbon::now()->dayOfWeek;
+
+        $status = DB::table('time_keepings')
+            ->where('user_id', $this->id)
+            ->whereDate('_date', '=', $now)
+            ->first();
+        if($status){
+            $status_AM = $status->status_am;
+            $status_PM = $status->status_pm;
+        } else {
+            if($dayOfWeek == 5 || $dayOfWeek == 6){
+                $status_AM = 2;
+                $status_PM = 2;
+            } else {
+                $status_AM = 0;
+                $status_PM = 0;
+            }
+        }
+
         return [
             'id' => $this->id,
             'name'=> $this->name,
@@ -37,7 +60,9 @@ class UserResource extends JsonResource
             'phone_number' => $this->phone_number ?: 'none',
             'salary' => '$'.$this->salary ?: 'none',
             'position' => $this->position ?: 'none',
-            'department' => new DepartmentResource($this->department),  
+            'department' => new DepartmentResource($this->department),
+            'status_AM' => $status_AM,
+            'status_PM' => $status_PM,
         ];
     }
 }

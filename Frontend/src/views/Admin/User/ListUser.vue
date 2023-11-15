@@ -95,7 +95,6 @@ main {
 
 .user {
   width: 80vw;
-  margin-top: -40px;
   display: flex;
   flex-direction: column;
   align-items: center;
