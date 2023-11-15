@@ -24,8 +24,8 @@ class UpdateDepartmentRequest extends FormRequest
         return [
             'departmentName' => ['required', 'string', new NameDepartmentUpdateRule],
             'address'=> 'required|string',
-            'email' =>'required|email',
-            'phoneNumber' => 'required|string'
+            'email' =>'nullable|email',
+            'phoneNumber' => 'nullable|string'
         ];
     }
 }

@@ -14,7 +14,6 @@
             New
           </el-button>
         </div>
-        <div>
           <el-input v-model="dataSearch.name" placeholder="Search by name" />
           <el-input v-model="dataSearch.address" placeholder="Search by address" />
           <el-input v-model="dataSearch.email" placeholder="Search by email" />
@@ -38,7 +37,6 @@
             </el-select>
           </el-form-item>
         </div>
-      </div>
       <el-table :data="data" height="59vh" style="width: 100%">
         <el-table-column prop="id" label="ID" width="50" />
         <el-table-column prop="name" label="Name" width="180" />
@@ -52,7 +50,7 @@
         <el-table-column prop="DOB" label="Date of birth" width="120" />
         <el-table-column prop="phone_number" label="Phone number" width="120" />
         <el-table-column prop="position" label="Position" width="120" />
-        <el-table-column prop="salary" label="Salary" width="120" />
+        <el-table-column prop='salary' label="Salary" width="120" />
         <el-table-column prop="department.name" label="Department" width="200" />
         <el-table-column prop="role" label="Role" width="100" />
         <el-table-column label="History" width="100">
@@ -63,7 +61,7 @@
         <el-table-column fixed="right" label="Operations" width="120">
           <template #default="scope">
             <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
-            <el-button v-if="user.id != scope.row.id" link type="danger"
+            <el-button v-if="scope.row.role != 'admin' " link type="danger"
               @click="handleDelete(scope.row.id)">Delete</el-button>
           </template>
         </el-table-column>
@@ -175,27 +173,6 @@ const operation_mode = ref('create')
 const userID_update = ref(0)
 const department = ref()
 const confirm_box = ref(false)
-<<<<<<< Frontend/src/views/Admin/User/ListUser.vue
-const search = ref('')
-
-const filterTableData = computed(() =>
-    data.value.filter(
-        (data) =>
-            !search.value ||
-            data.name.toLowerCase().includes(search.value.toLowerCase())
-    )
-)
-
-onMounted(() => {
-  if (user.role !== "admin") {
-    router.push({ path: "/" });
-  } else {
-    if (route.params.id) {
-      userDepartment(route.params.id);
-    } else {
-      displayUser();
-    }
-=======
 const totalPage = ref(0)
 const debounceSearch = ref(null);
 let currentPage = ref(1);
@@ -216,7 +193,6 @@ const role = [
   {
     name: "Admin",
     value: "admin",
->>>>>>> Frontend/src/views/Admin/User/ListUser.vue
   }
 ];
 const position = [
@@ -338,6 +314,6 @@ const previousPage = () => {
   }
 };
 function handleViewHistory(id) {
-  router.push({ path: `/admin/list-timekeeping/${id}` })
+  router.push({ path: `/admin/schedule/${id}` })
 }
 </script>

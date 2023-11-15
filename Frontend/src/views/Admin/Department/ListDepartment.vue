@@ -19,9 +19,15 @@
         <el-input v-model="dataSearch.address" placeholder="Search by address" />
         <el-input v-model="dataSearch.email" placeholder="Search by email" />
         <el-input v-model="dataSearch.phoneNumber" placeholder="Search by phone number" />
-        <el-input-number v-model="dataSearch.minStaff" controls-position="right" :min="0" placeholder="Min staff"/>
-        <el-input-number v-model="dataSearch.maxStaff" controls-position="right" :min="dataSearch.minStaff" placeholder="Max staff"/>
-      </div>
+        <div class="input-number">
+          <el-text>Min Staff</el-text>
+          <el-input-number v-model="dataSearch.minStaff" controls-position="right" :min="0"></el-input-number>
+        </div>
+        <div class="input-number">
+          <el-text>Max Staff</el-text>
+          <el-input-number v-model="dataSearch.maxStaff" controls-position="right" :min="dataSearch.minStaff"></el-input-number>
+        </div>
+        </div>
       <el-table :data="department" height="58vh" style="width: 100%;" border stripe>
         <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
         <el-table-column prop="name" label="Department name" min-width="180"></el-table-column>
@@ -46,7 +52,7 @@
               @click="messages('error', 'There are no employees at this department')">View
               Staff</el-button>
             <el-button class="el-button--text" v-else
-              @click="router.push({ path: `/admin/list-user/`, query: {department: scope.row.id} })">View
+              @click="router.push({ path: `/admin/list-user/`, query: { department: scope.row.id } })">View
               Staff</el-button>
           </template>
         </el-table-column>
@@ -94,6 +100,35 @@ main {
   position: absolute;
   bottom: 0%;
 }
+.title-table .input-number{
+  display: flex;
+  justify-content: flex-end;
+}
+.input-number {
+  width: 12%; 
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-number .el-input-number {
+  width: 40%;
+  background-color:#262727 ;
+}
+
+.input-number .el-text {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 10px;
+  white-space: nowrap;
+  border-radius: 4px 0 0 4px;
+  background-color: #262727;
+  color: #909399;
+  box-sizing: border-box;
+}
 
 .el-form {
   display: flex;
@@ -113,10 +148,6 @@ label {
 .title-table .el-input {
   margin-left: 10px;
   width: 15%;
-}
-
-.el-input-number {
-  margin-left: 10px;
 }
 
 .pagination {
