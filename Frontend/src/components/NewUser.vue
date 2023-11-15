@@ -243,7 +243,7 @@ function loadUser() {
       form.address = response.data.data[0].address === 'none' ? '' : response.data.data[0].address;
       form.phoneNumber = response.data.data[0].phone_number === 'none' ? '' : response.data.data[0].phone_number;
       form.DOB = response.data.data[0].DOB === 'none' ? '' : response.data.data[0].DOB;
-      form.salary = response.data.data[0].salary === 'none' ? '' : response.data.data[0].salary;
+      form.salary = response.data.data[0].salary === 'none' ? '' : response.data.data[0].salary.split('$')[1];
       form.position = response.data.data[0].position === 'none' ? '' : response.data.data[0].position;
       form.role = response.data.data[0].role;
       form.department = response.data.data[0].department.id;

@@ -35,7 +35,7 @@ class UserResource extends JsonResource
             'DOB' => $DOB_format,
             'role' => $this->role ?: 'user',
             'phone_number' => $this->phone_number ?: 'none',
-            'salary' => $this->salary ?: 'none',
+            'salary' => '$'.$this->salary ?: 'none',
             'position' => $this->position ?: 'none',
             'department' => new DepartmentResource($this->department),  
         ];
