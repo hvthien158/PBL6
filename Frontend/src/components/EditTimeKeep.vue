@@ -37,8 +37,8 @@
         <ButtonLoading @click="updateTimeKeep" style="font-size: 15px; margin-top: 20px" size="large" type="warning" round>Save</ButtonLoading>
       </div>
     </el-card>
-    <div style="margin-top: -10vh; margin-left: -10vw">
-      <Clock style="scale: 0.3"></Clock>
+    <div style="margin-top: -5vh; margin-left: -7vw">
+      <Clock style="scale: 0.5"></Clock>
     </div>
   </div>
 </template>

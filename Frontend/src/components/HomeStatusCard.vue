@@ -80,11 +80,11 @@
 }
 
 .bg-green{
-  background-color: rgb(83,245,127);
+  background-color: rgb(252,131,82);
 }
 
 .bg-purple{
-  background-color: rgba(148,0,211,0.61);
+  background-color: rgba(0,120,248,0.57);
 }
 
 .bg-gray{
