@@ -41,7 +41,7 @@ class AdminController extends Controller
             $user = User::orderBy('id', 'asc');
             if($request->name != '') {
                 $user->whereRaw('LOWER(name) like ?' , ['%'.$request->name.'%']);
-            } 
+            }
             if($request->email != '') {
                 $user->whereRaw('LOWER(email) like ?' , ['%'.$request->email.'%']);
             }
@@ -50,7 +50,7 @@ class AdminController extends Controller
             }
             if($request->phoneNumber != '') {
                 $user->whereRaw('LOWER(phone_number) like ?' , ['%'.$request->phoneNumber.'%']);
-            } 
+            }
             if($request->position != '') {
                 $user->where('position', $request->position);
             }
@@ -69,9 +69,9 @@ class AdminController extends Controller
             return response()->json($response);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
-
         }
     }
+
     /**
      * @param CreateUserRequest $request
      *

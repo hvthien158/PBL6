@@ -83,13 +83,9 @@
 
 small {
   color: red;
-  margin-top: 0.1rem;
-  margin-left: 16px;
   font-size: 14px;
-  color: red;
   margin-top: 0.1rem;
-  margin-left: 0 px;
-  font-size: 14px;
+  margin-left: 0;
 }
 
 .form-item {
