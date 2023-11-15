@@ -350,7 +350,7 @@ function rowStyle ({ row }){
 }
 
 const custom_status_css = function (status_AM, status_PM){
-  const color = ['rgb(83,245,127)', 'rgba(148,0,211,0.61)', '#ccc']
+  const color = ['rgb(252,131,82)', 'rgba(0,120,248,0.57)', '#ccc']
   return {
     'background': 'linear-gradient(to right, ' + color[status_AM] + ' 49%, rgba(0, 0, 0, 0) 49%), linear-gradient(to right, white 50%, ' + color[status_PM] + ' 1%)',
     'padding': '16px 30px',

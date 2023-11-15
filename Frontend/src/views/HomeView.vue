@@ -12,7 +12,7 @@
       </div>
       <div class="checkin-container">
         <div class="time">
-          <Clock style="scale: 0.6"></Clock>
+          <Clock style="scale: 0.9"></Clock>
         </div>
         <div class="date">
           <span class="date-span">{{ currentDate }}</span>
