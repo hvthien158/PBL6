@@ -229,17 +229,23 @@ const isPhoneNumber = (phoneNumber) => {
 function validate() {
     if (form.name === '') {
         checkLanding.checkName = 'Please enter name'
-    } if (form.address === '') {
+    } else{
+        checkLanding.checkName = ''
+    } 
+    if (form.address === '') {
         checkLanding.checkAddress = 'Please enter address'
+    } else {
+        checkLanding.checkAddress = ''
     }
-    if (form.email === '') {
-        checkLanding.checkEmail = 'Please enter email'
-    } if (!isEmail(form.email)) {
+    if (!isEmail(form.email) && form.email != '') {
         checkLanding.checkEmail = 'Invalid email'
-    } if (form.phoneNumber === '') {
-        checkLanding.checkPhoneNumber = 'Please enter phone number'
-    } if (isPhoneNumber(form.isPhoneNumber)) {
+    } else {
+        checkLanding.checkEmail = ''
+    } 
+    if (!isPhoneNumber(form.phoneNumber) && form.phoneNumber != '') {
         checkLanding.checkPhoneNumber = 'Invalid phone number'
+    } else {
+        checkLanding.checkPhoneNumber = ''
     }
     if (checkLanding.checkName == '' && checkLanding.checkAddress == '' && checkLanding.checkPhoneNumber == '' && checkLanding.checkEmail == '') {
         return true;

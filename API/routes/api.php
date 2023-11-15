@@ -64,6 +64,7 @@ Route::get('department', [DepartmentController::class,'index']);
 Route::get('department/{id}', [DepartmentController::class,'index']);
 
 //Admin
+Route::post('list-user/{id}', [AdminController::class,'listUser']);
 Route::post('create-user', [AdminController::class,'createUser']);
 Route::put('update-user/{id}', [AdminController::class,'updateUser']);
 Route::delete('delete-user/{id}', [AdminController::class,'deleteUser']);
