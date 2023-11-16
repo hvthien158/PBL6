@@ -80,7 +80,7 @@
 }
 
 .bg-green{
-  background-color: rgb(252,131,82);
+  background-color: #04fc43;
 }
 
 .bg-purple{

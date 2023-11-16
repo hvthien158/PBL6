@@ -249,7 +249,6 @@ const displayDepartment = async () => {
         headers: { Authorization: `Bearer ${user.token}` }
       })
       .then(function (response) {
-        console.log(response);
         department.value = response.data.department;
         totalPage.value = response.data.totalPage;
       });
