@@ -69,6 +69,7 @@ import axios from "axios";
 import * as XLSX from 'xlsx';
 import * as Papa from 'papaparse'
 import FileSaver from 'file-saver';
+import router from "../router";
 import { useUserStore } from "../stores/user";
 import { useAlertStore } from "../stores/alert";
 const prop = defineProps({
@@ -91,10 +92,14 @@ const form = reactive({
 })
 const data = ref();
 const exportExcel = async () => {
+    let api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${prop.userId}`;
+    if (router.currentRoute.value.fullPath === '/schedule') {
+        api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${user.id}`
+    }
     if (form.fromMonth != '' && form.toMonth != '') {
         try {
             console.log(formatToPost(form.fromMonth, 'start'), formatToPost(form.toMonth, 'end'));
-            await axios.get(`http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${prop.userId}`, {
+            await axios.get(api, {
                 headers: { Authorization: `Bearer ${user.token}` }
             }).then(function (response) {
                 data.value = response.data.data
