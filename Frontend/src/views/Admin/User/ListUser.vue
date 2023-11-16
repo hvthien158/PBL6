@@ -14,29 +14,29 @@
             New
           </el-button>
         </div>
-          <el-input v-model="dataSearch.name" placeholder="Search by name" />
-          <el-input v-model="dataSearch.address" placeholder="Search by address" />
-          <el-input v-model="dataSearch.email" placeholder="Search by email" />
-          <el-input v-model="dataSearch.phoneNumber" placeholder="Search by phone number" />
-          <el-form-item>
-            <el-select v-model="dataSearch.department" type="text">
-              <el-option label="Select Department" :value="0"></el-option>
-              <el-option v-for="item in department" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-select v-model="dataSearch.position" type="text">
-              <el-option label="Select Position" value="none"></el-option>
-              <el-option v-for="item in position" :label="item.name" :value="item.value"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-select v-model="dataSearch.role" type="text">
-              <el-option label="Select role" value="none"></el-option>
-              <el-option v-for="item in role" :label="item.name" :value="item.value"></el-option>
-            </el-select>
-          </el-form-item>
-        </div>
+        <el-input v-model="dataSearch.name" placeholder="Search by name" />
+        <el-input v-model="dataSearch.address" placeholder="Search by address" />
+        <el-input v-model="dataSearch.email" placeholder="Search by email" />
+        <el-input v-model="dataSearch.phoneNumber" placeholder="Search by phone number" />
+        <el-form-item>
+          <el-select v-model="dataSearch.department" type="text">
+            <el-option label="Select Department" :value="0"></el-option>
+            <el-option v-for="item in department" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="dataSearch.position" type="text">
+            <el-option label="Select Position" value="none"></el-option>
+            <el-option v-for="item in position" :label="item.name" :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="dataSearch.role" type="text">
+            <el-option label="Select role" value="none"></el-option>
+            <el-option v-for="item in role" :label="item.name" :value="item.value"></el-option>
+          </el-select>
+        </el-form-item>
+      </div>
       <el-table :data="data" height="59vh" style="width: 100%">
         <el-table-column prop="id" label="ID" width="50" />
         <el-table-column prop="name" label="Name" width="180" />
@@ -61,11 +61,14 @@
         <el-table-column fixed="right" label="Operations" width="120">
           <template #default="scope">
             <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
-            <el-button v-if="scope.row.role != 'admin' " link type="danger"
+            <el-button v-if="scope.row.role != 'admin'" link type="danger"
               @click="handleDelete(scope.row.id)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <div style="text-align: right; width: 100%">
+        <span style="padding-right: 12px; color: #8c8c8c">{{ tableDescription }}</span>
+      </div>
       <div class="pagination">
         <el-button @click="previousPage" :disabled="currentPage === 1">
           Previous
@@ -170,6 +173,7 @@ const route = useRoute();
 const visible_mode = ref(false)
 const operation_mode = ref('create')
 const userID_update = ref(0)
+const tableDescription = ref()
 const department = ref()
 const confirm_box = ref(false)
 const totalPage = ref(0)
@@ -232,9 +236,10 @@ const displayUser = async () => {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then(function (response) {
-        console.log(response)
         data.value = response.data.user;
-        totalPage.value = (response.data.totalPage == 0) ? 1 : response.data.totalPage
+        totalPage.value = Math.ceil(response.data.totalUser / 10) == 0 ? 1 : Math.ceil(response.data.totalUser / 10)
+        let tail = (response.data.totalUser < currentPage.value * 10) ? response.data.totalUser : currentPage.value * 10
+        tableDescription.value = ((currentPage.value - 1) * 10 + 1) + '..' + tail + ' of ' + response.data.totalUser + ' users'
       });
   } catch (e) {
     console.log(e);

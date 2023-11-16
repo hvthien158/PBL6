@@ -60,10 +60,10 @@ class AdminController extends Controller
             if($request->department != '') {
                 $user->where('department_id', $request->department);
             }
-            $totalPage = ceil($user->count() / $itemsPerPage);
+            $totalUser = $user->count();
             $user = $user->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
             $response = [
-                'totalPage' => $totalPage,
+                'totalUser' => $totalUser,
                 'user' => UserResource::collection($user)
             ];
             return response()->json($response);
@@ -178,10 +178,10 @@ class AdminController extends Controller
             if ($request->maxStaff != 0) {
                 $department->has('users', '<=', $request->maxStaff);
             }
-            $totalPage = ceil($department->count() / $itemsPerPage);
+            $totalDepartment = $department->count();
             $departments = $department->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
             $response = [
-                'totalPage' => $totalPage,
+                'totalDepartment' => $totalDepartment,
                 'department' => DepartmentResource::collection($departments),
             ];
             return response()->json($response);
