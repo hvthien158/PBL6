@@ -25,9 +25,10 @@
         </div>
         <div class="input-number">
           <el-text>Max Staff</el-text>
-          <el-input-number v-model="dataSearch.maxStaff" controls-position="right" :min="dataSearch.minStaff"></el-input-number>
+          <el-input-number v-model="dataSearch.maxStaff" controls-position="right"
+            :min="dataSearch.minStaff"></el-input-number>
         </div>
-        </div>
+      </div>
       <el-table :data="department" height="58vh" style="width: 100%;" border stripe>
         <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
         <el-table-column prop="name" label="Department name" min-width="180"></el-table-column>
@@ -63,6 +64,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <div style="text-align: right; width: 100%">
+        <span style="padding-right: 12px; color: #8c8c8c">{{ tableDescription }}</span>
+      </div>
       <div class="pagination">
         <el-button @click="previousPage" :disabled="currentPage === 1">
           Previous
@@ -77,11 +81,9 @@
           :departmentId="departmentId" :visible="visibleMode" v-if="visibleMode"></NewDepartment>
       </div>
       <div class="form-department">
-        <User @updateData="displayDepartment" @invisible="managerMode = false" :userId="userId" :visible="managerMode"
-          v-if="managerMode"></User>
+        <User @updateData="displayDepartment" @invisible="managerMode = false" :userId="userId" v-if="managerMode"></User>
       </div>
     </div>
-
     <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this department?" @confirm="deleteDepartment()"
       @cancel="confirmBox = false">
     </ConfirmBox>
@@ -100,12 +102,14 @@ main {
   position: absolute;
   bottom: 0%;
 }
-.title-table .input-number{
+
+.title-table .input-number {
   display: flex;
   justify-content: flex-end;
 }
+
 .input-number {
-  width: 12%; 
+  width: 12%;
   border-right: 0;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
@@ -113,7 +117,7 @@ main {
 
 .input-number .el-input-number {
   width: 40%;
-  background-color:#262727 ;
+  background-color: #262727;
 }
 
 .input-number .el-text {
@@ -216,6 +220,7 @@ const deleteId = ref(0)
 const totalPage = ref(0)
 const visibleMode = ref(false)
 const operationMode = ref('create')
+const tableDescription = ref()
 const confirmBox = ref(false)
 const debounceSearch = ref(null);
 const userId = ref(null)
@@ -250,7 +255,9 @@ const displayDepartment = async () => {
       })
       .then(function (response) {
         department.value = response.data.department;
-        totalPage.value = (response.data.totalPage == 0) ? 1 : response.data.totalPage
+        totalPage.value = Math.ceil(response.data.totalDepartment / 10) == 0 ? 1 : Math.ceil(response.data.totalDepartment / 10)
+        let tail = (response.data.totalDepartment < currentPage.value * 10) ? response.data.totalDepartment : currentPage.value * 10
+        tableDescription.value = ((currentPage.value - 1) * 10 + 1) + '..' + tail + ' of ' + response.data.totalDepartment + ' departments'
       });
   } catch (e) {
     console.log(e);
