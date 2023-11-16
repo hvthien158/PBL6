@@ -262,7 +262,7 @@ const getTimeKeeping = async () => {
     console.log(e);
   }
   currentDate.value = getCurrentDate();
-};
+}
 
 const handleCheckIn = async () => {
   try {

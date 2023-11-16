@@ -234,7 +234,7 @@ const displayUser = async () => {
       .then(function (response) {
         console.log(response)
         data.value = response.data.user;
-        totalPage.value = response.data.totalPage
+        totalPage.value = (response.data.totalPage == 0) ? 1 : response.data.totalPage
       });
   } catch (e) {
     console.log(e);

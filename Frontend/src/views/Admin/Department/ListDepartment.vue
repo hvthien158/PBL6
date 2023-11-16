@@ -250,7 +250,7 @@ const displayDepartment = async () => {
       })
       .then(function (response) {
         department.value = response.data.department;
-        totalPage.value = response.data.totalPage;
+        totalPage.value = (response.data.totalPage == 0) ? 1 : response.data.totalPage
       });
   } catch (e) {
     console.log(e);
