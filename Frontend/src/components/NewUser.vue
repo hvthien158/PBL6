@@ -1,5 +1,6 @@
 <template>
-  <el-dialog v-model="prop.visible" :show-close="false" min-width="30%">
+  <el-dialog v-model="prop.visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" style = "margin-top: 9vh"
+        @keyup.esc="$emit('invisible')" min-width="30%">
     <template #header>
       <div class="my-header">
         <h4 v-if="prop.mode === 'create'">Create User</h4>

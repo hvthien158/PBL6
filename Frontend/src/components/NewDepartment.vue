@@ -1,5 +1,6 @@
 <template>
-    <el-dialog v-model="prop.visible" :show-close="false" width="30%" >
+    <el-dialog v-model="prop.visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false"
+        @keyup.esc="$emit('invisible')"  width="30%">
         <template #header>
             <div class="my-header">
                 <h4 v-if="prop.mode === 'create'">Create Department</h4>
@@ -35,7 +36,7 @@
                 <small>{{ checkLanding.checkPhoneNumber }}</small>
             </el-form-item>
             <el-form-item label="Department Manager" :label-width="formLabelWidth">
-                <el-select v-model="form.manager" type="text" >
+                <el-select v-model="form.manager" type="text">
                     <el-option label="Select Manager" :value="0"></el-option>
                     <el-option v-for="item in dataUser" :label="item.name" :value="item.id"></el-option>
                 </el-select>
@@ -147,6 +148,7 @@ const prop = defineProps({
         type: Boolean
     }
 })
+
 const formLabelWidth = "150px";
 const user = useUserStore().user
 const alertStore = useAlertStore()
@@ -229,9 +231,9 @@ const isPhoneNumber = (phoneNumber) => {
 function validate() {
     if (form.name === '') {
         checkLanding.checkName = 'Please enter name'
-    } else{
+    } else {
         checkLanding.checkName = ''
-    } 
+    }
     if (form.address === '') {
         checkLanding.checkAddress = 'Please enter address'
     } else {
@@ -241,7 +243,7 @@ function validate() {
         checkLanding.checkEmail = 'Invalid email'
     } else {
         checkLanding.checkEmail = ''
-    } 
+    }
     if (!isPhoneNumber(form.phoneNumber) && form.phoneNumber != '') {
         checkLanding.checkPhoneNumber = 'Invalid phone number'
     } else {
@@ -264,7 +266,7 @@ function createDepartment() {
                 address: form.address,
                 email: form.email,
                 phoneNumber: form.phoneNumber,
-                manager : manager
+                manager: manager
             },
             {
                 headers: { Authorization: `Bearer ${user.token}` },
