@@ -127,7 +127,7 @@ class TimeKeepingController extends Controller
             );
         } else {
             $dayOfWeek = Carbon::now()->dayOfWeek;
-            if($dayOfWeek == 5 || $dayOfWeek == 6){
+            if ($dayOfWeek == 5 || $dayOfWeek == 6) {
                 $status_AM = 2;
                 $status_PM = 2;
             } else {
@@ -178,7 +178,28 @@ class TimeKeepingController extends Controller
             return TimeKeepingResource::collection($timeKeeping);
         }
     }
-
+    /**
+     * @param mixed $userId
+     * @param mixed $fromMonth
+     * @param mixed $toMonth
+     * 
+     * @return object
+     */
+    function getTimeKeepingExport($fromMonth, $toMonth, $userId)
+    {
+        if ($userId && $fromMonth && $toMonth) {
+            try {
+                $timekeeping = TimeKeeping::where('user_id', $userId)->whereBetween('_date', [$fromMonth, $toMonth])->get();
+                if ($timekeeping) {
+                    return TimeKeepingResource::collection($timekeeping);
+                } else {
+                    return response()->json(['message' => 'Time Keeping in this time not exist'], 400);
+                }
+            } catch (\Exception $e) {
+                return response()->json(['message' => $e->getMessage()], 400);
+            }
+        }
+    }
     /**
      * @param TimeRequest $request
      *

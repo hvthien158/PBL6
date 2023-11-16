@@ -8,6 +8,7 @@ use App\Http\Controllers\TimeKeepingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use App\Models\Department;
+use App\Models\TimeKeeping;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
@@ -54,7 +55,7 @@ Route::get('get-list-timekeeping/{from}/{to}/{user_id}', [TimeKeepingController:
 Route::post('search-by-around-time', [TimeKeepingController::class,'searchByAroundTime']);
 Route::post('search-by-month-year', [TimeKeepingController::class,'searchByMonth']);
 Route::post('/timekeeping/update', [TimeKeepingController::class,'updateTimeKeeping']);
-
+Route::get('get-timekeeping-export/{fromMonth}/{toMonth}/{userId}', [TimeKeepingController::class, 'getTimeKeepingExport']);
 //User
 Route::get('user/{id}', [UserController::class, 'user']);
 Route::get('user/', [UserController::class, 'user']);

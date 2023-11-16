@@ -128,7 +128,7 @@ const displayUser = async () => {
       })
       .then(function (response) {
         data.value = response.data.user
-        totalPage.value = (response.data.totalPage == 0) ? 1 : response.data.totalPage
+        totalPage.value = Math.ceil(response.data.totalUser / 8) == 0 ? 1 : Math.ceil(response.data.totalUser / 8)
       });
   } catch (e) {
     console.log(e);
