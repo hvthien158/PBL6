@@ -237,9 +237,9 @@ const displayUser = async () => {
       })
       .then(function (response) {
         data.value = response.data.user;
-        totalPage.value = Math.ceil(response.data.totalUser / 10) == 0 ? 1 : Math.ceil(response.data.totalUser / 10)
-        let tail = (response.data.totalUser < currentPage.value * 10) ? response.data.totalUser : currentPage.value * 10
-        tableDescription.value = ((currentPage.value - 1) * 10 + 1) + '..' + tail + ' of ' + response.data.totalUser + ' users'
+        totalPage.value = Math.ceil(response.data.totalUser / 8) == 0 ? 1 : Math.ceil(response.data.totalUser / 8)
+        let tail = (response.data.totalUser < currentPage.value * 8) ? response.data.totalUser : currentPage.value * 8
+        tableDescription.value = ((currentPage.value - 1) * 8 + 1) + '..' + tail + ' of ' + response.data.totalUser + ' users'
       });
   } catch (e) {
     console.log(e);
