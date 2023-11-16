@@ -45,8 +45,8 @@
           </el-table-column>
         </el-table>
         <div class="form-export">
-          <ExportExcel @invisible="visibleMode = false" :mode="operationMode"
-            :userId="user_id" v-if="visibleMode"></ExportExcel>
+          <ExportData @invisible="visibleMode = false" :mode="operationMode"
+            :userId="user_id" v-if="visibleMode"></ExportData>
         </div>
         <div class="pagination">
           <el-button type="info" @click="previousMonth">
@@ -118,7 +118,7 @@
 
 <script setup>
 import EditTimeKeep from "../components/EditTimeKeep.vue"
-import ExportExcel from "../components/ExportExcel.vue"
+import ExportData from "../components/ExportData.vue"
 import { saveAs } from "file-saver";
 import { read, utils, write } from "xlsx";
 import { ref, reactive, onMounted, defineProps, computed, watchEffect, watch } from "vue";
