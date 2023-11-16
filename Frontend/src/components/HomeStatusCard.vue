@@ -74,8 +74,8 @@
   align-items: center;
 }
 
-.bg-green {
-  background-color: rgb(252, 131, 82);
+.bg-green{
+  background-color: #04fc43;
 }
 
 .bg-purple {

@@ -254,7 +254,6 @@ const displayDepartment = async () => {
         headers: { Authorization: `Bearer ${user.token}` }
       })
       .then(function (response) {
-        console.log(response);
         department.value = response.data.department;
         totalPage.value = Math.ceil(response.data.totalDepartment / 10) == 0 ? 1 : Math.ceil(response.data.totalDepartment / 10)
         let tail = (response.data.totalDepartment < currentPage.value * 10) ? response.data.totalDepartment : currentPage.value * 10

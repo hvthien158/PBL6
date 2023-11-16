@@ -3,7 +3,6 @@
     <div class="home-container">
       <div>
         <HomeTimeKeepCard
-            style="height: 100%"
             :date="moment().format('YYYY-MM-DD')"
             :user_id="user.id"
             :status_AM_prop="today.status_AM"

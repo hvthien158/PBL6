@@ -26,6 +26,7 @@
         </div>
         <div>
           <el-select v-model="dataSearch.department" placeholder="Select department">
+            <el-option label="Select Department" :value="0"></el-option>
             <el-option v-for="item in department" :key="item.id" :label="item.name" :value="item.id"
                        :disabled="item.disabled"/>
           </el-select>
@@ -205,7 +206,7 @@ let currentPage = ref(1);
 let totalPage = ref(1);
 let dataSearch = reactive({
   name: '',
-  department: ''
+  department: 0
 })
 const filter_value = ref([])
 const monthDisplay = ref(moment().month())
@@ -247,7 +248,7 @@ function previousMonth() {
 
 function updateTableDescription() {
   let tail = (user_quantity.value < currentPage.value * 10) ? user_quantity.value : currentPage.value * 10
-  table_description.value = (currentPage.value - 1) * 10 + '..' + tail + ' of ' + user_quantity.value + ' users'
+  table_description.value = ((currentPage.value - 1) * 10 + 1) + '..' + tail + ' of ' + user_quantity.value + ' users'
 }
 
 onMounted(() => {

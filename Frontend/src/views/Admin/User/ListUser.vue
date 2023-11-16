@@ -61,7 +61,7 @@
         <el-table-column fixed="right" label="Operations" width="120">
           <template #default="scope">
             <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
-            <el-button v-if="scope.row.role != 'admin'" link type="danger"
+            <el-button :disabled="scope.row.role === 'admin' " link type="danger"
               @click="handleDelete(scope.row.id)">Delete</el-button>
           </template>
         </el-table-column>
