@@ -149,7 +149,7 @@ const displayShift = async () => {
         })
       .then(function (response) {
         shift.value = response.data.shift;
-        totalPage.value = response.data.totalPage
+        totalPage.value = (response.data.totalPage == 0) ? 1 : response.data.totalPage
       });
   } catch (e) {
     console.log(e);
