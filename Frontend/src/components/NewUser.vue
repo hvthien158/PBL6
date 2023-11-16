@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="prop.visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" style = "margin-top: 9vh"
+  <el-dialog v-model="prop.visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" 
         @keyup.esc="$emit('invisible')" min-width="30%">
     <template #header>
       <div class="my-header">

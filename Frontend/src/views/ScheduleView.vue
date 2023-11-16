@@ -2,6 +2,7 @@
   <div class="timekeeping-management">
     <EditTimeKeep
         style="height: 100%"
+        :user_id="user_id"
         :date="today.date"
         :day-of-week="today.dayOfWeek"
         :checkin="today.timeCheckIn"
@@ -151,6 +152,7 @@ const today = ref({
 })
 const first_load = ref(true)
 const admin_view = ref('')
+const user_id = ref(user.id)
 
 const getListTimeKeeping = async (from, to) => {
   if(router.currentRoute.value.fullPath === '/schedule'){
@@ -175,6 +177,7 @@ const getListTimeKeeping = async (from, to) => {
     }
   } else {
     let userID = router.currentRoute.value.params.userID
+    user_id.value = userID
     try {
       await axios
           .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to + '/' + userID, {
@@ -347,7 +350,7 @@ function rowStyle ({ row }){
 }
 
 const custom_status_css = function (status_AM, status_PM){
-  const color = ['rgb(83,245,127)', 'rgba(148,0,211,0.61)', '#ccc']
+  const color = ['rgb(252,131,82)', 'rgba(0,120,248,0.57)', '#ccc']
   return {
     'background': 'linear-gradient(to right, ' + color[status_AM] + ' 49%, rgba(0, 0, 0, 0) 49%), linear-gradient(to right, white 50%, ' + color[status_PM] + ' 1%)',
     'padding': '16px 30px',
@@ -356,14 +359,8 @@ const custom_status_css = function (status_AM, status_PM){
 }
 function cellStyle({rowIndex, columnIndex}){
   if(!only_show.value && columnIndex === 2){
-    if(dataByMonth.value[rowIndex].dayOfWeek === 'Sunday' || dataByMonth.value[rowIndex].dayOfWeek === 'Saturday'){
-      return custom_status_css(2, 2)
-    }
     return custom_status_css(dataByMonth.value[rowIndex].status_AM, dataByMonth.value[rowIndex].status_PM)
   } else if(columnIndex === 2){
-    if(dataDisplay.value[rowIndex].dayOfWeek === 'Sunday' || dataDisplay.value[rowIndex].dayOfWeek === 'Saturday'){
-      return custom_status_css(2, 2)
-    }
     return custom_status_css(dataDisplay.value[rowIndex].status_AM, dataDisplay.value[rowIndex].status_PM)
   }
 

@@ -1,9 +1,18 @@
 <template>
   <main>
-    <div class="container">
+    <div class="home-container">
+      <div>
+        <HomeTimeKeepCard
+            style="height: 100%"
+            :date="moment().format('YYYY-MM-DD')"
+            :user_id="user.id"
+            :status_AM_prop="today.status_AM"
+            :status_PM_prop="today.status_PM"
+        ></HomeTimeKeepCard>
+      </div>
       <div class="checkin-container">
         <div class="time">
-          <Clock></Clock>
+          <Clock style="scale: 0.9"></Clock>
         </div>
         <div class="date">
           <span class="date-span">{{ currentDate }}</span>
@@ -28,19 +37,22 @@
         </div>
         <button @click="router.push({name: 'schedule'})" class="active-button no-underline" style="margin-top: 20px; height: 40px">History</button>
       </div>
+      <div>
+        <HomeStatusCard></HomeStatusCard>
+      </div>
     </div>
   </main>
 </template>
 <style scoped>
 main {
-  max-width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.container {
+.home-container {
+  width: 90vw;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 .checkin-container {
@@ -66,6 +78,7 @@ main {
 .time {
   display: flex;
   align-items: center;
+  height: 30vh;
 }
 
 .time img {
@@ -161,6 +174,9 @@ import {useUserStore} from "../stores/user";
 import moment from "moment";
 import schedule from "../assets/image/schedule.png";
 import Clock from "../components/Clock.vue";
+import HomeStatusCard from "../components/HomeStatusCard.vue";
+import EditTimeKeep from "../components/EditTimeKeep.vue";
+import HomeTimeKeepCard from "../components/HomeTimeKeepCard.vue";
 
 const user = useUserStore().user
 if (user.token === '') {
@@ -170,6 +186,10 @@ const checkin = ref(false)
 const checkout = ref(false)
 const currentDate = ref(getCurrentDate());
 const currentTime = ref(getCurrentTime());
+const today = ref({
+  status_AM: 0,
+  status_PM: 0,
+})
 
 function getCurrentDate() {
   const now = new Date();
@@ -218,9 +238,11 @@ const getTimeKeeping = async () => {
         },
       })
       .then(function (response) {
-        if (response.status === 200) {
-          if (response.data.time_check_in && response.data.time_check_in !== '00:00:00') {
-            if (response.data.time_check_out && response.data.time_check_out !== '00:00:00') {
+        today.value.status_AM = response.data.status_AM
+        today.value.status_PM = response.data.status_PM
+        if(response.data.data){
+          if (response.data.data.time_check_in && response.data.data.time_check_in !== '00:00:00') {
+            if (response.data.data.time_check_out && response.data.data.time_check_out !== '00:00:00') {
               checkin.value = false;
               checkout.value = false;
             } else {
@@ -231,13 +253,16 @@ const getTimeKeeping = async () => {
             checkin.value = true;
             checkout.value = false;
           }
+        } else {
+          checkin.value = true;
+          checkout.value = false;
         }
       });
   } catch (e) {
     console.log(e);
   }
   currentDate.value = getCurrentDate();
-};
+}
 
 const handleCheckIn = async () => {
   try {
