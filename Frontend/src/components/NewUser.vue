@@ -1,5 +1,6 @@
 <template>
-  <el-dialog v-model="prop.visible" :show-close="false" min-width="30%">
+  <el-dialog v-model="prop.visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" 
+        @keyup.esc="$emit('invisible')" min-width="30%">
     <template #header>
       <div class="my-header">
         <h4 v-if="prop.mode === 'create'">Create User</h4>
@@ -83,9 +84,13 @@
 
 small {
   color: red;
-  font-size: 14px;
   margin-top: 0.1rem;
-  margin-left: 0;
+  margin-left: 16px;
+  font-size: 14px;
+  color: red;
+  margin-top: 0.1rem;
+  margin-left: 0 px;
+  font-size: 14px;
 }
 
 .form-item {

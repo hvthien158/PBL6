@@ -240,13 +240,18 @@ const getTimeKeeping = async () => {
       .then(function (response) {
         today.value.status_AM = response.data.status_AM
         today.value.status_PM = response.data.status_PM
-        if (response.data.data.time_check_in && response.data.data.time_check_in !== '00:00:00') {
-          if (response.data.data.time_check_out && response.data.data.time_check_out !== '00:00:00') {
-            checkin.value = false;
-            checkout.value = false;
+        if(response.data.data){
+          if (response.data.data.time_check_in && response.data.data.time_check_in !== '00:00:00') {
+            if (response.data.data.time_check_out && response.data.data.time_check_out !== '00:00:00') {
+              checkin.value = false;
+              checkout.value = false;
+            } else {
+              checkin.value = false;
+              checkout.value = true;
+            }
           } else {
-            checkin.value = false;
-            checkout.value = true;
+            checkin.value = true;
+            checkout.value = false;
           }
         } else {
           checkin.value = true;
@@ -257,7 +262,7 @@ const getTimeKeeping = async () => {
     console.log(e);
   }
   currentDate.value = getCurrentDate();
-};
+}
 
 const handleCheckIn = async () => {
   try {
