@@ -1,30 +1,24 @@
 <template>
+  <Calendar></Calendar>
   <div class="edit-timekeep">
-    <el-card style="border-radius: 12px" class="box-card">
-      <div class="card-content">
-        <div style="display: flex; flex-direction: column">
-          <div style="display: flex; flex-direction: column; align-items: center">
-            <span style="color: #939393">Morning</span>
-            <StatusButton @change-status="n => status_AM = n" :status_index="status_AM"></StatusButton>
-          </div>
-          <div style="display: flex; flex-direction: column; align-items: center">
-            <span style="color: #939393">Afternoon</span>
-            <StatusButton @change-status="n => status_PM = n" :status_index="status_PM"></StatusButton>
-          </div>
+    <div class="card-content">
+      <div style="display: flex; flex-direction: column">
+        <div style="display: flex; flex-direction: column; align-items: center">
+          <span>Morning</span>
+          <StatusButton @click="updateTimeKeep" @change-status="n => status_AM = n" :status_index="status_AM"></StatusButton>
         </div>
-        <div style="display: flex; justify-content: center">
-          <ButtonLoading @click="updateTimeKeep" style="font-size: 15px; margin-top: 20px" size="large" type="warning" round>Save</ButtonLoading>
+        <div style="display: flex; flex-direction: column; align-items: center">
+          <span>Afternoon</span>
+          <StatusButton @click="updateTimeKeep" @change-status="n => status_PM = n" :status_index="status_PM"></StatusButton>
         </div>
       </div>
-    </el-card>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .edit-timekeep{
-  display: flex;
-  width: 20vw;
-  flex-direction: column;
+  width: 320px;
   position: sticky !important;
   top: 10vh;
 }
@@ -46,6 +40,7 @@ import {useAlertStore} from "../stores/alert";
 import Clock from "./Clock.vue"
 import moment from "moment";
 import StatusButton from "./StatusButton.vue";
+import Calendar from "./Calendar.vue";
 
 const prop = defineProps({
   user_id: {
@@ -87,9 +82,6 @@ function updateTimeKeep(){
     headers: {Authorization: `Bearer ${user.token}`},
   }).then(() => {
     emit('update')
-    alertStore.alert = true
-    alertStore.type = 'success'
-    alertStore.msg = 'Update success'
   }).catch((e) => {
     alertStore.alert = true
     alertStore.type = 'error'

@@ -50,6 +50,7 @@ main {
 }
 
 #time{
+  padding-left: 2rem;
   display: flex;
   gap: 40px;
   color: #000;
