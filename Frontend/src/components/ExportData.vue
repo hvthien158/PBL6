@@ -158,6 +158,8 @@ const exportExcel = async () => {
                 }
             }
             XLSX.writeFile(wb, 'data.xlsx');
+            messages('success', 'Export complete')
+            emits('invisible');
         } catch (e) {
             messages('error', 'Something wrong')
             emits('invisible');
@@ -167,9 +169,13 @@ const exportExcel = async () => {
 };
 const exportCSV = () => {
     if (form.fromMonth !== '' && form.toMonth !== '') {
+        let api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${prop.userId}`;
+        if (router.currentRoute.value.fullPath === '/schedule') {
+            api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${user.id}`
+        }
         try {
             axios
-                .get(`http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${prop.userId}`, {
+                .get(api, {
                     headers: { Authorization: `Bearer ${user.token}` },
                 })
                 .then(function (response) {
@@ -275,7 +281,7 @@ const formatToPost = (time, type) => {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const daysInMonth = new Date(year, month, 0).getDate();
     const day = date.getDate().toString().padStart(2, '0');
-    if(type=='start'){
+    if (type == 'start') {
         return `${year}-${month}-${day}`;
     } else {
         return `${year}-${month}-${daysInMonth}`;
@@ -284,6 +290,6 @@ const formatToPost = (time, type) => {
 const messages = (type, message) => {
     alertStore.alert = true
     alertStore.type = type
-    alertStore.message = message
+    alertStore.msg = message
 }
 </script>
