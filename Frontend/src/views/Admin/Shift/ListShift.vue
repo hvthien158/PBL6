@@ -24,7 +24,7 @@
       </el-table>
       <div class="pagination">
         <el-button @click="previousPage" :disabled="currentPage === 1">
-          Previous
+          Prev
         </el-button>
         <span>{{ currentPage }} / {{ totalPage }}</span>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">

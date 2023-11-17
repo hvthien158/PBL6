@@ -29,18 +29,19 @@ class UserResource extends JsonResource
             $avatar = 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg';
         }
 
-        $now = Carbon::now()->format('Y-m-d');
+        $timezone = 'Asia/Ho_Chi_Minh';
+        $now = Carbon::now($timezone)->format('Y-m-d');
         $dayOfWeek = Carbon::now()->dayOfWeek;
 
         $status = DB::table('time_keepings')
             ->where('user_id', $this->id)
-            ->whereDate('_date', '=', $now)
+            ->where('_date', '=', $now)
             ->first();
         if($status){
             $status_AM = $status->status_am;
             $status_PM = $status->status_pm;
         } else {
-            if($dayOfWeek == 5 || $dayOfWeek == 6){
+            if($dayOfWeek == 6 || $dayOfWeek == 7){
                 $status_AM = 2;
                 $status_PM = 2;
             } else {

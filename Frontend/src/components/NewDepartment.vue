@@ -224,10 +224,6 @@ const isEmail = (email) => {
         /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     return filter.test(email);
 };
-const isPhoneNumber = (phoneNumber) => {
-    let filter = /^([0-9]{10})+$/;
-    return filter.test(phoneNumber);
-};
 function validate() {
     if (form.name === '') {
         checkLanding.checkName = 'Please enter name'
@@ -239,17 +235,17 @@ function validate() {
     } else {
         checkLanding.checkAddress = ''
     }
-    if (!isEmail(form.email) && form.email != '') {
+    if (!isEmail(form.email) && form.email !== '') {
         checkLanding.checkEmail = 'Invalid email'
     } else {
         checkLanding.checkEmail = ''
     }
-    if (!isPhoneNumber(form.phoneNumber) && form.phoneNumber != '') {
+    if (form.phoneNumber === '') {
         checkLanding.checkPhoneNumber = 'Invalid phone number'
     } else {
         checkLanding.checkPhoneNumber = ''
     }
-    if (checkLanding.checkName == '' && checkLanding.checkAddress == '' && checkLanding.checkPhoneNumber == '' && checkLanding.checkEmail == '') {
+    if (checkLanding.checkName === '' && checkLanding.checkAddress === '' && checkLanding.checkPhoneNumber === '' && checkLanding.checkEmail === '') {
         return true;
     } else {
         return false;

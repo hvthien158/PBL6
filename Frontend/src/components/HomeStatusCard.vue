@@ -11,12 +11,18 @@
         <div class="user">
           <div v-for="item in data">
             <el-avatar style="margin-right: 12px" :src="item.avatar" :size="40" />
-            <div style="height: 20px; display: flex; flex-direction: column; justify-content: space-between">
-              <span id="user-name" style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E">{{
-                item.name }}</span>
+            <div v-if="item.id !== user.id" style="height: 20px; display: flex; flex-direction: column; justify-content: space-between">
+              <span style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E">{{ item.name }}</span>
               <div style="display: flex">
                 <div :class="bg_color[item.status_AM]" style="height: 6px; width: 40px; margin-right: 1px;"></div>
                 <div :class="bg_color[item.status_PM]" style="height: 6px; width: 40px;"></div>
+              </div>
+            </div>
+            <div v-else style="height: 20px; display: flex; flex-direction: column; justify-content: space-between">
+              <span style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E">You</span>
+              <div style="display: flex">
+                <div :class="bg_color[status.status_AM]" style="height: 6px; width: 40px; margin-right: 1px;"></div>
+                <div :class="bg_color[status.status_PM]" style="height: 6px; width: 40px;"></div>
               </div>
             </div>
           </div>
@@ -91,6 +97,7 @@
 import { ref, watch } from "vue";
 import axios from "axios";
 import { useUserStore } from "../stores/user";
+import {useStatusStore} from "../stores/status";
 
 const value = ref('')
 
@@ -101,6 +108,7 @@ const currentPage = ref(1);
 const totalPage = ref(1);
 const user = useUserStore().user
 const bg_color = ref(['bg-green', 'bg-purple', 'bg-gray'])
+const status = useStatusStore()
 
 axios.get("http://127.0.0.1:8000/api/department")
   .then(function (response) {
@@ -128,7 +136,7 @@ const displayUser = async () => {
       })
       .then(function (response) {
         data.value = response.data.user
-        totalPage.value = Math.ceil(response.data.totalUser / 8) == 0 ? 1 : Math.ceil(response.data.totalUser / 8)
+        totalPage.value = Math.ceil(response.data.totalUser / 8) === 0 ? 1 : Math.ceil(response.data.totalUser / 8)
       });
   } catch (e) {
     console.log(e);

@@ -85,12 +85,8 @@
 small {
   color: red;
   margin-top: 0.1rem;
-  margin-left: 16px;
   font-size: 14px;
-  color: red;
-  margin-top: 0.1rem;
-  margin-left: 0 px;
-  font-size: 14px;
+  margin-left: 0;
 }
 
 .form-item {
@@ -238,7 +234,6 @@ function loadUser() {
         Authorization: `Bearer ${user.token}`
       },
     }).then((response) => {
-      console.log(response)
       form.email = response.data.data[0].email === 'none' ? '' : response.data.data[0].email;
       form.name = response.data.data[0].name === 'none' ? '' : response.data.data[0].name;
       form.address = response.data.data[0].address === 'none' ? '' : response.data.data[0].address;
@@ -262,10 +257,6 @@ function validate() {
     checkLanding.checkName = 'Please enter name'
   } else {
     checkLanding.checkName = ''
-  } if (form.address === '') {
-    checkLanding.checkAddress = 'Please enter address'
-  } else {
-    checkLanding.checkAddress = ''
   }
   if (form.password.length <= 6 && prop.mode === 'create') {
     checkLanding.checkPassword = 'Please enter password > 6 character'
@@ -279,18 +270,7 @@ function validate() {
   } else {
     checkLanding.checkEmail = ''
   }
-  if (form.phoneNumber === '') {
-    checkLanding.checkPhoneNumber = 'Please enter phone number'
-  } if (!(isPhoneNumber(form.phoneNumber))) {
-    checkLanding.checkPhoneNumber = 'Invalid phone number'
-  } else {
-    checkLanding.checkPhoneNumber = ''
-  }
-  if (checkLanding.checkName == '' && checkLanding.checkAddress == '' && checkLanding.checkPhoneNumber == '' && checkLanding.checkEmail == '' && checkLanding.checkPassword == '') {
-    return true;
-  } else {
-    return false;
-  }
+  return checkLanding.checkName === '' && checkLanding.checkAddress === '' && checkLanding.checkPhoneNumber === '' && checkLanding.checkEmail === '' && checkLanding.checkPassword === '';
 }
 const isEmail = (email) => {
   let filter =
@@ -370,6 +350,9 @@ function updateUser() {
   }
 }
 const formatToPost = (time) => {
+  if(!time){
+    return ''
+  }
   const date = new Date(time);
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');

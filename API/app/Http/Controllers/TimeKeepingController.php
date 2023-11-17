@@ -126,7 +126,7 @@ class TimeKeepingController extends Controller
                 ]
             );
         } else {
-            $dayOfWeek = Carbon::now()->dayOfWeek;
+            $dayOfWeek = Carbon::now('Asia/Ho_Chi_Minh')->dayOfWeek;
             if ($dayOfWeek == 5 || $dayOfWeek == 6) {
                 $status_AM = 2;
                 $status_PM = 2;
@@ -182,7 +182,7 @@ class TimeKeepingController extends Controller
      * @param mixed $userId
      * @param mixed $fromMonth
      * @param mixed $toMonth
-     * 
+     *
      * @return object
      */
     function getTimeKeepingExport($fromMonth, $toMonth, $userId)
