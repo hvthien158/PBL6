@@ -4,6 +4,7 @@
       :checkin="today.timeCheckIn" :checkout="today.timeCheckOut" :status_AM_prop="today.status_AM"
       :status_PM_prop="today.status_PM" @update="getListTimeKeeping(filter_value[0], filter_value[1])"></EditTimeKeep>
     <el-card>
+      <el-backtop :right="20" :bottom="100" />
       <div slot="header" class="card-header">
         Time Keeping
         <span style="position: absolute; right: calc(4vw + 36px)" v-if="admin_view">User: {{ admin_view }}</span>
