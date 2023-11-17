@@ -447,9 +447,17 @@ class AdminController extends Controller
                 }
                 $sumWorkingHours += intdiv($sumWorkingMinutes, 60);
                 $sumWorkingMinutes = $sumWorkingMinutes % 60;
-                $averageWorkingHours = $sumWorkingHours == 0 ? 0 : str_pad(intdiv($sumWorkingHours, $sumWorkingDays), 2, '0', STR_PAD_LEFT)
-                    .':'
-                    .str_pad(intdiv($sumWorkingMinutes, $sumWorkingDays), 2, '0', STR_PAD_LEFT);
+
+                if($sumWorkingDays != 0){
+                    $sumWorkingByMinutes = intdiv($sumWorkingHours * 60 + $sumWorkingMinutes, $sumWorkingDays) ;
+                    $averageWorkingHours = $sumWorkingByMinutes < 60 ? 0 : str_pad(intdiv($sumWorkingByMinutes, 60), 2, '0', STR_PAD_LEFT)
+                        .':'
+                        .str_pad($sumWorkingByMinutes % 60, 2, '0', STR_PAD_LEFT);
+                } else {
+                    $averageWorkingHours = '00:00';
+                }
+
+
                 $sumWorkingTime = str_pad($sumWorkingHours, 2, '0', STR_PAD_LEFT)
                     .':'
                     .str_pad($sumWorkingMinutes, 2, '0', STR_PAD_LEFT);

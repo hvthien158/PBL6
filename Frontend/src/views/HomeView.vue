@@ -36,9 +36,10 @@
         </div>
         <button @click="router.push({name: 'schedule'})" class="active-button no-underline" style="margin-top: 20px; height: 40px">History</button>
       </div>
-      <div>
+      <div v-if="user.role === 'admin'">
         <HomeStatusCard></HomeStatusCard>
       </div>
+      <div v-else style="min-width: 20vw;"></div>
     </div>
   </main>
 </template>
@@ -176,8 +177,11 @@ import Clock from "../components/Clock.vue";
 import HomeStatusCard from "../components/HomeStatusCard.vue";
 import EditTimeKeep from "../components/EditTimeKeep.vue";
 import HomeTimeKeepCard from "../components/HomeTimeKeepCard.vue";
+import {useStatusStore} from "../stores/status";
 
 const user = useUserStore().user
+const status = useStatusStore()
+
 if (user.token === '') {
   router.push({ path: "/login" });
 }
@@ -239,6 +243,8 @@ const getTimeKeeping = async () => {
       .then(function (response) {
         today.value.status_AM = response.data.status_AM
         today.value.status_PM = response.data.status_PM
+        status.status_AM = today.value.status_AM
+        status.status_PM = today.value.status_PM
         if(response.data.data){
           if (response.data.data.time_check_in && response.data.data.time_check_in !== '00:00:00') {
             if (response.data.data.time_check_out && response.data.data.time_check_out !== '00:00:00') {

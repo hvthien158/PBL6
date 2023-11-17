@@ -4,12 +4,12 @@
     <div class="card-content">
       <div style="display: flex; flex-direction: column">
         <div style="display: flex; flex-direction: column; align-items: center">
-          <span>Morning</span>
-          <StatusButton @click="updateTimeKeep" @change-status="n => status_AM = n" :status_index="status_AM"></StatusButton>
+          <span class="unselectable">8:30AM - 12:00PM</span>
+          <StatusButton @click="status.status_AM = status_AM" @change-status="n => status_AM = n" :status_index="status_AM"></StatusButton>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center">
-          <span>Afternoon</span>
-          <StatusButton @click="updateTimeKeep" @change-status="n => status_PM = n" :status_index="status_PM"></StatusButton>
+          <span class="unselectable">1:00PM - 5:45PM</span>
+          <StatusButton @click="status.status_PM = status_PM" @change-status="n => status_PM = n" :status_index="status_PM"></StatusButton>
         </div>
       </div>
     </div>
@@ -29,11 +29,18 @@
 .card-content{
   margin-top: 20px;
 }
+.unselectable {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 </style>
 
 <script setup>
 import ButtonLoading from "./ButtonLoading.vue";
-import {computed, ref, watch, watchEffect} from "vue";
+import {computed, onBeforeUnmount, onUnmounted, ref, watch, watchEffect} from "vue";
 import axios from "axios";
 import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
@@ -41,6 +48,7 @@ import Clock from "./Clock.vue"
 import moment from "moment";
 import StatusButton from "./StatusButton.vue";
 import Calendar from "./Calendar.vue";
+import {useStatusStore} from "../stores/status";
 
 const prop = defineProps({
   user_id: {
@@ -65,6 +73,7 @@ const alertStore = useAlertStore()
 const emit = defineEmits(['update'])
 const status_AM = ref(0)
 const status_PM = ref(0)
+const status = useStatusStore()
 
 watch([() => prop.status_AM_prop, () => prop.status_PM_prop],
     () => {
@@ -89,4 +98,8 @@ function updateTimeKeep(){
     console.log(e)
   })
 }
+
+onBeforeUnmount(() => {
+  updateTimeKeep()
+})
 </script>

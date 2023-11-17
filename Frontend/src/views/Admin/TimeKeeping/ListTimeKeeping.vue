@@ -52,12 +52,6 @@
         <el-table-column prop="sumWorkingTime" label="Working time" min-width="120"></el-table-column>
         <el-table-column prop="averageWorkingHours" label="Average" min-width="120"></el-table-column>
         <el-table-column prop="lateDays" label="Late days" min-width="120"></el-table-column>
-        <el-table-column fixed="right" label="Operations" width="140">
-          <template #default="scope">
-            <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
-            <el-button link type="danger" @click="handleDelete(scope.row.id)">Delete</el-button>
-          </template>
-        </el-table-column>
       </el-table>
       <div style="text-align: right; width: 100%">
         <span style="padding-right: 12px; color: #8c8c8c">{{ table_description }}</span>
@@ -70,10 +64,6 @@
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
-      </div>
-      <div class="form-timekeeping">
-        <NewTimeKeeping @updateData="displayTimeKeeping" @invisible="visibleMode = false" :timekeepingId="timekeepingId"
-                        v-if="visibleMode"></NewTimeKeeping>
       </div>
     </div>
     <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this timekeeping?" @confirm="deleteTimekeeping()"
@@ -189,7 +179,6 @@ import {useAlertStore} from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
 import {saveAs} from "file-saver";
 import {utils, write} from "xlsx";
-import NewTimeKeeping from "../../../components/NewTimeKeeping.vue";
 import moment from "moment"
 
 const user = useUserStore().user;

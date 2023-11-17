@@ -1,7 +1,7 @@
 <template>
   <div>
     <div @click="changeStatus" class="status-btn" :class="{'bg-green': index === 0, 'bg-purple': index === 1, 'bg-gray': index === 2}">
-      <span>{{ quotes }}</span>
+      <span class="unselectable">{{ quotes }}</span>
     </div>
   </div>
 </template>
@@ -29,6 +29,13 @@
 }
 .bg-purple{
   background-color: rgba(0,120,248,0.57)
+}
+.unselectable {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 </style>
 
