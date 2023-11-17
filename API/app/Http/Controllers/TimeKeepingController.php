@@ -190,7 +190,7 @@ class TimeKeepingController extends Controller
         if ($userId && $fromMonth && $toMonth) {
             try {
                 $timekeeping = TimeKeeping::where('user_id', $userId)->whereBetween('_date', [$fromMonth, $toMonth])->get();
-                if ($timekeeping) {
+                if (count($timekeeping) != 0) {
                     return TimeKeepingResource::collection($timekeeping);
                 } else {
                     return response()->json(['message' => 'Time Keeping in this time not exist'], 400);

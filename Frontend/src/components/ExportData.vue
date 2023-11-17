@@ -23,6 +23,7 @@
                     <el-date-picker v-model="form.toMonth" type="month" placeholder="Pick a month" />
                 </div>
             </el-form-item>
+            <small>{{ checkDate }}</small>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -61,10 +62,21 @@
 .dialog-footer button {
     margin-right: 8px;
 }
+
+small {
+    color: red;
+    margin-top: 0.1rem;
+    margin-left: 16px;
+    font-size: 14px;
+    color: red;
+    margin-top: 0.1rem;
+    margin-left: 0 px;
+    font-size: 14px;
+}
 </style>
   
 <script setup>
-import { ref, defineProps, reactive } from "vue";
+import { ref, defineProps, reactive, computed } from "vue";
 import axios from "axios";
 import * as XLSX from 'xlsx';
 import * as Papa from 'papaparse'
@@ -84,11 +96,22 @@ let visible = ref(true)
 const formLabelWidth = '150px'
 const user = useUserStore().user
 let username = ref('')
+let wasClick = ref(false)
 const alertStore = useAlertStore()
 const emits = defineEmits(['invisible', 'updateData'])
 const form = reactive({
     fromMonth: '',
     toMonth: ''
+})
+const checkDate = computed(() => {
+    if ((form.frommonth == '' || form.toMonth == '') && wasClick.value == true) {
+        return 'Please fill form'
+    }
+    else if (formatToPost(form.fromMonth, 'start') > formatToPost(form.toMonth, 'end') && wasClick.value == true) {
+        return 'To date must be bigger than from date'
+    } else {
+        return ''
+    }
 })
 const data = ref();
 const exportExcel = async () => {
@@ -97,165 +120,176 @@ const exportExcel = async () => {
         api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${user.id}`
     }
     if (form.fromMonth != '' && form.toMonth != '') {
-        try {
-            console.log(formatToPost(form.fromMonth, 'start'), formatToPost(form.toMonth, 'end'));
-            await axios.get(api, {
-                headers: { Authorization: `Bearer ${user.token}` }
-            }).then(function (response) {
-                data.value = response.data.data
-                username = response.data.data[0].user
-            })
-            const wb = XLSX.utils.book_new();
-            const fromDate = new Date(form.fromMonth);
-            const toDate = new Date(form.toMonth);
-            const currentDate = new Date(fromDate);
+        if (formatToPost(form.fromMonth, 'start') < formatToPost(form.toMonth, 'end')) {
+            try {
+                await axios.get(api, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                }).then(function (response) {
+                    data.value = response.data.data
+                    username = response.data.data[0].user
+                })
+                const wb = XLSX.utils.book_new();
+                const fromDate = new Date(form.fromMonth);
+                const toDate = new Date(form.toMonth);
+                const currentDate = new Date(fromDate);
 
-            while (currentDate <= toDate) {
-                const currentMonth = currentDate.getMonth() + 1;
-                const currentYear = currentDate.getFullYear();
-                const ws = XLSX.utils.aoa_to_sheet([]);
-                const daysInMonth = new Date(currentDate.getFullYear(), currentMonth, 0).getDate();
-                const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-                const headerRow = ['Date', 'Day of week', 'Time check in', 'Time check out', 'Shift', 'Status AM', 'Status PM', 'Time work', 'User name'];
-                const rows = daysArray.map(day => {
-                    const dataForDay = data.value.find(item => {
-                        const itemDate = new Date(item.date);
-                        return itemDate.getMonth() + 1 === currentMonth && itemDate.getDate() === day;
+                while (currentDate <= toDate) {
+                    const currentMonth = currentDate.getMonth() + 1;
+                    const currentYear = currentDate.getFullYear();
+                    const ws = XLSX.utils.aoa_to_sheet([]);
+                    const daysInMonth = new Date(currentDate.getFullYear(), currentMonth, 0).getDate();
+                    const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+                    const headerRow = ['Date', 'Day of week', 'Time check in', 'Time check out', 'Shift', 'Status AM', 'Status PM', 'Time work', 'User name'];
+                    const rows = daysArray.map(day => {
+                        const dataForDay = data.value.find(item => {
+                            const itemDate = new Date(item.date);
+                            return itemDate.getMonth() + 1 === currentMonth && itemDate.getDate() === day;
+                        });
+                        const rowData = [day, getDayOfWeek(currentDate, day)];
+                        if (dataForDay) {
+                            rowData.push(
+                                dataForDay['timeCheckIn'],
+                                dataForDay['timeCheckOut'],
+                                dataForDay['shift'],
+                                statusWork(dataForDay['status_AM']),
+                                statusWork(dataForDay['status_PM']),
+                                dataForDay['timeWork'],
+                                username
+                            );
+                        } else {
+                            rowData.push('00:00 (00:00)', '00:00 (00:00)', 'OFF', 'OFF', 'OFF', '00:00', username);
+                        }
+                        return rowData;
                     });
-                    const rowData = [day, getDayOfWeek(currentDate, day)];
-                    if (dataForDay) {
-                        rowData.push(
-                            dataForDay['timeCheckIn'],
-                            dataForDay['timeCheckOut'],
-                            dataForDay['shift'],
-                            statusWork(dataForDay['status_AM']),
-                            statusWork(dataForDay['status_PM']),
-                            dataForDay['timeWork'],
-                            username
-                        );
-                    } else {
-                        rowData.push('00:00 (00:00)', '00:00 (00:00)', 'OFF', 'OFF', 'OFF', '00:00', username);
+                    rows.unshift(headerRow);
+                    if (prop.mode == 'Excel') {
+                        if (!ws['!cols']) {
+                            ws['!cols'] = [];
+                        }
+                        ws['!cols'][0] = { wch: 5 };
+                        ws['!cols'][1] = { wch: 10 };
+                        ws['!cols'][2] = { wch: 15 };
+                        ws['!cols'][3] = { wch: 15 };
+                        ws['!cols'][4] = { wch: 5 };
+                        ws['!cols'][5] = { wch: 10 };
+                        ws['!cols'][6] = { wch: 10 };
+                        ws['!cols'][7] = { wch: 10 };
+                        ws['!cols'][8] = { wch: 15 };
+                        XLSX.utils.sheet_add_aoa(ws, rows, { origin: 'A1' });
+                        XLSX.utils.book_append_sheet(wb, ws, `${currentMonth} - ${currentYear}`);
+                        currentDate.setMonth(currentDate.getMonth() + 1);
                     }
-                    return rowData;
-                });
-                rows.unshift(headerRow);
-                if (prop.mode == 'Excel') {
-                    if (!ws['!cols']) {
-                        ws['!cols'] = [];
-                    }
-                    ws['!cols'][0] = { wch: 5 };
-                    ws['!cols'][1] = { wch: 10 };
-                    ws['!cols'][2] = { wch: 15 };
-                    ws['!cols'][3] = { wch: 15 };
-                    ws['!cols'][4] = { wch: 5 };
-                    ws['!cols'][5] = { wch: 10 };
-                    ws['!cols'][6] = { wch: 10 };
-                    ws['!cols'][7] = { wch: 10 };
-                    ws['!cols'][8] = { wch: 15 };
-                    XLSX.utils.sheet_add_aoa(ws, rows, { origin: 'A1' });
-                    XLSX.utils.book_append_sheet(wb, ws, `${currentMonth} - ${currentYear}`);
-                    currentDate.setMonth(currentDate.getMonth() + 1);
                 }
+                XLSX.writeFile(wb, 'data.xlsx');
+                messages('success', 'Export complete')
+                emits('invisible');
+            } catch (e) {
+                messages('error', e.response.data.message)
+                emits('invisible');
+                console.log(e);
             }
-            XLSX.writeFile(wb, 'data.xlsx');
-            messages('success', 'Export complete')
-            emits('invisible');
-        } catch (e) {
-            messages('error', 'Something wrong')
-            emits('invisible');
-            console.log(e);
+        } else {
+            wasClick.value = true
         }
+    } else {
+        wasClick.value = true
     }
 };
 const exportCSV = () => {
-    if (form.fromMonth !== '' && form.toMonth !== '') {
-        let api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${prop.userId}`;
-        if (router.currentRoute.value.fullPath === '/schedule') {
-            api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${user.id}`
-        }
-        try {
-            axios
-                .get(api, {
-                    headers: { Authorization: `Bearer ${user.token}` },
-                })
-                .then(function (response) {
-                    data.value = response.data.data;
-                    const username = response.data.data[0].user;
-                    const fromDate = new Date(form.fromMonth);
-                    const toDate = new Date(form.toMonth);
-                    const currentDate = new Date(fromDate);
+    if (form.fromMonth != '' && form.toMonth != '') {
+        if (formatToPost(form.fromMonth, 'start') < formatToPost(form.toMonth, 'end')) {
+            let api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${prop.userId}`;
+            if (router.currentRoute.value.fullPath === '/schedule') {
+                api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${user.id}`
+            }
+            try {
+                axios
+                    .get(api, {
+                        headers: { Authorization: `Bearer ${user.token}` },
+                    })
+                    .then(function (response) {
+                        data.value = response.data.data;
+                        const username = response.data.data[0].user;
+                        const fromDate = new Date(form.fromMonth);
+                        const toDate = new Date(form.toMonth);
+                        const currentDate = new Date(fromDate);
 
-                    const csvData = [];
-                    const headerRow = [
-                        'Date',
-                        'Day of week',
-                        'Time check in',
-                        'Time check out',
-                        'Shift',
-                        'Status AM',
-                        'Status PM',
-                        'Time work',
-                        'User name',
-                    ];
-                    csvData.push(headerRow);
+                        const csvData = [];
+                        const headerRow = [
+                            'Date',
+                            'Day of week',
+                            'Time check in',
+                            'Time check out',
+                            'Shift',
+                            'Status AM',
+                            'Status PM',
+                            'Time work',
+                            'User name',
+                        ];
+                        csvData.push(headerRow);
 
-                    while (currentDate <= toDate) {
-                        const currentMonth = currentDate.getMonth() + 1;
-                        const currentYear = currentDate.getFullYear();
-                        const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
-                        const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+                        while (currentDate <= toDate) {
+                            const currentMonth = currentDate.getMonth() + 1;
+                            const currentYear = currentDate.getFullYear();
+                            const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+                            const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-                        daysArray.forEach((day) => {
-                            const dataForDay = data.value.find((item) => {
-                                const itemDate = new Date(item.date);
-                                return (
-                                    itemDate.getMonth() + 1 === currentMonth &&
-                                    itemDate.getDate() === day
-                                );
+                            daysArray.forEach((day) => {
+                                const dataForDay = data.value.find((item) => {
+                                    const itemDate = new Date(item.date);
+                                    return (
+                                        itemDate.getMonth() + 1 === currentMonth &&
+                                        itemDate.getDate() === day
+                                    );
+                                });
+                                const rowData = [
+                                    `${currentYear}-${currentMonth}-${day}`,
+                                    getDayOfWeek(currentDate, day),
+                                ];
+
+                                if (dataForDay) {
+                                    rowData.push(
+                                        dataForDay['timeCheckIn'],
+                                        dataForDay['timeCheckOut'],
+                                        dataForDay['shift'],
+                                        statusWork(dataForDay['status_AM']),
+                                        statusWork(dataForDay['status_PM']),
+                                        dataForDay['timeWork'],
+                                        username
+                                    );
+                                } else {
+                                    rowData.push(
+                                        '00:00 (00:00)',
+                                        '00:00 (00:00)',
+                                        'OFF',
+                                        'OFF',
+                                        'OFF',
+                                        '00:00',
+                                        username
+                                    );
+                                }
+                                csvData.push(rowData);
                             });
-                            const rowData = [
-                                `${currentYear}-${currentMonth}-${day}`,
-                                getDayOfWeek(currentDate, day),
-                            ];
 
-                            if (dataForDay) {
-                                rowData.push(
-                                    dataForDay['timeCheckIn'],
-                                    dataForDay['timeCheckOut'],
-                                    dataForDay['shift'],
-                                    statusWork(dataForDay['status_AM']),
-                                    statusWork(dataForDay['status_PM']),
-                                    dataForDay['timeWork'],
-                                    username
-                                );
-                            } else {
-                                rowData.push(
-                                    '00:00 (00:00)',
-                                    '00:00 (00:00)',
-                                    'OFF',
-                                    'OFF',
-                                    'OFF',
-                                    '00:00',
-                                    username
-                                );
-                            }
-                            csvData.push(rowData);
-                        });
-
-                        currentDate.setMonth(currentDate.getMonth() + 1);
-                    }
-                    const csvContent = Papa.unparse(csvData);
-                    const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                    const fileName = `data_${prop.mode}_${formatToPost(form.fromMonth)}-${formatToPost(form.toMonth)}.csv`;
-                    FileSaver.saveAs(csvBlob, fileName);
-                    messages('success', 'Export complete');
-                    emits('invisible');
-                });
-        } catch (e) {
-            messages('error', 'Something wrong');
-            emits('invisible');
-            console.log(e);
+                            currentDate.setMonth(currentDate.getMonth() + 1);
+                        }
+                        const csvContent = Papa.unparse(csvData);
+                        const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const fileName = `data_${prop.mode}_${formatToPost(form.fromMonth)}-${formatToPost(form.toMonth)}.csv`;
+                        FileSaver.saveAs(csvBlob, fileName);
+                        messages('success', 'Export complete');
+                        emits('invisible');
+                    });
+            } catch (e) {
+                messages('error', e.response.data.message)
+                emits('invisible');
+                console.log(e);
+            }
+        } else {
+            wasClick.value = true
         }
+    } else {
+        wasClick.value = true
     }
 };
 const getDayOfWeek = (date, day) => {
