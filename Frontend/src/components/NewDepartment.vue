@@ -1,6 +1,6 @@
 <template>
     <el-dialog v-model="prop.visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false"
-        @keyup.esc="$emit('invisible')"  width="30%">
+        @keyup.esc="$emit('invisible')" width="30%">
         <template #header>
             <div class="my-header">
                 <h4 v-if="prop.mode === 'create'">Create Department</h4>
@@ -14,14 +14,14 @@
             </div>
         </template>
         <el-form :model="form">
-            <el-form-item v-if="prop.mode === 'update'" label="ID" :label-width="formLabelWidth">
-                <el-input v-model="prop.departmentId" autocomplete="off" disabled />
+            <el-form-item v-if="prop.mode === 'update'" :rules="[{ required : true }]" label="ID" :label-width="formLabelWidth" >
+                <el-input v-model="prop.departmentId"  autocomplete="off" disabled  />
             </el-form-item>
-            <el-form-item label="Department name" :label-width="formLabelWidth">
+            <el-form-item label="Department name" :label-width="formLabelWidth" :rules="[{ required : true }]" >
                 <el-input v-model="form.name" autocomplete="off" />
                 <small>{{ checkLanding.checkName }}</small>
             </el-form-item>
-            <el-form-item label="Address" :label-width="formLabelWidth">
+            <el-form-item label="Address" :label-width="formLabelWidth" :rules="[{ required : true }]">
                 <el-input v-model="form.address" autocomplete="off" />
                 <small>{{ checkLanding.checkAddress }}</small>
             </el-form-item>
@@ -35,10 +35,10 @@
                 <el-input v-model="form.phoneNumber" autocomplete="off" />
                 <small>{{ checkLanding.checkPhoneNumber }}</small>
             </el-form-item>
-            <el-form-item label="Department Manager" :label-width="formLabelWidth">
+            <el-form-item label="Department Manager" :label-width="formLabelWidth" :rules="[{ required : true }]">
                 <el-select v-model="form.manager" type="text">
                     <el-option label="Select Manager" :value="0"></el-option>
-                    <el-option v-for="item in dataUser" :label="item.name" :value="item.id"></el-option>
+                    <el-option v-for="item in dataUser" :label="item.id + ' - ' + item.name" :value="item.id"></el-option>
                 </el-select>
             </el-form-item>
         </el-form>
@@ -129,6 +129,9 @@ span {
     height: 6px;
     background-color: #e0e0e0;
 }
+.el-select{
+    width: 50%;
+}
 </style>
   
 <script setup>
@@ -149,7 +152,7 @@ const prop = defineProps({
     }
 })
 
-const formLabelWidth = "150px";
+const formLabelWidth = "160px";
 const user = useUserStore().user
 const alertStore = useAlertStore()
 const dataUser = ref()
