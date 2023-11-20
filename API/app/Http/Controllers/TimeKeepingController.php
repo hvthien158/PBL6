@@ -6,6 +6,7 @@ use App\Common\ResponseMessage;
 use App\Common\Role;
 use App\Http\Requests\MonthYearRequest;
 use App\Http\Requests\TimeRequest;
+use App\Http\Requests\UpdateTimeKeepingRequest;
 use App\Http\Resources\TimeKeepingResource;
 use App\Models\Systemtime;
 use App\Models\TimeKeeping;
@@ -228,20 +229,8 @@ class TimeKeepingController extends Controller
         return $timekeepingRecords;
     }
 
-    public function updateTimeKeeping(Request $request)
+    public function updateTimeKeeping(UpdateTimeKeepingRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required',
-            'date' => 'required',
-            'time_check_in' => 'nullable',
-            'time_check_out' => 'nullable',
-            'status_am' => 'nullable|integer|between:0,2',
-            'status_pm' => 'nullable|integer|between:0,2',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['data' => $validator->failed(), 'message' => ResponseMessage::VALIDATION_ERROR], 422);
-        }
         $status_am = $request->get('status_am');
         $status_pm = $request->get('status_pm');
 
