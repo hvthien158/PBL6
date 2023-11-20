@@ -103,7 +103,16 @@ router.beforeEach(async () => {
     })
   }
 })
-
+router.beforeEach(async (to) => {
+  if (to.path.includes('admin')) {
+    const user = await useUserStore().user
+    if (user.role !== 'admin') {
+      await router.push({
+        name: 'home',
+      })
+    }
+  }
+})
 router.beforeResolve((to, from, next) => {
   if (to.name) {
     NProgress.start()

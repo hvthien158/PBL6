@@ -35,7 +35,7 @@
                 <el-input v-model="form.phoneNumber" autocomplete="off" />
                 <small>{{ checkLanding.checkPhoneNumber }}</small>
             </el-form-item>
-            <el-form-item label="Department Manager" :label-width="formLabelWidth" :rules="[{ required : true }]">
+            <el-form-item label="Department Manager" :label-width="formLabelWidth">
                 <el-select v-model="form.manager" type="text">
                     <el-option label="Select Manager" :value="0"></el-option>
                     <el-option v-for="item in dataUser" :label="item.id + ' - ' + item.name" :value="item.id"></el-option>
@@ -222,15 +222,35 @@ if (prop.mode === 'update') {
     loadDepartment()
 }
 displayUser()
-const isEmail = (email) => {
-    let filter =
-        /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-    return filter.test(email);
-};
-const isPhoneNumber = (phoneNumber) => {
-    let filter = /^([0-9]{10})+$/;
-    return filter.test(phoneNumber);
-};
+
+watch(() => form.name, () => {
+    if (form.name === '') {
+        checkLanding.checkName = 'Please enter name'
+    } else {
+        checkLanding.checkName = ''
+    }
+})
+watch(() => form.address, () => {
+    if (form.address === '') {
+        checkLanding.checkAddress = 'Please enter address'
+    } else {
+        checkLanding.checkAddress = ''
+    }
+})
+watch(() => form.email, () => {
+    if (!isEmail(form.email) && form.email !== '') {
+        checkLanding.checkEmail = 'Invalid email'
+    } else {
+        checkLanding.checkEmail = ''
+    }
+})
+watch(() => form.phoneNumber, () => {
+    if (!isPhoneNumber(form.phoneNumber) && form.phoneNumber != '') {
+        checkLanding.checkPhoneNumber = 'Invalid phone number'
+    } else {
+        checkLanding.checkPhoneNumber = ''
+    }
+})
 function validate() {
     if (form.name === '') {
         checkLanding.checkName = 'Please enter name'
@@ -258,7 +278,15 @@ function validate() {
         return false;
     }
 }
-
+const isEmail = (email) => {
+    let filter =
+        /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return filter.test(email);
+};
+const isPhoneNumber = (phoneNumber) => {
+    let filter = /^([0-9]{10})+$/;
+    return filter.test(phoneNumber);
+};
 function createDepartment() {
     if (validate()) {
         let manager = form.manager === 0 ? null : form.manager
