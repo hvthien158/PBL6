@@ -9,13 +9,6 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     /**
-     * @return void
-     */
-    public function __construct(){
-        $this->middleware(['auth:api', 'checkrole']);
-    }
-
-    /**
      * @param int|null $id
      *
      * @return object
