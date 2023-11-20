@@ -19,7 +19,7 @@ class CheckIp
         if($request->header('X-Forwarded-For') == env('IP_COMPANY')){
             return $next($request);
         } else {
-            return response()->json(["message"=>  'You must be checkin and checkout by IP Company']);
+            return response()->json(["message"=>  'You must be checkin and checkout by IP Company'], 400);
         }
     }
 }
