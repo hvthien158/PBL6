@@ -32,8 +32,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/update-profile', [AuthController::class, 'updateProfile']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
     //Time keeping
-    Route::post('check-in', [TimeKeepingController::class, 'checkIn']);
-    Route::put('check-out/', [TimeKeepingController::class, 'checkOut']);
+    Route::middleware('checkip')->group(function () {
+        Route::post('check-in', [TimeKeepingController::class, 'checkIn']);
+        Route::put('check-out', [TimeKeepingController::class, 'checkOut']);
+    });
     Route::get('time-keeping', [TimeKeepingController::class, 'getTimeKeeping']);
     Route::get('get-list-timekeeping/{from}/{to}', [TimeKeepingController::class, 'getListTimeKeeping']);
     Route::get('get-list-timekeeping/{from}/{to}/{user_id}', [TimeKeepingController::class, 'getListTimeKeeping']);

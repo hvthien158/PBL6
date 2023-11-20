@@ -172,16 +172,14 @@ import router from "../router";
 import axios from "axios";
 import {useUserStore} from "../stores/user";
 import moment from "moment";
-import schedule from "../assets/image/schedule.png";
 import Clock from "../components/Clock.vue";
 import HomeStatusCard from "../components/HomeStatusCard.vue";
-import EditTimeKeep from "../components/EditTimeKeep.vue";
 import HomeTimeKeepCard from "../components/HomeTimeKeepCard.vue";
 import {useStatusStore} from "../stores/status";
-
+import { useAlertStore } from "../stores/alert";
 const user = useUserStore().user
 const status = useStatusStore()
-
+const alertStore = useAlertStore()
 if (user.token === '') {
   router.push({ path: "/login" });
 }
@@ -271,9 +269,8 @@ const getTimeKeeping = async () => {
 
 const handleCheckIn = async () => {
   try {
-    await axios
-
-      .post("http://127.0.0.1:8000/api/check-in",{} ,
+    console.log(1)
+    await axios.post("http://127.0.0.1:8000/api/check-in",{} ,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -284,14 +281,13 @@ const handleCheckIn = async () => {
         getTimeKeeping();
       });
   } catch (e) {
-    console.log(e);
+    messages('error', e.response.data.message)
   }
 };
 
 const handleCheckOut = async () => {
     try {
-      await axios
-        .put(
+      await axios.put(
           `http://127.0.0.1:8000/api/check-out/`, null,
           {
             headers: {
@@ -300,14 +296,17 @@ const handleCheckOut = async () => {
           }
         )
         .then(function (response) {
-          console.log(response)
           getTimeKeeping();
         });
     } catch (e) {
-      console.log(e);
+      messages('error', e.response.data.message)
     }
 }
-
+const messages = (type, msg) => {
+    alertStore.alert = true;
+    alertStore.type = type;
+    alertStore.msg = msg
+}
 setInterval(() => {
   currentTime.value = getCurrentTime();
   currentDate.value = getCurrentDate();
