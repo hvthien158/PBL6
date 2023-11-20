@@ -73,7 +73,8 @@
         <el-button @click="previousPage" :disabled="currentPage === 1">
           Prev
         </el-button>
-        <span>{{ currentPage }} / {{ totalPage }}</span>
+<!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => {currentPage = page}"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
@@ -136,7 +137,7 @@ main {
 .el-form-item {
   min-width: 170px;
   margin-left: 10px;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .form-user {
@@ -165,6 +166,7 @@ import router from "../../../router";
 import { useRoute } from "vue-router";
 import { useAlertStore } from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
+import Pagination from "../../../components/Pagination.vue";
 
 const data = ref();
 const user = useUserStore().user;
@@ -237,7 +239,7 @@ const displayUser = async () => {
       })
       .then(function (response) {
         data.value = response.data.user;
-        totalPage.value = Math.ceil(response.data.totalUser / 8) == 0 ? 1 : Math.ceil(response.data.totalUser / 8)
+        totalPage.value = Math.ceil(response.data.totalUser / 8) === 0 ? 1 : Math.ceil(response.data.totalUser / 8)
         let tail = (response.data.totalUser < currentPage.value * 8) ? response.data.totalUser : currentPage.value * 8
         tableDescription.value = ((currentPage.value - 1) * 8 + 1) + '..' + tail + ' of ' + response.data.totalUser + ' users'
       });
@@ -258,7 +260,6 @@ onMounted(() => {
   if (user.role !== "admin") {
     router.push({ path: "/" });
   } else {
-    console.log(route)
     if (route.query.department) {
       dataSearch.department = Number(route.query.department)
     }
@@ -305,16 +306,18 @@ function handleEdit(id) {
   operation_mode.value = 'update'
   userID_update.value = id
 }
+
+watch(() => currentPage.value, () => {
+  displayUser()
+})
 const nextPage = () => {
   if (currentPage.value < totalPage.value) {
     currentPage.value++;
-    displayUser()
   }
 };
 const previousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
-    displayUser()
   }
 };
 function handleViewHistory(id) {

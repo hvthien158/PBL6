@@ -71,7 +71,8 @@
         <el-button @click="previousPage" :disabled="currentPage === 1">
           Prev
         </el-button>
-        <span>{{ currentPage }} / {{ totalPage }}</span>
+<!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => currentPage = page"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
@@ -213,6 +214,7 @@ import { useAlertStore } from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
 import User from '../../../components/User.vue'
 import NewDepartment from "../../../components/NewDepartment.vue";
+import Pagination from "../../../components/Pagination.vue";
 const user = useUserStore().user;
 const alertStore = useAlertStore();
 const department = ref();
@@ -291,16 +293,18 @@ const deleteDepartment = async () => {
   }
   displayDepartment();
 };
+
+watch(() => currentPage.value, () => {
+  displayDepartment()
+})
 const nextPage = () => {
   if (currentPage.value < totalPage.value) {
     currentPage.value++;
-    displayDepartment()
   }
 };
 const previousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
-    displayDepartment()
   }
 };
 const messages = (type, msg) => {
