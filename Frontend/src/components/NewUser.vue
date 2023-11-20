@@ -84,7 +84,6 @@
 
 small {
   color: red;
-  margin-top: 0.1rem;
   font-size: 14px;
   margin-left: 0;
 }
@@ -253,9 +252,39 @@ function loadUser() {
   }
 }
 loadUser()
+watch(() => form.name, () => {
+  if (form.name.length <= 4) {
+    checkLanding.checkName = 'Please enter name > 4'
+  } else {
+    checkLanding.checkName = ''
+  }
+})
+watch(() => form.password, () => {
+  if (form.password.length <= 6 && prop.mode === 'create') {
+    checkLanding.checkPassword = 'Please enter password > 6 character'
+  } else {
+    checkLanding.checkPassword = ''
+  }
+})
+watch(() => form.email, () => {
+  if (form.email === '') {
+    checkLanding.checkEmail = 'Please enter email'
+  } if (!isEmail(form.email)) {
+    checkLanding.checkEmail = 'Invalid email'
+  } else {
+    checkLanding.checkEmail = ''
+  }
+})
+watch(() => form.phoneNumber, () => {
+  if (form.phoneNumber === '' || isPhoneNumber(form.phoneNumber)){
+    checkLanding.checkPhoneNumber = ''
+  } else {
+    checkLanding.checkPhoneNumber = 'Invalid phone number'
+  }
+})
 function validate() {
-  if (form.name === '') {
-    checkLanding.checkName = 'Please enter name'
+  if (form.name.length <= 4) {
+    checkLanding.checkName = 'Please enter name > 4'
   } else {
     checkLanding.checkName = ''
   }
@@ -270,6 +299,11 @@ function validate() {
     checkLanding.checkEmail = 'Invalid email'
   } else {
     checkLanding.checkEmail = ''
+  }
+  if (form.phoneNumber === '' || isPhoneNumber(form.phoneNumber)){
+    checkLanding.checkPhoneNumber = ''
+  } else {
+    checkLanding.checkPhoneNumber = 'Invalid phone number'
   }
   return checkLanding.checkName === '' && checkLanding.checkAddress === '' && checkLanding.checkPhoneNumber === '' && checkLanding.checkEmail === '' && checkLanding.checkPassword === '';
 }
