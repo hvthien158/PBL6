@@ -60,6 +60,7 @@
 .card-content:hover::-webkit-scrollbar-thumb {
   width: 6px;
   background-color: #ababab;
+  border-radius: 12px;
 }
 
 .user>div {

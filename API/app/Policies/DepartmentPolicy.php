@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Common\Role;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -21,7 +22,7 @@ class DepartmentPolicy
      */
     public function viewUser(User $user, Department $department): bool
     {
-        if(auth()->user()->role == 'admin' || auth()->user()->department()->name == request()->route('name')) {
+        if(auth()->user()->role == Role::ADMIN || auth()->user()->department()->name == request()->route('name')) {
             return true;
         } else {
             return false;
@@ -33,7 +34,7 @@ class DepartmentPolicy
      */
     public function create(User $user): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**
@@ -41,7 +42,7 @@ class DepartmentPolicy
      */
     public function update(User $user, Department $department): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**
@@ -49,7 +50,7 @@ class DepartmentPolicy
      */
     public function delete(User $user, Department $department): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**

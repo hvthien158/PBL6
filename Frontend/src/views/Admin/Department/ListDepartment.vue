@@ -14,8 +14,8 @@
             New
           </el-button>
         </div>
-        <el-input v-model="dataSearch.name" placeholder="Search by department name" />
-        <el-input v-model="dataSearch.manager" placeholder="Search by department manager" />
+        <el-input v-model="dataSearch.name" placeholder="Search by name" />
+        <el-input v-model="dataSearch.manager" placeholder="Search by manager" />
         <el-input v-model="dataSearch.address" placeholder="Search by address" />
         <el-input v-model="dataSearch.email" placeholder="Search by email" />
         <el-input v-model="dataSearch.phoneNumber" placeholder="Search by phone number" />
@@ -110,6 +110,7 @@ main {
 
 .input-number {
   width: 12%;
+  min-width: 170px;
   border-right: 0;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;

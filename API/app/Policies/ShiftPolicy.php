@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Common\Role;
 use App\Models\Shift;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -25,14 +26,14 @@ class ShiftPolicy
     }
     /**
      * Determine whether the user can create models.Determine whether the user can create models.
-     * 
+     *
      * @param User $user
-     * 
+     *
      * @return bool
      */
     public function create(User $user): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**
@@ -40,7 +41,7 @@ class ShiftPolicy
      */
     public function update(User $user, Shift $shift): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**
@@ -48,7 +49,7 @@ class ShiftPolicy
      */
     public function delete(User $user, Shift $shift): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**

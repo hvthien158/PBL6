@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Common\Role;
 use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
 use Carbon\Carbon;
@@ -57,7 +58,7 @@ class UserResource extends JsonResource
             'avatar'=> $avatar,
             'address' => $this->address ?: 'none',
             'DOB' => $DOB_format,
-            'role' => $this->role ?: 'user',
+            'role' => $this->role ?: Role::USER,
             'phone_number' => $this->phone_number ?: 'none',
             'salary' => '$'.$this->salary ?: 'none',
             'position' => $this->position ?: 'none',

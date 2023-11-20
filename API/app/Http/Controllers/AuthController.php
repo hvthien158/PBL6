@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\ResponseMessage;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
@@ -15,7 +16,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Str;
-use function Laravel\Prompts\table;
 
 class AuthController extends Controller
 {
@@ -34,12 +34,12 @@ class AuthController extends Controller
         $info = array_merge(['email' => $request->email], ['password' => $request->password]);
 
         if (!$token = auth()->attempt($info)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => ResponseMessage::AUTHORIZATION_ERROR], 401);
         }
 
         if (!auth()->user()->hasVerifiedEmail()) {
             auth()->user()->sendEmailVerificationNotification();
-            return response()->json(['verify_quest' => 'Please verify email'],);
+            return response()->json(['verify_quest' => 'Please verify email'], 303);
         }
 
         return $this->createNewToken($token);
@@ -77,7 +77,7 @@ class AuthController extends Controller
 
 
         return response()->json([
-            'message' => 'User successfully registered',
+            'message' => ResponseMessage::CREATE_SUCCESS,
             'user' => $user
         ], 201);
     }
@@ -89,7 +89,7 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json(['message' => 'User successfully signed out']);
+        return response()->json(['message' => ResponseMessage::OK]);
     }
 
     /**
@@ -129,7 +129,7 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
+            return response()->json(ResponseMessage::VALIDATION_ERROR, 422);
         }
 
         if (!Hash::check($request->old_password, auth()->user()->getAuthPassword())) {
@@ -144,7 +144,7 @@ class AuthController extends Controller
 
         if ($check == 1) {
             return response()->json([
-                'message' => 'User successfully changed password',
+                'message' => ResponseMessage::OK,
             ], 201);
         }
         return response()->json([
@@ -180,7 +180,7 @@ class AuthController extends Controller
         }
         $user = User::where('id', auth()->id())->get();
         return response()->json([
-            'message' => 'Successfully updated profile',
+            'message' => ResponseMessage::UPDATE_SUCCESS,
             'user' => UserResource::collection($user)
         ], 201);
     }
@@ -214,9 +214,9 @@ class AuthController extends Controller
 
         $email = DB::table('users')->where('email', '=', $request->input('email'))->first();
         if ($email) {
-            return response()->json([], 200);
+            return response()->json(['message' => ResponseMessage::OK], 200);
         } else {
-            return response()->json([], 404);
+            return response()->json(['error' => ResponseMessage::NOT_FOUND_ERROR], 404);
         }
     }
 
