@@ -59,7 +59,8 @@
         <el-button @click="previousPage" :disabled="currentPage === 1">
           Prev
         </el-button>
-        <span>{{ currentPage }} / {{ totalPage }}</span>
+<!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => currentPage = page"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
@@ -179,6 +180,7 @@ import ConfirmBox from "../../../components/ConfirmBox.vue";
 import {saveAs} from "file-saver";
 import {utils, write} from "xlsx";
 import moment from "moment"
+import Pagination from "../../../components/Pagination.vue";
 
 const user = useUserStore().user;
 const alertStore = useAlertStore();
@@ -330,19 +332,20 @@ const formatDate = (date) => {
   }
 };
 
+watch(() => currentPage.value, () => {
+  displayTimeKeeping()
+  updateTableDescription()
+})
+
 const nextPage = () => {
   if (currentPage.value < totalPage.value) {
     currentPage.value++;
-    displayTimeKeeping()
-    updateTableDescription()
   }
 };
 
 const previousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
-    displayTimeKeeping()
-    updateTableDescription()
   }
 };
 
