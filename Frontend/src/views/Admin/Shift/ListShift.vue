@@ -26,7 +26,8 @@
         <el-button @click="previousPage" :disabled="currentPage === 1">
           Prev
         </el-button>
-        <span>{{ currentPage }} / {{ totalPage }}</span>
+<!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => currentPage = page"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
@@ -124,6 +125,7 @@ import { useAlertStore } from "../../../stores/alert";
 import { saveAs } from "file-saver";
 import { utils, write } from "xlsx";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
+import Pagination from "../../../components/Pagination.vue";
 let dataSearch = ref('');
 let currentPage = ref(1)
 const totalPage = ref(1)
@@ -149,7 +151,7 @@ const displayShift = async () => {
         })
       .then(function (response) {
         shift.value = response.data.shift;
-        totalPage.value = (response.data.totalPage == 0) ? 1 : response.data.totalPage
+        totalPage.value = (response.data.totalPage === 0) ? 1 : response.data.totalPage
       });
   } catch (e) {
     console.log(e);
@@ -164,6 +166,11 @@ watch(dataSearch, () => {
     displayShift();
   }, 500);
 });
+
+watch(() => currentPage.value, () => {
+  displayShift()
+})
+
 const nextPage = () => {
   if (currentPage.value < totalPage.value) {
     currentPage.value++;

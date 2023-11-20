@@ -32,7 +32,8 @@
         <el-button size="small" @click="previousPage" :disabled="currentPage === 1">
           Prev
         </el-button>
-        <span style="margin: 0 10px">{{ currentPage }} / {{ totalPage }}</span>
+<!--        <span style="margin: 0 10px">{{ currentPage }} / {{ totalPage }}</span>-->
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => currentPage = page"></Pagination>
         <el-button size="small" @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
@@ -99,6 +100,7 @@ import { ref, watch } from "vue";
 import axios from "axios";
 import { useUserStore } from "../stores/user";
 import {useStatusStore} from "../stores/status";
+import Pagination from "./Pagination.vue";
 
 const value = ref('')
 
@@ -144,16 +146,18 @@ const displayUser = async () => {
   }
 };
 
+watch(() => currentPage.value, () => {
+  displayUser()
+})
+
 const nextPage = () => {
   if (currentPage.value < totalPage.value) {
     currentPage.value++;
-    displayUser()
   }
 };
 const previousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
-    displayUser()
   }
 };
 </script>
