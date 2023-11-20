@@ -11,18 +11,12 @@
         <div class="user">
           <div v-for="item in data">
             <el-avatar style="margin-right: 12px" :src="item.avatar" :size="40" />
-            <div v-if="item.id !== user.id" style="height: 20px; display: flex; flex-direction: column; justify-content: space-between">
-              <span style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E">{{ item.name }}</span>
+            <div style="height: 20px; display: flex; flex-direction: column; justify-content: space-between">
+              <span v-if="item.id !== user.id" style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E"> {{item.id +' - '+item.name }}</span>
+              <span v-else style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E">{{item.id }} - You</span>
               <div style="display: flex">
                 <div :class="bg_color[item.status_AM]" style="height: 6px; width: 40px; margin-right: 1px;"></div>
                 <div :class="bg_color[item.status_PM]" style="height: 6px; width: 40px;"></div>
-              </div>
-            </div>
-            <div v-else style="height: 20px; display: flex; flex-direction: column; justify-content: space-between">
-              <span style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E">You</span>
-              <div style="display: flex">
-                <div :class="bg_color[status.status_AM]" style="height: 6px; width: 40px; margin-right: 1px;"></div>
-                <div :class="bg_color[status.status_PM]" style="height: 6px; width: 40px;"></div>
               </div>
             </div>
           </div>
