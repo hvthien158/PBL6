@@ -281,7 +281,6 @@ const handleCheckIn = async () => {
         getTimeKeeping();
       });
   } catch (e) {
-    console.log(e)
     messages('error', e.response.data.message)
   }
 };
@@ -297,11 +296,9 @@ const handleCheckOut = async () => {
           }
         )
         .then(function (response) {
-          console.log(response)
           getTimeKeeping();
         });
     } catch (e) {
-      console.log(e)
       messages('error', e.response.data.message)
     }
 }
