@@ -19,14 +19,6 @@ use League\CommonMark\Parser\Block\ParagraphParser;
 class TimeKeepingController extends Controller
 {
     /**
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
-
-    /**
      * @return \Illuminate\Http\JsonResponse
      */
     public function checkIn()

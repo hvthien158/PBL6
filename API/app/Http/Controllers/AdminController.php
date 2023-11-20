@@ -30,10 +30,6 @@ class AdminController extends Controller
     /**
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware(['auth:api']);
-    }
     public function listUser(Request $request, $id)
     {
         try {

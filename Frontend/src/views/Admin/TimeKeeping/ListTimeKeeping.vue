@@ -6,7 +6,6 @@
       <div class="title-table">
         <div>
           <el-date-picker
-              style="margin: 40px 30px 0 15%"
               v-model="filter_value"
               type="daterange"
               start-placeholder="Start date"
