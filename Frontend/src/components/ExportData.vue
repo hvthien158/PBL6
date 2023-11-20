@@ -119,7 +119,7 @@ const exportExcel = async () => {
     if (router.currentRoute.value.fullPath === '/schedule') {
         api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${user.id}`
     }
-    if (form.fromMonth != '' && form.toMonth != '') {
+    if (form.fromMonth !== '' && form.toMonth !== '') {
         if (formatToPost(form.fromMonth, 'start') < formatToPost(form.toMonth, 'end')) {
             try {
                 await axios.get(api, {
@@ -162,7 +162,7 @@ const exportExcel = async () => {
                         return rowData;
                     });
                     rows.unshift(headerRow);
-                    if (prop.mode == 'Excel') {
+                    if (prop.mode === 'Excel') {
                         if (!ws['!cols']) {
                             ws['!cols'] = [];
                         }
@@ -195,8 +195,8 @@ const exportExcel = async () => {
         wasClick.value = true
     }
 };
-const exportCSV = async() => {
-    if (form.fromMonth != '' && form.toMonth != '') {
+const exportCSV = async () => {
+    if (form.fromMonth !== '' && form.toMonth !== '') {
         if (formatToPost(form.fromMonth, 'start') < formatToPost(form.toMonth, 'end')) {
             let api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${prop.userId}`;
             if (router.currentRoute.value.fullPath === '/schedule') {

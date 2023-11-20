@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Common\Role;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->role === "admin" || auth()->user()->id == $request->id) {
+        if (auth()->user()->role === Role::ADMIN || auth()->user()->id == $request->id) {
             return $next($request);
         } else {
             return response()->json(["message"=>  Response::HTTP_FORBIDDEN]);

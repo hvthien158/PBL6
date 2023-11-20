@@ -40,7 +40,7 @@
       <el-table :data="data" height="59vh" style="width: 100%">
         <el-table-column prop="id" label="ID" width="50" />
         <el-table-column prop="name" label="Name" width="180" />
-        <el-table-column prop="avatar" label="avatar" width="100">
+        <el-table-column prop="avatar" label="Avatar" width="100">
           <template #default="scope">
             <el-avatar :src="scope.row.avatar" :size="40" />
           </template>

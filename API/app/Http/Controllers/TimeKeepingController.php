@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\ResponseMessage;
+use App\Common\Role;
 use App\Http\Requests\MonthYearRequest;
 use App\Http\Requests\TimeRequest;
 use App\Http\Resources\TimeKeepingResource;
@@ -52,7 +54,7 @@ class TimeKeepingController extends Controller
                     return response()->json(['message' => 'Cannot create system time'], 400);
                 }
             }
-            return response()->json(['message' => 'Checkin success']);
+            return response()->json(['message' => ResponseMessage::OK]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -91,9 +93,9 @@ class TimeKeepingController extends Controller
                         break;
                     }
                 }
-                return response()->json(['message' => 'Checkout success']);
+                return response()->json(['message' => ResponseMessage::OK]);
             } else {
-                return response()->json(['message' => 'Thời gian checkout không hợp lệ'], 400);
+                return response()->json(['message' => 'Invalid time checkout'], 400);
             }
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -152,7 +154,7 @@ class TimeKeepingController extends Controller
                 ->orderBy('_date', 'desc')->get();
             return TimeKeepingResource::collection($timeKeeping);
         }
-        if (auth()->user()->role == 'admin') {
+        if (auth()->user()->role == Role::ADMIN) {
             $timeKeeping = TimeKeeping::where('user_id', $user_id)
                 ->whereBetween('_date', [$from, $to])
                 ->orderBy('_date', 'desc')->get();
@@ -185,7 +187,7 @@ class TimeKeepingController extends Controller
                 if (count($timekeeping) != 0) {
                     return TimeKeepingResource::collection($timekeeping);
                 } else {
-                    return response()->json(['message' => 'Time Keeping in this time not exist'], 400);
+                    return response()->json(['message' => ResponseMessage::NOT_FOUND_ERROR], 404);
                 }
             } catch (\Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 400);
@@ -238,7 +240,7 @@ class TimeKeepingController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['data' => $validator->failed(), 'message' => 'Invalid data request'], 422);
+            return response()->json(['data' => $validator->failed(), 'message' => ResponseMessage::VALIDATION_ERROR], 422);
         }
         $status_am = $request->get('status_am');
         $status_pm = $request->get('status_pm');
@@ -326,6 +328,6 @@ class TimeKeepingController extends Controller
             }
         }
 
-        return response()->json(['message' => 'Update successfully']);
+        return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
     }
 }
