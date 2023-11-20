@@ -14,18 +14,18 @@
       </div>
     </template>
     <el-form :model="form">
-      <el-form-item v-if="prop.mode === 'update'" label="ID" :label-width="formLabelWidth">
+      <el-form-item v-if="prop.mode === 'update'" label="ID" :label-width="formLabelWidth" :rules="[{ required : true }]">
         <el-input v-model="prop.userId" autocomplete="off" disabled />
       </el-form-item>
-      <el-form-item label="Name" :label-width="formLabelWidth">
+      <el-form-item label="Name" :label-width="formLabelWidth" :rules="[{ required : true }]">
         <el-input v-model="form.name" autocomplete="off" />
         <small>{{ checkLanding.checkName }}</small>
       </el-form-item>
-      <el-form-item label="Email" :label-width="formLabelWidth">
+      <el-form-item label="Email" :label-width="formLabelWidth" :rules="[{ required : true }]">
         <el-input v-model="form.email" autocomplete="off" />
         <small>{{ checkLanding.checkEmail }}</small>
       </el-form-item>
-      <el-form-item v-if="prop.mode === 'create'" label="Password" :label-width="formLabelWidth">
+      <el-form-item v-if="prop.mode === 'create'" label="Password" :label-width="formLabelWidth" :rules="[{ required : true }]">
         <el-input type="password" show-password v-model="form.password" autocomplete="off" />
         <small>{{ checkLanding.checkPassword }}</small>
       </el-form-item>
@@ -45,7 +45,7 @@
         <el-input :formatter="(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
           :parser="(value) => value.replace(/\$\s?|(,*)/g, '')" v-model="form.salary" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="Role" :label-width="formLabelWidth">
+      <el-form-item label="Role" :label-width="formLabelWidth" :rules="[{ required : true }]">
         <el-select v-model="form.role" type="text">
           <el-option v-for="item in role" :label="item.name" :value="item.value"></el-option>
         </el-select>
@@ -55,7 +55,7 @@
           <el-option v-for="item in position" :label="item.name" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="Department" :label-width="formLabelWidth">
+      <el-form-item label="Department" :label-width="formLabelWidth" :rules="[{ required : true }]">
         <el-select v-model="form.department" type="text">
           <el-option label="Select Department" :value="0"></el-option>
           <el-option v-for="item in department" :label="item.name" :value="item.id"></el-option>
@@ -125,6 +125,7 @@ span {
   margin-top: 0.5rem;
   margin-left: 16px;
 }
+
 </style>
 
 <script setup>
