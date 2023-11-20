@@ -278,7 +278,7 @@ const exportCSV = async () => {
                         const fileName = `data_${prop.mode}_${formatToPost(form.fromMonth)}-${formatToPost(form.toMonth)}.csv`;
                         FileSaver.saveAs(csvBlob, fileName);
                         messages('success', 'Export complete');
-                        emits('invisible');
+                        emits('invisible');[]
                     });
             } catch (e) {
                 messages('error', e.response.data.message)

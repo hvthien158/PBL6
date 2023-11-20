@@ -98,7 +98,7 @@ main {
   cursor: pointer;
   align-items: center;
   appearance: none;
-  background-image: radial-gradient(100% 100% at 100% 0, #f9ac38 0, #d95827 100%);
+  background-image: radial-gradient(100% 100% at 100% 0, #62f197 0, #1cb966 100%);
   border: 0;
   border-radius: 6px;
   box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
