@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\ResponseMessage;
 use App\Http\Requests\CreateDepartmentRequest;
 use App\Http\Requests\CreateShiftRequest;
 use App\Http\Requests\UpdateShiftRequest;
@@ -89,7 +90,7 @@ class AdminController extends Controller
                 'position' => $request->position,
                 'role' => $request->role
             ]);
-            return response()->json(['message' => 'Create user successfully']);
+            return response()->json(['message' => ResponseMessage::CREATE_SUCCESS], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -116,7 +117,7 @@ class AdminController extends Controller
                 'position' => $request->position,
                 'role' => $request->role
             ]);
-            return response()->json(['message' => 'Update user successfully']);
+            return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -133,9 +134,9 @@ class AdminController extends Controller
         try {
             $user = DB::table('users')->delete($id);
             if ($user == 1) {
-                return response()->json(['message' => 'Delete user successfully']);
+                return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
             } else {
-                return response()->json(['message' => 'User not found'], 400);
+                return response()->json(['message' => ResponseMessage::NOT_FOUND_ERROR], 404);
             }
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -201,7 +202,7 @@ class AdminController extends Controller
                 'phone_number' => $request->phoneNumber,
                 'department_manager_id' => $request->manager
             ]);
-            return response()->json(['message' => 'Create department successfully']);
+            return response()->json(['message' => ResponseMessage::CREATE_SUCCESS], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -224,7 +225,7 @@ class AdminController extends Controller
                 'phone_number' => $request->phoneNumber,
                 'department_manager_id' => $request->manager
             ]);
-            return response()->json(['message' => 'Update department successfully']);
+            return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -242,7 +243,7 @@ class AdminController extends Controller
             $department = Department::find($id);
             if ($department)
                 $department->delete();
-            return response()->json(['message' => 'Delete department successfully']);
+            return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -260,7 +261,7 @@ class AdminController extends Controller
             if ($userDepartment) {
                 return UserResource::collection($userDepartment);
             } else {
-                return response()->json(['message' => 'Không có user nào']);
+                return response()->json(['message' => ResponseMessage::NOT_FOUND_ERROR], 404);
             }
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -307,7 +308,7 @@ class AdminController extends Controller
                 'time_valid_check_out' => $request->timeValidCheckOut,
                 'amount' => $request->amount
             ]);
-            return response()->json(['message' => 'Create shift successfully']);
+            return response()->json(['message' => ResponseMessage::CREATE_SUCCESS], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -329,7 +330,7 @@ class AdminController extends Controller
                 'time_valid_check_out' => $request->timeValidCheckOut,
                 'amount' => $request->amount
             ]);
-            return response()->json(['message' => 'Update shift successfully']);
+            return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -347,7 +348,7 @@ class AdminController extends Controller
             $shift = Shift::find($id);
             if ($shift)
                 $shift->delete();
-            return response()->json(['message' => 'Delete shift successfully']);
+            return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -369,7 +370,7 @@ class AdminController extends Controller
         ]);
 
         if($validator->fails()){
-            return response()->json(['failed_data' => $validator->failed()], 422);
+            return response()->json(['message' => ResponseMessage::VALIDATION_ERROR], 422);
         }
 
         $from = $request->from;
@@ -446,7 +447,7 @@ class AdminController extends Controller
 
                 if($sumWorkingDays != 0){
                     $sumWorkingByMinutes = intdiv($sumWorkingHours * 60 + $sumWorkingMinutes, $sumWorkingDays) ;
-                    $averageWorkingHours = $sumWorkingByMinutes < 60 ? 0 : str_pad(intdiv($sumWorkingByMinutes, 60), 2, '0', STR_PAD_LEFT)
+                    $averageWorkingHours = ($sumWorkingByMinutes < 60 ? '00' : str_pad(intdiv($sumWorkingByMinutes, 60), 2, '0', STR_PAD_LEFT))
                         .':'
                         .str_pad($sumWorkingByMinutes % 60, 2, '0', STR_PAD_LEFT);
                 } else {

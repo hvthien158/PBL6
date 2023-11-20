@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Common\Role;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -12,7 +13,7 @@ class UserPolicy
      */
     public function adminView(User $user): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**
@@ -28,7 +29,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**
@@ -36,7 +37,7 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**
@@ -44,7 +45,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return (auth()->user()->role == 'admin') ? true : false;
+        return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
 
     /**

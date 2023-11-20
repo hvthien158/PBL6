@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Common\Role;
 use App\Models\TimeKeeping;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -16,7 +17,7 @@ class TimeKeepingPolicy
      */
     public function viewAny(User $user): bool
     {
-        return auth()->user()->role === 'admin';
+        return auth()->user()->role === Role::ADMIN;
     }
 
     /**
@@ -46,7 +47,7 @@ class TimeKeepingPolicy
             ->whereDate('date', $currentDate)
             ->first();
         if ($existingTimeKeeping) {
-            if (auth()->user()->role === 'admin' || auth()->user()->id === $existingTimeKeeping->id);
+            if (auth()->user()->role === Role::ADMIN || auth()->user()->id === $existingTimeKeeping->id);
             return true;
         }
         return  false;
@@ -62,7 +63,7 @@ class TimeKeepingPolicy
             ->whereDate('date', $currentDate)
             ->first();
         if ($existingTimeKeeping) {
-            if (auth()->user()->role === 'admin' || auth()->user()->id === $existingTimeKeeping->id);
+            if (auth()->user()->role === Role::ADMIN || auth()->user()->id === $existingTimeKeeping->id);
             return true;
         }
         return  false;
