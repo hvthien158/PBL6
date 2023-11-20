@@ -195,7 +195,7 @@ const exportExcel = async () => {
         wasClick.value = true
     }
 };
-const exportCSV = () => {
+const exportCSV = async() => {
     if (form.fromMonth != '' && form.toMonth != '') {
         if (formatToPost(form.fromMonth, 'start') < formatToPost(form.toMonth, 'end')) {
             let api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${prop.userId}`;
@@ -203,7 +203,7 @@ const exportCSV = () => {
                 api = `http://127.0.0.1:8000/api/get-timekeeping-export/${formatToPost(form.fromMonth, 'start')}/${formatToPost(form.toMonth, 'end')}/${user.id}`
             }
             try {
-                axios
+                await axios
                     .get(api, {
                         headers: { Authorization: `Bearer ${user.token}` },
                     })
@@ -278,7 +278,7 @@ const exportCSV = () => {
                         const fileName = `data_${prop.mode}_${formatToPost(form.fromMonth)}-${formatToPost(form.toMonth)}.csv`;
                         FileSaver.saveAs(csvBlob, fileName);
                         messages('success', 'Export complete');
-                        emits('invisible');
+                        emits('invisible');[]
                     });
             } catch (e) {
                 messages('error', e.response.data.message)
