@@ -19,11 +19,6 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword', 'checkEmail']]);
-    }
-
     /**
      * @param LoginRequest $request
      *
