@@ -1,6 +1,5 @@
 <template>
-    <el-dialog v-model="visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false"
-        @keyup.esc="$emit('invisible')" style="width:30%">
+    <el-dialog v-model="visible" @close="$emit('invisible')" :show-close="false" :width="popupWidth">
         <template #header>
             <div class="my-header">
                 <h4>Export {{ prop.mode }}</h4>
@@ -14,13 +13,13 @@
         </template>
         <el-form>
             <el-form-item label="From Month" :label-width="formLabelWidth">
-                <div class="block">
-                    <el-date-picker v-model="form.fromMonth" type="month" placeholder="Pick a month" />
+                <div class="block" >
+                    <el-date-picker class="date-picker" v-model="form.fromMonth" type="month" placeholder="Pick a month" />
                 </div>
             </el-form-item>
             <el-form-item label="To Month" :label-width="formLabelWidth">
                 <div class="block">
-                    <el-date-picker v-model="form.toMonth" type="month" placeholder="Pick a month" />
+                    <el-date-picker class="date-picker" v-model="form.toMonth" type="month" placeholder="Pick a month" />
                 </div>
             </el-form-item>
             <small>{{ checkDate }}</small>
@@ -48,7 +47,6 @@
 .user {
     display: flex;
     align-items: center;
-    min-width: 30%
 }
 
 .dialog-footer {
@@ -73,10 +71,13 @@ small {
     margin-left: 0 px;
     font-size: 14px;
 }
+.el-input{
+    width: 100px 
+}
 </style>
   
 <script setup>
-import { ref, defineProps, reactive, computed } from "vue";
+import { ref, defineProps, reactive, computed, onMounted } from "vue";
 import axios from "axios";
 import * as XLSX from 'xlsx';
 import * as Papa from 'papaparse'
@@ -92,8 +93,9 @@ const prop = defineProps({
         type: String
     }
 })
+let popupWidth = ref('30%')
 let visible = ref(true)
-const formLabelWidth = '150px'
+let formLabelWidth = '150px'
 const user = useUserStore().user
 let username = ref('')
 let wasClick = ref(false)
@@ -103,6 +105,7 @@ const form = reactive({
     fromMonth: '',
     toMonth: ''
 })
+let formDatePicker = document.querySelector('.date-picker')
 const checkDate = computed(() => {
     if ((form.frommonth == '' || form.toMonth == '') && wasClick.value == true) {
         return 'Please fill form'
@@ -111,6 +114,38 @@ const checkDate = computed(() => {
         return 'To date must be bigger than from date'
     } else {
         return ''
+    }
+})
+onMounted(() => {
+    if (window.innerWidth <= 400) {
+        popupWidth.value = '90%'
+        formLabelWidth = '100px'
+        if(visible && formDatePicker) {
+            formDatePicker.map
+        }
+    }
+    if (window.innerWidth <= 900) {
+        popupWidth.value = '90%'
+        formLabelWidth = '100px'
+    }
+    else if (window.innerWidth <= 1440) {
+        popupWidth.value = '50%'
+        formLabelWidth = '100px'
+    } else {
+        popupWidth.value = '30%'
+        formLabelWidth = '150px'
+    }
+})
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth <= 900) {
+        popupWidth.value = '90%'
+        formLabelWidth = '100px'
+    }
+    else if (window.innerWidth <= 1440) {
+        popupWidth.value = '50%'
+    } else {
+        popupWidth.value = '30%'
     }
 })
 const data = ref();

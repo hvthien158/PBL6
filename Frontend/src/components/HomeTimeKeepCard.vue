@@ -2,13 +2,13 @@
   <Calendar></Calendar>
   <div class="edit-timekeep">
     <div class="card-content">
-      <div style="display: flex; flex-direction: column">
+      <div class="status">
         <div style="display: flex; flex-direction: column; align-items: center">
-          <span class="unselectable">8:30AM - 12:00PM</span>
+          <span class="unselectable">8:30 AM - 12:00 AM</span>
           <StatusButton @click="status.status_AM = status_AM" @change-status="n => status_AM = n" :status_index="status_AM"></StatusButton>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center">
-          <span class="unselectable">1:00PM - 5:45PM</span>
+          <span class="unselectable">1:00 PM - 5:45 PM</span>
           <StatusButton @click="status.status_PM = status_PM" @change-status="n => status_PM = n" :status_index="status_PM"></StatusButton>
         </div>
       </div>
@@ -26,6 +26,11 @@
   font-size: 18px;
   font-weight: bold;
 }
+.status {
+  display: flex; 
+  flex-direction: column;
+  justify-content: space-between
+}
 .card-content{
   margin-top: 20px;
 }
@@ -36,16 +41,18 @@
   -ms-user-select: none;
   user-select: none;
 }
+@media screen and (max-width : 1280px) {
+  .status {
+    flex-direction: row
+  }
+}
 </style>
 
 <script setup>
-import ButtonLoading from "./ButtonLoading.vue";
-import {computed, onBeforeUnmount, onUnmounted, ref, watch, watchEffect} from "vue";
+import { onBeforeUnmount, ref, watch } from "vue";
 import axios from "axios";
 import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
-import Clock from "./Clock.vue"
-import moment from "moment";
 import StatusButton from "./StatusButton.vue";
 import Calendar from "./Calendar.vue";
 import {useStatusStore} from "../stores/status";

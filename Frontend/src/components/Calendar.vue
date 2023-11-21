@@ -112,6 +112,11 @@
   color: #fff;
   font-weight: 600;
 }
+@media screen and (max-width : 1280px) {
+  .calendar{
+    display: none;
+  }
+}
 </style>
 
 <script setup>

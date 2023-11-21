@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="btn-status">
     <div @click="changeStatus" class="status-btn" :class="{'bg-green': index === 0, 'bg-purple': index === 1, 'bg-gray': index === 2}">
       <span class="unselectable">{{ quotes }}</span>
     </div>
@@ -7,8 +7,10 @@
 </template>
 
 <style scoped>
+.btn-status{
+  width: 100%;
+}
 .status-btn{
-  width: 12vw;
   height: 30px;
   border-radius: 6px;
   text-align: center;

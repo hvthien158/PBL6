@@ -1,40 +1,29 @@
 <template>
   <div class="edit-timekeep">
-    <el-card style="border-radius: 12px" class="box-card" :class="{ 'bg-orange' : today, 'bg-gray' : weekend}">
+    <el-card style="border-radius: 12px" class="box-card" :class="{ 'bg-orange': today, 'bg-gray': weekend }">
       <div class="card-content">
         <h1>{{ prop.dayOfWeek }}</h1>
         <p>{{ prop.date }}</p>
         <div style="display: flex">
-          <div style="display: flex; flex-direction: column; align-items: center">
+          <div class="info-status">
             <span style="color: #939393">Morning</span>
             <StatusButton @change-status="n => status_AM = n" :status_index="status_AM"></StatusButton>
           </div>
-          <div style="display: flex; flex-direction: column; align-items: center">
+          <div class="info-status">
             <span style="color: #939393">Afternoon</span>
             <StatusButton @change-status="n => status_PM = n" :status_index="status_PM"></StatusButton>
           </div>
         </div>
         <p>Check-in:</p>
         <div>
-          <el-time-select
-              v-model="check_in_format"
-              start="08:30"
-              step="00:15"
-              end="18:30"
-              placeholder="(none)"
-          />
+          <el-time-select v-model="check_in_format" start="08:30" step="00:15" end="18:30" placeholder="(none)" />
         </div>
         <p style="margin-top: 20px">Check-out:</p>
         <div>
-          <el-time-select
-              v-model="check_out_format"
-              start="08:30"
-              step="00:15"
-              end="18:30"
-              placeholder="(none)"
-          />
+          <el-time-select v-model="check_out_format" start="08:30" step="00:15" end="18:30" placeholder="(none)" />
         </div>
-        <ButtonLoading @click="updateTimeKeep" style="font-size: 15px; margin-top: 20px" size="large" type="warning" round>Save</ButtonLoading>
+        <ButtonLoading @click="updateTimeKeep" style="font-size: 15px; margin-top: 20px" size="large" type="warning"
+          round>Save</ButtonLoading>
       </div>
     </el-card>
     <div style="margin-top: -5vh; margin-left: -7vw">
@@ -44,7 +33,7 @@
 </template>
 
 <style scoped>
-.edit-timekeep{
+.edit-timekeep {
   display: flex;
   flex-direction: column;
   width: 30vw !important;
@@ -52,27 +41,38 @@
   position: sticky !important;
   top: 10vh;
 }
-.card-header{
+
+.info-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+}
+
+.card-header {
   font-size: 18px;
   font-weight: bold;
 }
-.card-content{
+
+.card-content {
   margin-top: 20px;
 }
-.bg-orange{
+
+.bg-orange {
   background-color: rgba(255, 153, 41, 0.36);
 }
-.bg-gray{
+
+.bg-gray {
   background-color: rgba(204, 204, 204, 0.43);
 }
 </style>
 
 <script setup>
 import ButtonLoading from "./ButtonLoading.vue";
-import {computed, ref, watch, watchEffect} from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import axios from "axios";
-import {useUserStore} from "../stores/user";
-import {useAlertStore} from "../stores/alert";
+import { useUserStore } from "../stores/user";
+import { useAlertStore } from "../stores/alert";
 import Clock from "./Clock.vue"
 import moment from "moment";
 import StatusButton from "./StatusButton.vue";
@@ -118,16 +118,16 @@ const status_AM = ref(0)
 const status_PM = ref(0)
 
 watch(() => prop.date,
-    () => {
-        weekend.value = prop.dayOfWeek === 'Sunday' || prop.dayOfWeek === 'Saturday';
-        today.value = prop.date === moment().format('YYYY-MM-DD')
-        check_out_format.value = prop.checkout.slice(0, 5)
-        check_in_format.value = prop.checkin.slice(0, 5)
-        status_AM.value = prop.status_AM_prop
-        status_PM.value = prop.status_PM_prop
-    })
+  () => {
+    weekend.value = prop.dayOfWeek === 'Sunday' || prop.dayOfWeek === 'Saturday';
+    today.value = prop.date === moment().format('YYYY-MM-DD')
+    check_out_format.value = prop.checkout.slice(0, 5)
+    check_in_format.value = prop.checkin.slice(0, 5)
+    status_AM.value = prop.status_AM_prop
+    status_PM.value = prop.status_PM_prop
+  })
 
-function updateTimeKeep(){
+function updateTimeKeep() {
   axios.post('http://127.0.0.1:8000/api/timekeeping/update', {
     'user_id': prop.user_id,
     'date': prop.date,
@@ -136,7 +136,7 @@ function updateTimeKeep(){
     'status_am': status_AM.value,
     'status_pm': status_PM.value,
   }, {
-    headers: {Authorization: `Bearer ${user.token}`},
+    headers: { Authorization: `Bearer ${user.token}` },
   }).then(() => {
     emit('update')
     alertStore.alert = true
