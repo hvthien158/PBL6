@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="visible" @close="$emit('invisible')" :show-close="false" :width="popupWidth">
+    <el-dialog v-model="visible" @close="$emit('invisible')" :show-close="false" :width="popupWidth" >
         <template #header>
             <div class="my-header">
                 <h4>Export {{ prop.mode }}</h4>
@@ -12,14 +12,16 @@
             </div>
         </template>
         <el-form>
-            <el-form-item label="From Month" :label-width="formLabelWidth">
+            <el-form-item :label="fromMonth" :label-width="formLabelWidth" :rules="[{ required : true }]" >
                 <div class="block" >
-                    <el-date-picker class="date-picker" v-model="form.fromMonth" type="month" placeholder="Pick a month" />
+                    <el-date-picker v-if="fromMonth == ''" class="date-picker" v-model="form.fromMonth" type="month" placeholder="From Month" />
+                    <el-date-picker v-else class="date-picker" v-model="form.fromMonth" type="month" placeholder="Pick a month" />
                 </div>
             </el-form-item>
-            <el-form-item label="To Month" :label-width="formLabelWidth">
+            <el-form-item :label="toMonth" :label-width="formLabelWidth" :rules="[{ required : true }]">
                 <div class="block">
-                    <el-date-picker class="date-picker" v-model="form.toMonth" type="month" placeholder="Pick a month" />
+                    <el-date-picker v-if="toMonth == ''" class="date-picker" v-model="form.toMonth" type="month" placeholder="To Month" />
+                    <el-date-picker v-else class="date-picker" v-model="form.toMonth" type="month" placeholder="Pick a month" />
                 </div>
             </el-form-item>
             <small>{{ checkDate }}</small>
@@ -48,7 +50,9 @@
     display: flex;
     align-items: center;
 }
-
+.el-form-item label {
+    margin-bottom: 0
+}
 .dialog-footer {
     margin-top: 16px;
 }
@@ -100,6 +104,8 @@ const user = useUserStore().user
 let username = ref('')
 let wasClick = ref(false)
 const alertStore = useAlertStore()
+const fromMonth = ref('from Month')
+const toMonth = ref('To Month')
 const emits = defineEmits(['invisible', 'updateData'])
 const form = reactive({
     fromMonth: '',
@@ -119,33 +125,52 @@ const checkDate = computed(() => {
 onMounted(() => {
     if (window.innerWidth <= 400) {
         popupWidth.value = '90%'
-        formLabelWidth = '100px'
-        if(visible && formDatePicker) {
-            formDatePicker.map
-        }
+        formLabelWidth = '0px'
+        fromMonth.value = ''
+        toMonth.value = ''
     }
-    if (window.innerWidth <= 900) {
+    else if (window.innerWidth <= 900) {
         popupWidth.value = '90%'
         formLabelWidth = '100px'
+        fromMonth.value = 'From Month'
+        toMonth.value = 'To Month'
     }
     else if (window.innerWidth <= 1440) {
         popupWidth.value = '50%'
         formLabelWidth = '100px'
+        fromMonth.value = 'From Month'
+        toMonth.value = 'To Month'
     } else {
         popupWidth.value = '30%'
         formLabelWidth = '150px'
+        fromMonth.value = 'From Month'
+        toMonth.value = 'To Month'
     }
 })
 
 window.addEventListener('resize', () => {
-    if (window.innerWidth <= 900) {
+    if (window.innerWidth <= 400) {
+        popupWidth.value = '90%'
+        formLabelWidth = '0px'
+        fromMonth.value = ''
+        toMonth.value = ''
+    } 
+    else if (window.innerWidth <= 900) {
         popupWidth.value = '90%'
         formLabelWidth = '100px'
+        fromMonth.value = 'From Month'
+        toMonth.value = 'To Month'
     }
     else if (window.innerWidth <= 1440) {
         popupWidth.value = '50%'
+        formLabelWidth = '100px'
+        fromMonth.value = 'From Month'
+        toMonth.value = 'To Month'
     } else {
         popupWidth.value = '30%'
+        formLabelWidth = '150px'
+        fromMonth.value = 'From Month'
+        toMonth.value = 'To Month'
     }
 })
 const data = ref();
@@ -183,8 +208,8 @@ const exportExcel = async () => {
                         const rowData = [day, getDayOfWeek(currentDate, day)];
                         if (dataForDay) {
                             rowData.push(
-                                dataForDay['timeCheckIn'],
-                                dataForDay['timeCheckOut'],
+                                dataForDay['timeCheckIn'].slice(7,12),
+                                dataForDay['timeCheckOut'].slice(7,12),
                                 dataForDay['shift'],
                                 statusWork(dataForDay['status_AM']),
                                 statusWork(dataForDay['status_PM']),
@@ -192,7 +217,7 @@ const exportExcel = async () => {
                                 username
                             );
                         } else {
-                            rowData.push('00:00 (00:00)', '00:00 (00:00)', 'OFF', 'OFF', 'OFF', '00:00', username);
+                            rowData.push('00:00', '00:00', 'OFF', 'OFF', 'OFF', '00:00', username);
                         }
                         return rowData;
                     });
@@ -284,8 +309,8 @@ const exportCSV = async () => {
 
                                 if (dataForDay) {
                                     rowData.push(
-                                        dataForDay['timeCheckIn'],
-                                        dataForDay['timeCheckOut'],
+                                        dataForDay['timeCheckIn'].slice(7,12),
+                                        dataForDay['timeCheckOut'].slice(7,12),
                                         dataForDay['shift'],
                                         statusWork(dataForDay['status_AM']),
                                         statusWork(dataForDay['status_PM']),
@@ -294,8 +319,8 @@ const exportCSV = async () => {
                                     );
                                 } else {
                                     rowData.push(
-                                        '00:00 (00:00)',
-                                        '00:00 (00:00)',
+                                        '00:00',
+                                        '00:00',
                                         'OFF',
                                         'OFF',
                                         'OFF',
