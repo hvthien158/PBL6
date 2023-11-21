@@ -1,8 +1,9 @@
 <template>
   <div class="timekeeping-management">
-    <EditTimeKeep style="height: 100%" :user_id="user_id" :date="today.date" :day-of-week="today.dayOfWeek"
-      :checkin="today.timeCheckIn" :checkout="today.timeCheckOut" :status_AM_prop="today.status_AM"
-      :status_PM_prop="today.status_PM" @update="getListTimeKeeping(filter_value[0], filter_value[1])"></EditTimeKeep>
+    <EditTimeKeep class="edit-timekeeping" style="height: 100%" :user_id="user_id" :date="today.date"
+      :day-of-week="today.dayOfWeek" :checkin="today.timeCheckIn" :checkout="today.timeCheckOut"
+      :status_AM_prop="today.status_AM" :status_PM_prop="today.status_PM"
+      @update="getListTimeKeeping(filter_value[0], filter_value[1])"></EditTimeKeep>
     <el-card>
       <el-backtop :right="20" :bottom="100" />
       <div slot="header" class="card-header">
@@ -35,9 +36,9 @@
           <el-table-column prop="dayOfWeek" label="Day of week" width="160"></el-table-column>
           <el-table-column prop="date" label="Date" width="100"></el-table-column>
           <el-table-column label="Status" width="120"></el-table-column>
-          <el-table-column prop="timeCheckIn" label="Checkin"></el-table-column>
-          <el-table-column prop="timeCheckOut" label="Checkout"></el-table-column>
-          <el-table-column prop="timeWork" label="Working time" width="110"></el-table-column>
+          <el-table-column prop="timeCheckIn" label="Checkin" min-width="110"></el-table-column>
+          <el-table-column prop="timeCheckOut" label="Checkout" min-width="110"></el-table-column>
+          <el-table-column prop="timeWork" label="Working time" min-width="110"></el-table-column>
           <el-table-column prop="shift" label="Shift" width="80"></el-table-column>
           <el-table-column label="Request" width="100">
             <template #default="scope">
@@ -46,8 +47,8 @@
           </el-table-column>
         </el-table>
         <div class="form-export">
-          <ExportData @invisible="visibleMode = false" :mode="operationMode"
-            :userId="user_id" v-if="visibleMode"></ExportData>
+          <ExportData @invisible="visibleMode = false" :mode="operationMode" :userId="user_id" v-if="visibleMode">
+          </ExportData>
         </div>
         <div class="pagination">
           <el-button type="info" @click="previousMonth">
@@ -78,10 +79,12 @@
   font-size: 18px;
   font-weight: bold;
 }
+
 .form-export {
   position: absolute;
   bottom: 7%;
 }
+
 .el-card {
   width: 70vw;
 }
@@ -114,6 +117,16 @@
 
 .pagination span {
   margin: 0 10px;
+}
+
+@media screen and (max-width: 1440px) {
+  .edit-timekeeping {
+    display: none;
+  }
+
+  .el-card {
+    width: 90vw;
+  }
 }
 </style>
 
@@ -344,7 +357,7 @@ function rowStyle({ row }) {
     }
   }
 }
-const custom_status_css = function (status_AM, status_PM){
+const custom_status_css = function (status_AM, status_PM) {
   const color = ['#04fc43', 'rgba(0,120,248,0.57)', '#ccc']
   return {
     'background': 'linear-gradient(to right, ' + color[status_AM] + ' 49%, rgba(0, 0, 0, 0) 49%), linear-gradient(to right, white 50%, ' + color[status_PM] + ' 1%)',
@@ -369,12 +382,12 @@ function editTime(index) {
   }
 }
 const handleExportExcel = () => {
-  visibleMode.value = true 
+  visibleMode.value = true
   operationMode.value = 'Excel'
   user_id.value = Number(router.currentRoute.value.params.userID)
 }
 const handleExportCSV = () => {
-  visibleMode.value = true 
+  visibleMode.value = true
   operationMode.value = 'CSV'
   user_id.value = Number(router.currentRoute.value.params.userID)
 }
