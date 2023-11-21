@@ -154,7 +154,7 @@ window.addEventListener('resize', () => {
         formLabelWidth = '0px'
         fromMonth.value = ''
         toMonth.value = ''
-    }
+    } 
     else if (window.innerWidth <= 900) {
         popupWidth.value = '90%'
         formLabelWidth = '100px'
@@ -208,8 +208,8 @@ const exportExcel = async () => {
                         const rowData = [day, getDayOfWeek(currentDate, day)];
                         if (dataForDay) {
                             rowData.push(
-                                dataForDay['timeCheckIn'],
-                                dataForDay['timeCheckOut'],
+                                dataForDay['timeCheckIn'].slice(7,12),
+                                dataForDay['timeCheckOut'].slice(7,12),
                                 dataForDay['shift'],
                                 statusWork(dataForDay['status_AM']),
                                 statusWork(dataForDay['status_PM']),
@@ -217,7 +217,7 @@ const exportExcel = async () => {
                                 username
                             );
                         } else {
-                            rowData.push('00:00 (00:00)', '00:00 (00:00)', 'OFF', 'OFF', 'OFF', '00:00', username);
+                            rowData.push('00:00', '00:00', 'OFF', 'OFF', 'OFF', '00:00', username);
                         }
                         return rowData;
                     });
@@ -309,8 +309,8 @@ const exportCSV = async () => {
 
                                 if (dataForDay) {
                                     rowData.push(
-                                        dataForDay['timeCheckIn'],
-                                        dataForDay['timeCheckOut'],
+                                        dataForDay['timeCheckIn'].slice(7,12),
+                                        dataForDay['timeCheckOut'].slice(7,12),
                                         dataForDay['shift'],
                                         statusWork(dataForDay['status_AM']),
                                         statusWork(dataForDay['status_PM']),
@@ -319,8 +319,8 @@ const exportCSV = async () => {
                                     );
                                 } else {
                                     rowData.push(
-                                        '00:00 (00:00)',
-                                        '00:00 (00:00)',
+                                        '00:00',
+                                        '00:00',
                                         'OFF',
                                         'OFF',
                                         'OFF',
