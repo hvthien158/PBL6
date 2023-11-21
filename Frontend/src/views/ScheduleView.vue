@@ -11,13 +11,17 @@
         <span style="position: absolute; right: calc(4vw + 36px)" v-if="admin_view">User: {{ admin_view }}</span>
       </div>
       <div class="card-content">
-        <el-form inline>
-          <el-date-picker style="margin: 40px 30px 0 15%" v-model="filter_value" type="daterange"
-            start-placeholder="Start date" end-placeholder="End date" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
-          <el-form-item>
-            <el-button type="warning" @click="handleExportExcel">Export Excel</el-button>
-            <el-button type="warning" @click="handleExportCSV">Export CSV</el-button>
-          </el-form-item>
+        <el-form>
+          <div class="responsive-menu">
+            <el-date-picker style="max-width: 250px" v-model="filter_value" type="daterange"
+              start-placeholder="Start date" end-placeholder="End date" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
+            <div class="export">
+              <el-form-item>
+                <el-button type="warning" @click="handleExportExcel">Export Excel</el-button>
+                <el-button type="warning" @click="handleExportCSV">Export CSV</el-button>
+              </el-form-item>
+            </div>
+          </div>
         </el-form>
         <div>
           <div class="pagination">
@@ -73,6 +77,8 @@
 
 .el-form {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
 }
 
 .card-header {
@@ -119,6 +125,13 @@
   margin: 0 10px;
 }
 
+.responsive-menu {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
 @media screen and (max-width: 1440px) {
   .edit-timekeeping {
     display: none;
@@ -126,6 +139,24 @@
 
   .el-card {
     width: 90vw;
+  }
+}
+
+@media screen and (max-width: 608px) {
+  .el-form {
+    display: flex;
+    justify-content: center;
+  }
+
+  .el-form .responsive-menu {
+    width: auto;
+    display: block;
+  }
+
+  .export {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
   }
 }
 </style>
