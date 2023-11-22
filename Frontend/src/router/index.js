@@ -103,9 +103,15 @@ router.beforeEach(async () => {
     })
   }
 })
+
 router.beforeEach(async (to) => {
-  if (to.path.includes('admin')) {
-    const user = await useUserStore().user
+  const user = await useUserStore().user
+  if(user.token == '' && !(to.path.includes('login') || to.path.includes('forgot-password') || to.path.includes('reset-password'))) {
+    await router.push({
+      name: 'login',
+    })
+  }
+  else if (to.path.includes('admin')) {
     if (user.role !== 'admin') {
       await router.push({
         name: 'home',
@@ -113,6 +119,7 @@ router.beforeEach(async (to) => {
     }
   }
 })
+
 router.beforeResolve((to, from, next) => {
   if (to.name) {
     NProgress.start()
