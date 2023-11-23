@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\GoogleDriveController;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Str;
 
@@ -134,7 +135,8 @@ class AuthController extends Controller
         $user = User::where('id', auth()->id());
         if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');
-            $path = Storage::disk('public')->put('avatar/' . auth()->id(), $avatar);
+            $googleDriver = new GoogleDriveController;
+            $path = $googleDriver->googleDriveFileUpload($avatar);
             $user->update(array_merge($request->validated(), ['avatar' => $path]));
         } else {
             $user->update(array_merge($request->validated()));
@@ -145,7 +147,6 @@ class AuthController extends Controller
             'user' => UserResource::collection($user)
         ], 201);
     }
-
     /**
      * @param Request $request
      *

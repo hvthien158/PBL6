@@ -26,7 +26,7 @@ class UserResource extends JsonResource
             $DOB_format = 'none';
         }
         if($this->avatar){
-            $avatar = env('STORAGE_URL').$this->avatar;
+            $avatar = $this->avatar;
         } else {
             $avatar = 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg';
         }
