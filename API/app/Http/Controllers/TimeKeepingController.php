@@ -124,10 +124,14 @@ class TimeKeepingController extends Controller
             if ($dayOfWeek == 5 || $dayOfWeek == 6) {
                 $status_AM = 2;
                 $status_PM = 2;
-            } else {
-                $status_AM = 0;
-                $status_PM = 0;
+                return response()->json([
+                    'weekend' => 1,
+                    'status_AM' => $status_AM,
+                    'status_PM' => $status_PM,
+                ]);
             }
+            $status_AM = 0;
+            $status_PM = 0;
             return response()->json([
                 'status_AM' => $status_AM,
                 'status_PM' => $status_PM,
@@ -260,6 +264,10 @@ class TimeKeepingController extends Controller
             ->where('_date', '=', $date)->first();
 
         if ($timekeep) {
+            $need_request_status = $status_am !== $timekeep->status_am || $status_pm !== $timekeep->status_pm;
+            $need_request_time = ($checkin && $checkin->format('H:i:s') !== $timekeep->time_check_in)
+                || ($checkout && $checkout->format('H:i:s') !== $timekeep->time_check_out);
+
             DB::table('time_keepings')->where('user_id', '=', $request->user_id)
                 ->where('_date', '=', $date)
                 ->update([
@@ -267,6 +275,8 @@ class TimeKeepingController extends Controller
                     'time_check_out' => $checkout ? $checkout->format('H:i:s') : $timekeep->time_check_out,
                     'status_am' => $status_am >= 0 ? $status_am : $timekeep->status_am,
                     'status_pm' => $status_pm >= 0 ? $status_pm : $timekeep->status_pm,
+                    'admin_accept_status' => $need_request_status ? 0 : $timekeep->admin_accept_status,
+                    'admin_accept_time' => $need_request_time ? 0 : $timekeep->admin_accept_time,
                 ]);
 
 
@@ -304,6 +314,8 @@ class TimeKeepingController extends Controller
                 'time_check_out' => $checkout ? $checkout->format('H:i:s') : null,
                 'status_am' => $status_am ?: 0,
                 'status_pm' => $status_pm ?: 0,
+                'admin_accept_status' => ($checkin || $checkout) ? 0 : null,
+                'admin_accept_time' => ($status_am || $status_pm) ? 0 : null,
             ]);
             $check = DB::table('systemtimes')->insert([
                 'id' => $newtimekeep,

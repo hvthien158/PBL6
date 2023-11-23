@@ -66,6 +66,8 @@ class TimeKeepingResource extends JsonResource
             'status_PM' => $this->status_pm,
             'user' => $this->user->name,
             'shift' => $timeCheckOut ? $shift : '',
+            'adminAcceptStatus' => $this->admin_accept_status,
+            'adminAcceptTime' => $this->admin_accept_time,
         ];
     }
 }

@@ -1,10 +1,21 @@
 <template>
   <div class="timekeeping-management">
-    <EditTimeKeep style="height: 100%" :user_id="user_id" :date="today.date" :day-of-week="today.dayOfWeek"
-      :checkin="today.timeCheckIn" :checkout="today.timeCheckOut" :status_AM_prop="today.status_AM"
-      :status_PM_prop="today.status_PM" @update="getListTimeKeeping(filter_value[0], filter_value[1])"></EditTimeKeep>
+    <EditTimeKeep
+        :id="today.id"
+        :user_id="user_id"
+        :date="today.date"
+        :day-of-week="today.dayOfWeek"
+        :checkin="today.timeCheckIn"
+        :checkout="today.timeCheckOut"
+        :status_AM_prop="today.status_AM"
+        :status_PM_prop="today.status_PM"
+        :status_change="today.adminAcceptStatus === 0"
+        :time_change="today.adminAcceptTime === 0"
+        @update="getListTimeKeeping(filter_value[0], filter_value[1])"
+        @nextday="index += 1"
+        @prevday="index -= 1"></EditTimeKeep>
     <el-card>
-      <el-backtop :right="20" :bottom="100" />
+      <el-backtop :right="20" :bottom="100"/>
       <div slot="header" class="card-header">
         Time Keeping
         <span style="position: absolute; right: calc(4vw + 36px)" v-if="admin_view">User: {{ admin_view }}</span>
@@ -12,7 +23,8 @@
       <div class="card-content">
         <el-form inline>
           <el-date-picker style="margin: 40px 30px 0 15%" v-model="filter_value" type="daterange"
-            start-placeholder="Start date" end-placeholder="End date" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
+                          start-placeholder="Start date" end-placeholder="End date" format="YYYY-MM-DD"
+                          value-format="YYYY-MM-DD"/>
           <el-form-item>
             <el-button type="warning" @click="handleExportExcel">Export Excel</el-button>
             <el-button type="warning" @click="handleExportCSV">Export CSV</el-button>
@@ -28,18 +40,53 @@
               Next
             </el-button>
           </div>
-          <el-checkbox v-model="only_show" label="Only show checkin days" size="large" />
+          <el-checkbox v-model="only_show" label="Only show checkin days" size="large"/>
         </div>
         <el-table :row-style="rowStyle" :cell-style="cellStyle" size="small" style="font-size: 14px"
-          :data="only_show ? dataDisplay : dataByMonth" border>
-          <el-table-column prop="dayOfWeek" label="Day of week" width="160"></el-table-column>
+                  :data="only_show ? dataDisplay : dataByMonth" border>
+          <el-table-column prop="dayOfWeek" label="Day of week" width="160">
+            <template #default="scope">
+              <el-button
+                  style="color: #606266;
+                  font-weight: normal"
+                  class="el-button--text"
+                  @click="editTime(scope.$index)"
+              >
+                {{ scope.row.dayOfWeek }}&thinsp;
+              </el-button>
+              <span v-if="scope.row.statusRequest === 0"
+                    style="color: red">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-exclamation-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path
+                      d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                </svg>
+              </span>
+              <span v-else-if="scope.row.statusRequest === 1" style="color: #f3952d">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock"
+                     viewBox="0 0 16 16">
+                  <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                </svg>
+              </span>
+              <span v-else-if="scope.row.statusRequest === 2" style="color: #1cb966">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                     class="bi bi-check-circle" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path
+                      d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                </svg>
+              </span>
+            </template>
+          </el-table-column>
           <el-table-column prop="date" label="Date" width="100"></el-table-column>
           <el-table-column label="Status" width="120"></el-table-column>
           <el-table-column prop="timeCheckIn" label="Checkin"></el-table-column>
           <el-table-column prop="timeCheckOut" label="Checkout"></el-table-column>
           <el-table-column prop="timeWork" label="Working time" width="110"></el-table-column>
           <el-table-column prop="shift" label="Shift" width="80"></el-table-column>
-          <el-table-column label="Request" width="100">
+          <el-table-column label="Operations" width="100">
             <template #default="scope">
               <el-button class="el-button--text" @click="editTime(scope.$index)">Edit</el-button>
             </template>
@@ -47,7 +94,7 @@
         </el-table>
         <div class="form-export">
           <ExportData @invisible="visibleMode = false" :mode="operationMode"
-            :userId="user_id" v-if="visibleMode"></ExportData>
+                      :userId="user_id" v-if="visibleMode"></ExportData>
         </div>
         <div class="pagination">
           <el-button type="info" @click="previousMonth">
@@ -78,10 +125,12 @@
   font-size: 18px;
   font-weight: bold;
 }
+
 .form-export {
   position: absolute;
   bottom: 7%;
 }
+
 .el-card {
   width: 70vw;
 }
@@ -120,13 +169,14 @@
 <script setup>
 import EditTimeKeep from "../components/EditTimeKeep.vue"
 import ExportData from "../components/ExportData.vue"
-import { saveAs } from "file-saver";
-import { read, utils, write } from "xlsx";
-import { ref, reactive, onMounted, defineProps, computed, watchEffect, watch } from "vue";
-import { useUserStore } from "../stores/user";
+import {saveAs} from "file-saver";
+import {read, utils, write} from "xlsx";
+import {ref, reactive, onMounted, defineProps, computed, watchEffect, watch} from "vue";
+import {useUserStore} from "../stores/user";
 import axios from "axios";
 import moment from "moment";
 import router from "../router";
+import UserRequest from "../components/UserRequest.vue";
 
 const user = useUserStore().user;
 let dataSearch = reactive({
@@ -144,28 +194,34 @@ const today = ref({
   date: '',
   timeCheckIn: '',
   timeCheckOut: '',
+  adminAcceptStatus: null,
+  adminAcceptTime: null,
 })
 const first_load = ref(true)
 const admin_view = ref('')
 const user_id = ref(user.id)
 const visibleMode = ref(false)
 const operationMode = ref('Excel')
+const status_change = ref(false)
+const time_change = ref(false)
+const index = ref(0)
+
 const getListTimeKeeping = async (from, to) => {
   if (router.currentRoute.value.fullPath === '/schedule') {
     try {
       await axios
-        .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
-        .then(function (response) {
-          data.value = response.data.data;
-          if (first_load.value) {
-            loadToday()
-            first_load.value = false
-          }
-        });
+          .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to, {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          })
+          .then(function (response) {
+            data.value = response.data.data;
+            if (first_load.value) {
+              loadToday()
+              first_load.value = false
+            }
+          });
       dataSearch.startDate = null
       dataSearch.endDate = null
     } catch (e) {
@@ -176,19 +232,19 @@ const getListTimeKeeping = async (from, to) => {
     user_id.value = Number(userID)
     try {
       await axios
-        .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to + '/' + userID, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        })
-        .then(function (response) {
-          data.value = response.data.data;
-          admin_view.value = data.value[0].user
-          if (first_load.value) {
-            loadToday()
-            first_load.value = false
-          }
-        });
+          .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to + '/' + userID, {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          })
+          .then(function (response) {
+            data.value = response.data.data;
+            admin_view.value = data.value[0].user
+            if (first_load.value) {
+              loadToday()
+              first_load.value = false
+            }
+          });
       dataSearch.startDate = null
       dataSearch.endDate = null
     } catch (e) {
@@ -220,10 +276,14 @@ const dataByMonth = computed(() => {
   let limit = 100
 
   do {
+    if(start.format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')){
+      index.value = result.length
+    }
     let check = data.value.find((element) => {
       return element.date === start.format('YYYY-MM-DD')
     })
     if (check) {
+      check.statusRequest = checkStatusRequest(check)
       result.push(check)
     } else {
       if (start.format('dddd') === 'Sunday' || start.format('dddd') === "Saturday") {
@@ -233,8 +293,7 @@ const dataByMonth = computed(() => {
           status_AM: 2,
           status_PM: 2,
         })
-      }
-      else {
+      } else {
         result.push({
           date: start.format('YYYY-MM-DD'),
           dayOfWeek: start.format('dddd'),
@@ -260,8 +319,7 @@ const dataByMonth = computed(() => {
         status_AM: 2,
         status_PM: 2,
       })
-    }
-    else {
+    } else {
       result.push({
         date: start.format('YYYY-MM-DD'),
         dayOfWeek: start.format('dddd'),
@@ -270,9 +328,22 @@ const dataByMonth = computed(() => {
       })
     }
   }
-
   return result
 })
+
+function checkStatusRequest(check) {
+  let status = check.adminAcceptStatus
+  let time = check.adminAcceptTime
+
+  if(status == null && time == null){
+    return 'Nothing'
+  } else if(status == null){
+    return time
+  } else if(time == null) {
+    return status
+  }
+  return Math.min(status, time)
+}
 
 function filterByMonth() {
   filter_value.value = [
@@ -304,6 +375,7 @@ function nextMonth() {
   }
   filterByMonth()
 }
+
 function previousMonth() {
   if (monthDisplay.value === 0) {
     monthDisplay.value = 11
@@ -327,7 +399,7 @@ function loadToday() {
   }
 }
 
-function rowStyle({ row }) {
+function rowStyle({row}) {
   if (row.date === moment().format('YYYY-MM-DD')) {
     return {
       'background-color': 'rgba(255,153,41,0.37)'
@@ -344,15 +416,17 @@ function rowStyle({ row }) {
     }
   }
 }
-const custom_status_css = function (status_AM, status_PM){
+
+const custom_status_css = function (status_AM, status_PM) {
   const color = ['#04fc43', 'rgba(0,120,248,0.57)', '#ccc']
   return {
-    'background': 'linear-gradient(to right, ' + color[status_AM] + ' 49%, rgba(0, 0, 0, 0) 49%), linear-gradient(to right, white 50%, ' + color[status_PM] + ' 1%)',
+    'background': 'linear-gradient(to right, ' + color[status_AM] + ' 49%, rgba(0, 0, 0, 0) 49%), linear-gradient(to right, white 50%, ' + color[status_PM] + ' 50%)',
     'padding': '16px 30px',
     'background-clip': 'content-box',
   }
 }
-function cellStyle({ rowIndex, columnIndex }) {
+
+function cellStyle({rowIndex, columnIndex}) {
   if (!only_show.value && columnIndex === 2) {
     return custom_status_css(dataByMonth.value[rowIndex].status_AM, dataByMonth.value[rowIndex].status_PM)
   } else if (columnIndex === 2) {
@@ -361,20 +435,37 @@ function cellStyle({ rowIndex, columnIndex }) {
 
 }
 
-function editTime(index) {
+watch(() => index.value, () => {
+  if (only_show.value === false) {
+    if (dataByMonth.value[index.value].dayOfWeek === 'Saturday') {
+      index.value += 2
+    } else if (dataByMonth.value[index.value].dayOfWeek === 'Sunday'){
+      index.value -= 2
+    }
+  }
+  editTime(index.value)
+})
+
+function editTime(id) {
+  index.value = id
   if (only_show.value === true) {
-    today.value = dataDisplay.value[index]
+    if (!['Saturday', 'Sunday'].includes(dataDisplay.value[id].dayOfWeek)) {
+      today.value = dataDisplay.value[id]
+    }
   } else {
-    today.value = dataByMonth.value[index]
+    if (!['Saturday', 'Sunday'].includes(dataByMonth.value[id].dayOfWeek)) {
+      today.value = dataByMonth.value[id]
+    }
   }
 }
+
 const handleExportExcel = () => {
-  visibleMode.value = true 
+  visibleMode.value = true
   operationMode.value = 'Excel'
   user_id.value = Number(router.currentRoute.value.params.userID)
 }
 const handleExportCSV = () => {
-  visibleMode.value = true 
+  visibleMode.value = true
   operationMode.value = 'CSV'
   user_id.value = Number(router.currentRoute.value.params.userID)
 }

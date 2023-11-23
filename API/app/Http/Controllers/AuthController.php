@@ -34,7 +34,7 @@ class AuthController extends Controller
 
         if (!auth()->user()->hasVerifiedEmail()) {
             auth()->user()->sendEmailVerificationNotification();
-            return response()->json(['verify_quest' => 'Please verify email'], 303);
+            return response()->json(['verify_quest' => 'Please verify email'], 200);
         }
 
         return $this->createNewToken($token);

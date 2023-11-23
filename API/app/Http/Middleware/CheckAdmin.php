@@ -19,7 +19,7 @@ class CheckAdmin
         if (auth()->user()->role === Role::ADMIN) {
             return $next($request);
         } else {
-            return response()->json(["message"=>  Response::HTTP_FORBIDDEN]);
+            return response()->json("", 403);
         }
     }
 }

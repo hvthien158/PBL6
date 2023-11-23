@@ -13,8 +13,9 @@ class Message extends Model
     protected $table = 'messages';
 
     protected $fillable = [
+        'title',
         'content',
-        'user_id'
+        'time_keeping_id',
     ];
 
     public function user(): BelongsTo

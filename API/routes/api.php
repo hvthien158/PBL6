@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\TimeKeepingController;
 use App\Http\Controllers\UserController;
@@ -31,6 +32,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/update-profile', [AuthController::class, 'updateProfile']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+
     //Time keeping
     Route::middleware('checkip')->group(function () {
         Route::post('check-in', [TimeKeepingController::class, 'checkIn']);
@@ -45,24 +47,39 @@ Route::middleware('auth:api')->group(function () {
     Route::get('get-timekeeping-export/{fromMonth}/{toMonth}/{userId}', [TimeKeepingController::class, 'getTimeKeepingExport']);
     Route::get('user/{id}', [UserController::class, 'user']);
     Route::get('user/', [UserController::class, 'user']);
-    //Admin 
-    Route::post('list-user/{id}', [AdminController::class, 'listUser']);
-    Route::post('create-user', [AdminController::class, 'createUser']);
-    Route::put('update-user/{id}', [AdminController::class, 'updateUser']);
-    Route::delete('delete-user/{id}', [AdminController::class, 'deleteUser']);
-    Route::post('list-department/{id}', [AdminController::class, 'listDepartment']);
-    Route::post('search-department', [AdminController::class, 'searchDepartment']);
-    Route::post('create-department', [AdminController::class, 'createDepartment']);
-    Route::get('user-department/{id}', [AdminController::class, 'getUserDepartment']);
-    Route::put('update-department/{id}', [AdminController::class, 'updateDepartment']);
-    Route::delete('delete-department/{id}', [AdminController::class, 'deleteDepartment']);
-    Route::post('list-shift/{id}', [AdminController::class, 'listShift']);
-    Route::post('create-shift', [AdminController::class, 'createShift']);
-    Route::put('update-shift/{id}', [AdminController::class, 'updateShift']);
-    Route::delete('delete-shift/{id}', [AdminController::class, 'deleteShift']);
-    Route::post('manage-timekeeping/{skip}', [AdminController::class, 'manageTimeKeeping']);
-    Route::put('update-timekeeping/{id}', [AdminController::class, 'updateTimeKeeping']);
-    Route::delete('delete-timekeeping/{id}', [AdminController::class, 'deleteTimeKeeping']);
+
+    //Message
+    Route::post('message/send', [MessageController::class, 'createRequest']);
+
+    //Admin
+    Route::middleware('admin')->group(function () {
+        Route::post('list-user/{id}', [AdminController::class, 'listUser']);
+        Route::post('create-user', [AdminController::class, 'createUser']);
+        Route::put('update-user/{id}', [AdminController::class, 'updateUser']);
+        Route::delete('delete-user/{id}', [AdminController::class, 'deleteUser']);
+
+        Route::post('list-department/{id}', [AdminController::class, 'listDepartment']);
+        Route::post('search-department', [AdminController::class, 'searchDepartment']);
+        Route::post('create-department', [AdminController::class, 'createDepartment']);
+        Route::get('user-department/{id}', [AdminController::class, 'getUserDepartment']);
+        Route::put('update-department/{id}', [AdminController::class, 'updateDepartment']);
+        Route::delete('delete-department/{id}', [AdminController::class, 'deleteDepartment']);
+
+        Route::post('list-shift/{id}', [AdminController::class, 'listShift']);
+        Route::post('create-shift', [AdminController::class, 'createShift']);
+        Route::put('update-shift/{id}', [AdminController::class, 'updateShift']);
+        Route::delete('delete-shift/{id}', [AdminController::class, 'deleteShift']);
+
+        Route::post('manage-timekeeping/{skip}', [AdminController::class, 'manageTimeKeeping']);
+        Route::put('update-timekeeping/{id}', [AdminController::class, 'updateTimeKeeping']);
+        Route::delete('delete-timekeeping/{id}', [AdminController::class, 'deleteTimeKeeping']);
+
+        Route::get('message/all', [MessageController::class, 'getAllMessage']);
+        Route::get('message/limit', [MessageController::class, 'getLimitMessage']);
+        Route::get('message/limit-unread', [MessageController::class, 'getLimitUnreadMessage']);
+        Route::post('message/read', [MessageController::class, 'checkReadMessage']);
+        Route::post('message/pass', [MessageController::class, 'checkPassMassage']);
+    });
 });
 
 //User
