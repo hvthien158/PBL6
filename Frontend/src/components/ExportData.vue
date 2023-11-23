@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="visible" @close="$emit('invisible')" :show-close="false" :width="popupWidth" >
+    <el-dialog v-model="visible" @close="$emit('invisible')" :show-close="false" :width="popupWidth">
         <template #header>
             <div class="my-header">
                 <h4>Export {{ prop.mode }}</h4>
@@ -12,16 +12,20 @@
             </div>
         </template>
         <el-form>
-            <el-form-item :label="fromMonth" :label-width="formLabelWidth" :rules="[{ required : true }]" >
-                <div class="block" >
-                    <el-date-picker v-if="fromMonth == ''" class="date-picker" v-model="form.fromMonth" type="month" placeholder="From Month" />
-                    <el-date-picker v-else class="date-picker" v-model="form.fromMonth" type="month" placeholder="Pick a month" />
+            <el-form-item :label="fromMonth" :label-width="formLabelWidth" :rules="[{ required: true }]">
+                <div class="block">
+                    <el-date-picker v-if="fromMonth == ''" class="date-picker" v-model="form.fromMonth" type="month"
+                        placeholder="From Month" />
+                    <el-date-picker v-else class="date-picker" v-model="form.fromMonth" type="month"
+                        placeholder="Pick a month" />
                 </div>
             </el-form-item>
-            <el-form-item :label="toMonth" :label-width="formLabelWidth" :rules="[{ required : true }]">
+            <el-form-item :label="toMonth" :label-width="formLabelWidth" :rules="[{ required: true }]">
                 <div class="block">
-                    <el-date-picker v-if="toMonth == ''" class="date-picker" v-model="form.toMonth" type="month" placeholder="To Month" />
-                    <el-date-picker v-else class="date-picker" v-model="form.toMonth" type="month" placeholder="Pick a month" />
+                    <el-date-picker v-if="toMonth == ''" class="date-picker" v-model="form.toMonth" type="month"
+                        placeholder="To Month" />
+                    <el-date-picker v-else class="date-picker" v-model="form.toMonth" type="month"
+                        placeholder="Pick a month" />
                 </div>
             </el-form-item>
             <small>{{ checkDate }}</small>
@@ -50,9 +54,11 @@
     display: flex;
     align-items: center;
 }
+
 .el-form-item label {
     margin-bottom: 0
 }
+
 .dialog-footer {
     margin-top: 16px;
 }
@@ -75,8 +81,9 @@ small {
     margin-left: 0 px;
     font-size: 14px;
 }
-.el-input{
-    width: 100px 
+
+.el-input {
+    width: 100px
 }
 </style>
   
@@ -154,7 +161,7 @@ window.addEventListener('resize', () => {
         formLabelWidth = '0px'
         fromMonth.value = ''
         toMonth.value = ''
-    } 
+    }
     else if (window.innerWidth <= 900) {
         popupWidth.value = '90%'
         formLabelWidth = '100px'
@@ -201,27 +208,35 @@ const exportExcel = async () => {
                     const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
                     const headerRow = ['Date', 'Day of week', 'Time check in', 'Time check out', 'Shift', 'Status AM', 'Status PM', 'Time work', 'User name'];
                     const rows = daysArray.map(day => {
-                        const dataForDay = data.value.find(item => {
-                            const itemDate = new Date(item.date);
-                            return itemDate.getMonth() + 1 === currentMonth && itemDate.getDate() === day;
-                        });
-                        const rowData = [day, getDayOfWeek(currentDate, day)];
-                        if (dataForDay) {
-                            rowData.push(
-                                dataForDay['timeCheckIn'].slice(7,12),
-                                dataForDay['timeCheckOut'].slice(7,12),
-                                dataForDay['shift'],
-                                statusWork(dataForDay['status_AM']),
-                                statusWork(dataForDay['status_PM']),
-                                dataForDay['timeWork'],
-                                username
-                            );
-                        } else {
-                            rowData.push('00:00', '00:00', 'OFF', 'OFF', 'OFF', '00:00', username);
+                        if (getDayOfWeek(currentDate, day) != 'Sat' && getDayOfWeek(currentDate, day) != 'Sun') {
+                            const dataForDay = data.value.find(item => {
+                                const itemDate = new Date(item.date);
+                                return itemDate.getMonth() + 1 === currentMonth && itemDate.getDate() === day;
+                            });
+
+                            const rowData = [day, getDayOfWeek(currentDate, day)];
+                            if (dataForDay) {
+                                if (dataForDay[['timeCheckIn']] != '') {
+                                    rowData.push(
+                                        dataForDay['timeCheckIn'].slice(7, 12),
+                                        dataForDay['timeCheckOut'].slice(7, 12),
+                                        dataForDay['shift'],
+                                        statusWork(dataForDay['status_AM']),
+                                        statusWork(dataForDay['status_PM']),
+                                        dataForDay['timeWork'],
+                                        username
+                                    );
+                                } else {
+                                    rowData.push('00:00', '00:00', 'OFF', 'OFF', 'OFF', '00:00', username);
+                                }
+                            } else {
+                                rowData.push('00:00', '00:00', 'OFF', 'OFF', 'OFF', '00:00', username);
+                            }
+                            return rowData;
                         }
-                        return rowData;
                     });
-                    rows.unshift(headerRow);
+                    const filteredRows = rows.filter(row => row !== undefined);
+                    filteredRows.unshift(headerRow);
                     if (prop.mode === 'Excel') {
                         if (!ws['!cols']) {
                             ws['!cols'] = [];
@@ -235,7 +250,7 @@ const exportExcel = async () => {
                         ws['!cols'][6] = { wch: 10 };
                         ws['!cols'][7] = { wch: 10 };
                         ws['!cols'][8] = { wch: 15 };
-                        XLSX.utils.sheet_add_aoa(ws, rows, { origin: 'A1' });
+                        XLSX.utils.sheet_add_aoa(ws, filteredRows, { origin: 'A1' });
                         XLSX.utils.book_append_sheet(wb, ws, `${currentMonth} - ${currentYear}`);
                         currentDate.setMonth(currentDate.getMonth() + 1);
                     }
@@ -244,9 +259,9 @@ const exportExcel = async () => {
                 messages('success', 'Export complete')
                 emits('invisible');
             } catch (e) {
+                console.log(e);
                 messages('error', e.response.data.message)
                 emits('invisible');
-                console.log(e);
             }
         } else {
             wasClick.value = true
@@ -295,42 +310,56 @@ const exportCSV = async () => {
                             const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
                             daysArray.forEach((day) => {
-                                const dataForDay = data.value.find((item) => {
-                                    const itemDate = new Date(item.date);
-                                    return (
-                                        itemDate.getMonth() + 1 === currentMonth &&
-                                        itemDate.getDate() === day
-                                    );
-                                });
-                                const rowData = [
-                                    `${currentYear}-${currentMonth}-${day}`,
-                                    getDayOfWeek(currentDate, day),
-                                ];
+                                const dayOfWeek = getDayOfWeek(currentDate, day);
+                                if (dayOfWeek !== 'Sat' && dayOfWeek !== 'Sun') {
+                                    const dataForDay = data.value.find((item) => {
+                                        const itemDate = new Date(item.date);
+                                        return (
+                                            itemDate.getMonth() + 1 === currentMonth &&
+                                            itemDate.getDate() === day
+                                        );
+                                    });
+                                    const rowData = [
+                                        `${currentYear}-${currentMonth}-${day}`,
+                                        getDayOfWeek(currentDate, day),
+                                    ];
 
-                                if (dataForDay) {
-                                    rowData.push(
-                                        dataForDay['timeCheckIn'].slice(7,12),
-                                        dataForDay['timeCheckOut'].slice(7,12),
-                                        dataForDay['shift'],
-                                        statusWork(dataForDay['status_AM']),
-                                        statusWork(dataForDay['status_PM']),
-                                        dataForDay['timeWork'],
-                                        username
-                                    );
-                                } else {
-                                    rowData.push(
-                                        '00:00',
-                                        '00:00',
-                                        'OFF',
-                                        'OFF',
-                                        'OFF',
-                                        '00:00',
-                                        username
-                                    );
+                                    if (dataForDay) {
+                                        if (dataForDay[['timeCheckIn']] != '') {
+                                            rowData.push(
+                                                dataForDay['timeCheckIn'].slice(7, 12),
+                                                dataForDay['timeCheckOut'].slice(7, 12),
+                                                dataForDay['shift'],
+                                                statusWork(dataForDay['status_AM']),
+                                                statusWork(dataForDay['status_PM']),
+                                                dataForDay['timeWork'],
+                                                username
+                                            );
+                                        } else {
+                                            rowData.push(
+                                                '00:00',
+                                                '00:00',
+                                                'OFF',
+                                                'OFF',
+                                                'OFF',
+                                                '00:00',
+                                                username
+                                            );
+                                        }
+                                    } else {
+                                        rowData.push(
+                                            '00:00',
+                                            '00:00',
+                                            'OFF',
+                                            'OFF',
+                                            'OFF',
+                                            '00:00',
+                                            username
+                                        );
+                                    }
+                                    csvData.push(rowData);
                                 }
-                                csvData.push(rowData);
                             });
-
                             currentDate.setMonth(currentDate.getMonth() + 1);
                         }
                         const csvContent = Papa.unparse(csvData);
