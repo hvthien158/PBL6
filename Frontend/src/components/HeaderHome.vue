@@ -5,10 +5,11 @@
         <img class="logo" :src="logo" alt="Logo"/>
       </router-link>
     </div>
-    <span v-if="user.token" style="font-weight: bold; margin-right: 20px">
+    <span v-if="user.token" style="font-weight: bold; margin-right: 20px; display: flex; align-items: center">
+      <AdminMessage v-if="user.role === 'admin'"></AdminMessage>
       <el-dropdown>
         <span class="el-dropdown-link">
-          <span style="line-height: 44px; font-size: larger">{{ user.name }} </span>
+          <span style="line-height: 44px; font-size: larger">{{ user.name }}</span>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
@@ -84,13 +85,13 @@ header {
   border-bottom: 1px solid #ccc;
 }
 
-#dropdown-name{
+#dropdown-name {
   font-size: 15px;
   color: #6A679E;
   font-weight: 600;
 }
 
-#dropdown-name:hover{
+#dropdown-name:hover {
   text-decoration: underline;
   color: #f3952d;
   cursor: pointer;
@@ -98,12 +99,11 @@ header {
 </style>
 <script setup>
 import logo from "../assets/image/logo.png";
-import schedule from "../assets/image/schedule.png";
-import {reactive} from "vue";
 import axios from "axios";
 import router from "../router";
 import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
+import AdminMessage from "./AdminMessage.vue";
 
 const alertStore = useAlertStore()
 const user = useUserStore().user

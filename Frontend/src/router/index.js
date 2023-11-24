@@ -93,11 +93,6 @@ router.beforeEach(async () => {
   const user = await useUserStore()
   if (user.isExpired()) {
     user.logout()
-
-    useAlertStore().alert = true
-    useAlertStore().type = 'warning'
-    useAlertStore().msg = '(Token expired) Please login'
-
     await router.push({
       name: 'login',
     })

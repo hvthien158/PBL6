@@ -6,47 +6,49 @@
       </div>
       <div class="form-container" v-else>
         <div class="form-input">
-          <h3 style="text-align: center; font-weight: 700">LOGIN</h3>
-          <div class="login__field">
-            <i class="login__icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
-              </svg>
-            </i>
-            <input
-                v-model="info.email"
-                type="text"
-                class="login__input"
-                placeholder="Email"
-                @blur="checkmail"
-                @input="checkmail"
-                @keyup.enter="passwordInput.focus()"
-            >
-            <span class="error">{{ email_error }}</span>
-          </div>
-          <div class="login__field">
-            <i class="login__icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
-                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-              </svg>
-            </i>
-            <input
-                ref="passwordInput"
-                v-model="info.password"
-                type="password"
-                class="login__input"
-                placeholder="Password"
-                @blur="checkpass"
-                @input="checkpass"
-                @keyup.enter="login"
-            >
-            <span class="error">{{ password_error }}</span>
-          </div>
-          <div class="login__field">
-            <ButtonLoading :loading="loading" @click="login" style="font-size: 15px" size="large" type="warning" round>Login</ButtonLoading>
-            <span @click="goToForgot" class="login__forgot">Forgot password?</span>
-          </div>
-          <p class="fail-login" v-if="fail_login">Wrong email or password</p>
+          <form action="#">
+            <h3 style="text-align: center; font-weight: 700">LOGIN</h3>
+            <div class="login__field">
+              <i class="login__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                  <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                </svg>
+              </i>
+              <input
+                  v-model="info.email"
+                  type="text"
+                  class="login__input"
+                  placeholder="Email"
+                  @blur="checkmail"
+                  @input="checkmail"
+                  @keyup.enter="passwordInput.focus()"
+              >
+              <span class="error">{{ email_error }}</span>
+            </div>
+            <div class="login__field">
+              <i class="login__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+                  <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                </svg>
+              </i>
+              <input
+                  ref="passwordInput"
+                  v-model="info.password"
+                  type="password"
+                  class="login__input"
+                  placeholder="Password"
+                  @blur="checkpass"
+                  @input="checkpass"
+                  @keyup.enter="login"
+              >
+              <span class="error">{{ password_error }}</span>
+            </div>
+            <div class="login__field">
+              <ButtonLoading :loading="loading" @click="login" style="font-size: 15px" size="large" type="warning" round>Login</ButtonLoading>
+              <span @click="goToForgot" class="login__forgot">Forgot password?</span>
+            </div>
+            <p class="fail-login" v-if="fail_login">Wrong email or password</p>
+          </form>
         </div>
       </div>
     </div>
@@ -196,7 +198,6 @@ const login = async () => {
             if(response.data.verify_quest){
               verifyQuest.value = true
             } else {
-              console.log(response)
               user.id = response.data.user[0].id
               user.token = response.data.access_token
               user.name = response.data.user[0].name

@@ -1,35 +1,58 @@
 <template>
-  <div class="edit-timekeep">
-    <el-card style="border-radius: 12px" class="box-card" :class="{ 'bg-orange': today, 'bg-gray': weekend }">
+  <div>
+    <div class="edit-timekeep">
+      <el-card style="border-radius: 12px;" class="box-card" :class="{ 'bg-orange': today, 'bg-gray': weekend }">
       <div class="card-content">
-        <h1>{{ prop.dayOfWeek }}</h1>
-        <p>{{ prop.date }}</p>
-        <div style="display: flex">
-          <div class="info-status">
-            <span style="color: #939393">Morning</span>
-            <StatusButton @change-status="n => status_AM = n" :status_index="status_AM"></StatusButton>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <el-button text @click="$emit('prevday')">&lt;&lt;Previous day</el-button>
+            <el-button text @click="$emit('nextday')">Next day>></el-button>
           </div>
-          <div class="info-status">
-            <span style="color: #939393">Afternoon</span>
-            <StatusButton @change-status="n => status_PM = n" :status_index="status_PM"></StatusButton>
+          <h1>{{ prop.dayOfWeek }}</h1>
+          <p>{{ prop.date }}</p>
+          <div style="display: flex">
+            <div class="info-status">
+              <span style="color: #939393">Morning</span>
+              <StatusButton @change-status="n => status_AM = n" :status_index="status_AM"></StatusButton>
+            </div>
+            <div class="info-status">
+              <span style="color: #939393">Afternoon</span>
+              <StatusButton @change-status="n => status_PM = n" :status_index="status_PM"></StatusButton>
+            </div>
           </div>
-        </div>
-        <p>Check-in:</p>
+          <p>Check-in: <span style="color: #888">{{ check_in_system }}</span></p>
         <div>
           <el-time-select v-model="check_in_format" start="08:30" step="00:15" end="18:30" placeholder="(none)" />
         </div>
-        <p style="margin-top: 20px">Check-out:</p>
+        <p style="margin-top: 20px">Check-out:<span style="color: #888">{{ check_out_system }}</span></p>
         <div>
           <el-time-select v-model="check_out_format" start="08:30" step="00:15" end="18:30" placeholder="(none)" />
         </div>
         <ButtonLoading @click="updateTimeKeep" style="font-size: 15px; margin-top: 20px" size="large" type="warning"
           round>Save</ButtonLoading>
+          <ButtonLoading :warning="status_change || time_change"
+                         @click="dialog_visible = !dialog_visible"
+                         style="font-size: 15px; margin-top: 20px" size="large" type="warning"
+                         round>Request
+          </ButtonLoading>
+        </div>
+      </el-card>
+      <div style="margin-top: -5vh; margin-left: -7vw">
+        <Clock style="scale: 0.5"></Clock>
       </div>
-    </el-card>
-    <div style="margin-top: -5vh; margin-left: -7vw">
-      <Clock style="scale: 0.5"></Clock>
     </div>
   </div>
+  <UserRequest
+      :time_keeping_id="time_keeping_id"
+      :visible="dialog_visible"
+      :status_AM="status_AM"
+      :status_PM="status_PM"
+      :checkin="check_in_format"
+      :checkout="check_out_format"
+      :checkin_system="check_in_system"
+      :checkout_system="check_out_system"
+      :time_change="time_change"
+      :status_change="status_change"
+      :today="prop.date"></UserRequest>
 </template>
 
 <style scoped>
@@ -55,7 +78,7 @@
 }
 
 .card-content {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .bg-orange {
@@ -76,8 +99,13 @@ import { useAlertStore } from "../stores/alert";
 import Clock from "./Clock.vue"
 import moment from "moment";
 import StatusButton from "./StatusButton.vue";
+import UserRequest from "./UserRequest.vue";
 
 const prop = defineProps({
+  id: {
+    type: Number,
+    default: 0,
+  },
   user_id: {
     type: Number,
     default: 0,
@@ -106,26 +134,41 @@ const prop = defineProps({
     type: Number,
     default: 0,
   },
+  status_change: {
+    type: Boolean,
+    default: false,
+  },
+  time_change: {
+    type: Boolean,
+    default: false,
+  }
 })
+const time_keeping_id = ref(prop.id)
 const check_in_format = ref(prop.checkin.slice(0, 5))
+const check_in_system = ref(prop.checkin.slice(7, 12))
 const check_out_format = ref(prop.checkout.slice(0, 5))
+const check_out_system = ref(prop.checkout.slice(7, 12))
 const user = useUserStore().user
 const alertStore = useAlertStore()
-const emit = defineEmits(['update'])
+const emit = defineEmits(['update', 'nextday', 'prevday'])
 const today = ref(false)
 const weekend = ref(false)
 const status_AM = ref(0)
 const status_PM = ref(0)
+const dialog_visible = ref(false)
 
-watch(() => prop.date,
-  () => {
-    weekend.value = prop.dayOfWeek === 'Sunday' || prop.dayOfWeek === 'Saturday';
-    today.value = prop.date === moment().format('YYYY-MM-DD')
-    check_out_format.value = prop.checkout.slice(0, 5)
-    check_in_format.value = prop.checkin.slice(0, 5)
-    status_AM.value = prop.status_AM_prop
-    status_PM.value = prop.status_PM_prop
-  })
+watch(() => prop.id,
+    () => {
+      time_keeping_id.value = prop.id
+      weekend.value = prop.dayOfWeek === 'Sunday' || prop.dayOfWeek === 'Saturday'
+      today.value = prop.date === moment().format('YYYY-MM-DD')
+      check_out_format.value = prop.checkout.slice(0, 5)
+      check_out_system.value = prop.checkout.slice(7, 12)
+      check_in_format.value = prop.checkin.slice(0, 5)
+      check_in_system.value = prop.checkin.slice(7, 12)
+      status_AM.value = prop.status_AM_prop
+      status_PM.value = prop.status_PM_prop
+    })
 
 function updateTimeKeep() {
   axios.post('http://127.0.0.1:8000/api/timekeeping/update', {
