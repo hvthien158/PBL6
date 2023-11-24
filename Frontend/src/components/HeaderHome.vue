@@ -61,7 +61,7 @@ header {
 
 .header-img img {
   max-height: 8vh;
-  margin-left: 50px;
+  margin-left: 2vw;
 }
 
 .el-dropdown-link {

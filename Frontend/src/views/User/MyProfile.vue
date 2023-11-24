@@ -1,14 +1,25 @@
 <template>
   <div class="container-custom">
     <div class="profile-container">
-      <input type="file" name="file" id="file" class="inputfile" @input="onFileChange" />
-      <label for="file">
-        <img style="height: 150px; width: 150px; border-radius: 50%; margin: 20px" :src="imgPath">
-      </label>
-      <div style="display:flex; flex-direction: column">
-        <div style="display: flex">
-          <span style="color: #f3952d; font-size: xx-large">{{ user.name }}</span>
-          <span style="color: #9b9b9b; line-height: 60px"> &emsp; {{ user.email }}</span>
+      <div class="avatar-img">
+        <input type="file" name="file" id="file" class="inputfile" @input="onFileChange" />
+        <label for="file" class="responsive-img">
+          <img style="height: 150px; width: 150px; border-radius: 50%; margin: 20px" :src="imgPath">
+        </label>
+      </div>
+      <div style="display:flex; flex-direction: column; overflow: auto;">
+        <div class="responsive-img">
+          <input type="file" name="file" id="file" class="inputfile" @input="onFileChange" />
+          <label for="file">
+            <img style="height: 150px; width: 150px; border-radius: 50%; margin: 20px" :src="imgPath">
+          </label>
+        </div>
+        <div class="info-user">
+
+          <div class="content">
+            <p style="color: #f3952d; font-size: xx-large">{{ user.name }}</p>
+            <p style="color: #9b9b9b; line-height: 60px">{{ user.email }}</p>
+          </div>
         </div>
         <div class="child">
           <span>Date of birth: </span>
@@ -49,12 +60,34 @@
   justify-content: center;
 }
 
+.info-user {
+  display: flex;
+}
+
+.info-user .content {
+  display: flex;
+}
+
+.avatar-img {
+  display: block;
+}
+.info-user .content p:last-child {
+    margin-left: 10px;
+  }
+.responsive-img {
+  display: none;
+}
+span{
+  display: inline-block;
+}
 .profile-container {
+  margin: 20px;
   display: flex;
   padding: 50px;
   background-color: white;
   border-radius: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-width: 40vw;
 }
 
 .child {
@@ -82,6 +115,25 @@
 .inputfile:focus+label,
 .inputfile+label:hover {
   opacity: 0.8;
+}
+
+@media screen and (max-width : 768px) {
+  .info-user .content {
+    display: block;
+
+  }
+
+  .avatar-img {
+    display: none;
+  }
+
+  .responsive-img {
+    display: flex;
+    justify-content: center;
+  }
+  .info-user .content p:last-child {
+    margin-left: 0px;
+  }
 }
 </style>
 

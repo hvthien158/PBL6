@@ -82,7 +82,7 @@ main {
   background-color: white;
   border-radius: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 400px;
+  min-width: 25vw;
 }
 
 .login__field {
