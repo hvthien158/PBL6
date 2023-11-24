@@ -2,28 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\ResponseMessage;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\EmailRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\GoogleDriveController;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Str;
-use function Laravel\Prompts\table;
 
 class AuthController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword', 'checkEmail']]);
-    }
-
     /**
      * @param LoginRequest $request
      *
@@ -34,12 +34,12 @@ class AuthController extends Controller
         $info = array_merge(['email' => $request->email], ['password' => $request->password]);
 
         if (!$token = auth()->attempt($info)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => ResponseMessage::AUTHORIZATION_ERROR], 401);
         }
 
         if (!auth()->user()->hasVerifiedEmail()) {
             auth()->user()->sendEmailVerificationNotification();
-            return response()->json(['verify_quest' => 'Please verify email'],);
+            return response()->json(['verify_quest' => 'Please verify email'], 303);
         }
 
         return $this->createNewToken($token);
@@ -50,34 +50,16 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
-            'department_id' => 'required',
-            'address' => 'string|nullable',
-            'DOB' => 'nullable|date',
-            'phone_number' => 'nullable',
-            'avatar' => 'nullable',
-            'salary' => 'nullable',
-            'position' => 'nullable',
-            'role' => 'nullable',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 422);
-        }
-
         $user = User::create(array_merge(
-            $validator->validated(),
+            $request->validated(),
             ['password' => bcrypt($request->password)]
         ));
 
 
         return response()->json([
-            'message' => 'User successfully registered',
+            'message' => ResponseMessage::CREATE_SUCCESS,
             'user' => $user
         ], 201);
     }
@@ -89,7 +71,7 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json(['message' => 'User successfully signed out']);
+        return response()->json(['message' => ResponseMessage::OK]);
     }
 
     /**
@@ -121,18 +103,9 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function changePassword(Request $request)
+    public function changePassword(ChangePasswordRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'old_password' => 'required|string|min:6',
-            'new_password' => 'required|string|confirmed|min:6'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
-        }
-
-        if (!Hash::check($request->old_password, auth()->user()->getAuthPassword())){
+        if (!Hash::check($request->old_password, auth()->user()->getAuthPassword())) {
             return response()->json(['error' => 'Current password is incorrect'], 400);
         }
 
@@ -142,14 +115,14 @@ class AuthController extends Controller
             ['password' => bcrypt($request->new_password)]
         );
 
-        if($check == 1){
+        if ($check == 1) {
             return response()->json([
-                'message' => 'User successfully changed password',
+                'message' => ResponseMessage::OK,
             ], 201);
         }
         return response()->json([
-        'error' => 'Error change password',
-    ], 400);
+            'error' => 'Error change password',
+        ], 400);
     }
 
     /**
@@ -157,41 +130,30 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function updateProfile(Request $request){
-        $validator = Validator::make($request->all(), [
-            'address' => 'string|nullable',
-            'DOB' => 'nullable',
-            'phone_number' => 'nullable',
-            'avatar' => 'nullable|image',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 422);
-        }
-
-        $user = DB::table('users')->where('id', '=', auth()->id());
-        if($request->hasFile('avatar')) {
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        $user = User::where('id', auth()->id());
+        if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');
-            $path = Storage::disk('public')->put('avatar/'.auth()->id(), $avatar);
-            $user->update(array_merge($validator->validated(), ['avatar' => $path]));
+            $googleDriver = new GoogleDriveController;
+            $path = $googleDriver->googleDriveFileUpload($avatar);
+            $user->update(array_merge($request->validated(), ['avatar' => $path]));
         } else {
-            $user->update(array_merge($validator->validated()));
+            $user->update(array_merge($request->validated()));
         }
         $user = User::where('id', auth()->id())->get();
         return response()->json([
-            'message' => 'Successfully updated profile',
+            'message' => ResponseMessage::UPDATE_SUCCESS,
             'user' => UserResource::collection($user)
         ], 201);
     }
-
     /**
      * @param Request $request
      *
      * @return object
      */
-    public function forgotPassword(Request $request){
-        $request->validate(['email' => 'required|email']);
-
+    public function forgotPassword(EmailRequest $request)
+    {
         $status = Password::sendResetLink(
             $request->only('email')
         );
@@ -206,14 +168,13 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function checkEmail(Request $request){
-        $request->validate(['email' => 'required|email']);
-
+    public function checkEmail(EmailRequest $request)
+    {
         $email = DB::table('users')->where('email', '=', $request->input('email'))->first();
-        if($email){
-            return response()->json([], 200);
+        if ($email) {
+            return response()->json(['message' => ResponseMessage::OK], 200);
         } else {
-            return response()->json([], 404);
+            return response()->json(['error' => ResponseMessage::NOT_FOUND_ERROR], 404);
         }
     }
 
@@ -222,13 +183,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function resetPassword(Request $request){
-        $request->validate([
-            'token' => 'required',
-            'email' => 'email|required',
-            'password' => 'required|min:6|confirmed',
-        ]);
-
+    public function resetPassword(ResetPasswordRequest $request)
+    {
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {

@@ -41,11 +41,12 @@
           <div class="login__field" style="display: flex; justify-content: center">
             <ButtonLoading :loading="loading" @click="reset" style="font-size: 15px;" size="large" type="warning" round>Change password</ButtonLoading>
           </div>
-        </div>
-        <div class="content-bottom">
-          <span>Already have an account? </span>
+          <div class="content-bottom">
+          <span style="margin-right: 5px;">Already have an account? </span>
           <span id="go-login" @click="router.push({name: 'login'})">Sign in</span>
         </div>
+        </div>
+        
       </div>
     </div>
   </main>
@@ -77,7 +78,7 @@ main {
   background-color: white;
   border-radius: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 400px;
+  min-width: 25vw;
 }
 
 .login__field {
@@ -125,8 +126,8 @@ main {
 }
 
 .content-bottom{
-  position: absolute;
-  bottom: 28%;
+  display: flex;
+  justify-content: center;
 }
 
 #go-login{

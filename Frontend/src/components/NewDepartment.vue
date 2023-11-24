@@ -1,5 +1,6 @@
 <template>
-    <el-dialog v-model="prop.visible" :show-close="false" width="30%" >
+    <el-dialog v-model="prop.visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false"
+        @keyup.esc="$emit('invisible')" width="30%">
         <template #header>
             <div class="my-header">
                 <h4 v-if="prop.mode === 'create'">Create Department</h4>
@@ -13,14 +14,14 @@
             </div>
         </template>
         <el-form :model="form">
-            <el-form-item v-if="prop.mode === 'update'" label="ID" :label-width="formLabelWidth">
-                <el-input v-model="prop.departmentId" autocomplete="off" disabled />
+            <el-form-item v-if="prop.mode === 'update'" :rules="[{ required : true }]" label="ID" :label-width="formLabelWidth" >
+                <el-input v-model="prop.departmentId"  autocomplete="off" disabled  />
             </el-form-item>
-            <el-form-item label="Department name" :label-width="formLabelWidth">
+            <el-form-item label="Department name" :label-width="formLabelWidth" :rules="[{ required : true }]" >
                 <el-input v-model="form.name" autocomplete="off" />
                 <small>{{ checkLanding.checkName }}</small>
             </el-form-item>
-            <el-form-item label="Address" :label-width="formLabelWidth">
+            <el-form-item label="Address" :label-width="formLabelWidth" :rules="[{ required : true }]">
                 <el-input v-model="form.address" autocomplete="off" />
                 <small>{{ checkLanding.checkAddress }}</small>
             </el-form-item>
@@ -35,9 +36,9 @@
                 <small>{{ checkLanding.checkPhoneNumber }}</small>
             </el-form-item>
             <el-form-item label="Department Manager" :label-width="formLabelWidth">
-                <el-select v-model="form.manager" type="text" >
+                <el-select v-model="form.manager" type="text">
                     <el-option label="Select Manager" :value="0"></el-option>
-                    <el-option v-for="item in dataUser" :label="item.name" :value="item.id"></el-option>
+                    <el-option v-for="item in dataUser" :label="item.id + ' - ' + item.name" :value="item.id"></el-option>
                 </el-select>
             </el-form-item>
         </el-form>
@@ -128,6 +129,9 @@ span {
     height: 6px;
     background-color: #e0e0e0;
 }
+.el-select{
+    width: 50%;
+}
 </style>
   
 <script setup>
@@ -147,7 +151,8 @@ const prop = defineProps({
         type: Boolean
     }
 })
-const formLabelWidth = "150px";
+
+const formLabelWidth = "160px";
 const user = useUserStore().user
 const alertStore = useAlertStore()
 const dataUser = ref()
@@ -217,6 +222,62 @@ if (prop.mode === 'update') {
     loadDepartment()
 }
 displayUser()
+
+watch(() => form.name, () => {
+    if (form.name === '') {
+        checkLanding.checkName = 'Please enter name'
+    } else {
+        checkLanding.checkName = ''
+    }
+})
+watch(() => form.address, () => {
+    if (form.address === '') {
+        checkLanding.checkAddress = 'Please enter address'
+    } else {
+        checkLanding.checkAddress = ''
+    }
+})
+watch(() => form.email, () => {
+    if (!isEmail(form.email) && form.email !== '') {
+        checkLanding.checkEmail = 'Invalid email'
+    } else {
+        checkLanding.checkEmail = ''
+    }
+})
+watch(() => form.phoneNumber, () => {
+    if (!isPhoneNumber(form.phoneNumber) && form.phoneNumber != '') {
+        checkLanding.checkPhoneNumber = 'Invalid phone number'
+    } else {
+        checkLanding.checkPhoneNumber = ''
+    }
+})
+function validate() {
+    if (form.name === '') {
+        checkLanding.checkName = 'Please enter name'
+    } else {
+        checkLanding.checkName = ''
+    }
+    if (form.address === '') {
+        checkLanding.checkAddress = 'Please enter address'
+    } else {
+        checkLanding.checkAddress = ''
+    }
+    if (!isEmail(form.email) && form.email !== '') {
+        checkLanding.checkEmail = 'Invalid email'
+    } else {
+        checkLanding.checkEmail = ''
+    }
+    if (!isPhoneNumber(form.phoneNumber) && form.phoneNumber != '') {
+        checkLanding.checkPhoneNumber = 'Invalid phone number'
+    } else {
+        checkLanding.checkPhoneNumber = ''
+    }
+    if (checkLanding.checkName === '' && checkLanding.checkAddress === '' && checkLanding.checkPhoneNumber === '' && checkLanding.checkEmail === '') {
+        return true;
+    } else {
+        return false;
+    }
+}
 const isEmail = (email) => {
     let filter =
         /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -226,28 +287,6 @@ const isPhoneNumber = (phoneNumber) => {
     let filter = /^([0-9]{10})+$/;
     return filter.test(phoneNumber);
 };
-function validate() {
-    if (form.name === '') {
-        checkLanding.checkName = 'Please enter name'
-    } if (form.address === '') {
-        checkLanding.checkAddress = 'Please enter address'
-    }
-    if (form.email === '') {
-        checkLanding.checkEmail = 'Please enter email'
-    } if (!isEmail(form.email)) {
-        checkLanding.checkEmail = 'Invalid email'
-    } if (form.phoneNumber === '') {
-        checkLanding.checkPhoneNumber = 'Please enter phone number'
-    } if (isPhoneNumber(form.isPhoneNumber)) {
-        checkLanding.checkPhoneNumber = 'Invalid phone number'
-    }
-    if (checkLanding.checkName == '' && checkLanding.checkAddress == '' && checkLanding.checkPhoneNumber == '' && checkLanding.checkEmail == '') {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 function createDepartment() {
     if (validate()) {
         let manager = form.manager === 0 ? null : form.manager
@@ -258,7 +297,7 @@ function createDepartment() {
                 address: form.address,
                 email: form.email,
                 phoneNumber: form.phoneNumber,
-                manager : manager
+                manager: manager
             },
             {
                 headers: { Authorization: `Bearer ${user.token}` },

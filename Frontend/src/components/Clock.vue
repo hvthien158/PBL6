@@ -1,329 +1,219 @@
 <template>
-  <div class="countdown">
-    <div class="time-section" id="hours">
-      <div class="time-group">
-        <div class="time-segment">
-          <div class="segment-display">
-            <div class="segment-display__top"></div>
-            <div class="segment-display__bottom"></div>
-            <div class="segment-overlay">
-              <div class="segment-overlay__top"></div>
-              <div class="segment-overlay__bottom"></div>
-            </div>
-          </div>
-        </div>
-        <div class="time-segment">
-          <div class="segment-display">
-            <div class="segment-display__top"></div>
-            <div class="segment-display__bottom"></div>
-            <div class="segment-overlay">
-              <div class="segment-overlay__top"></div>
-              <div class="segment-overlay__bottom"></div>
-            </div>
-          </div>
-        </div>
+  <main>
+    <div id="time">
+      <div class="circle" style="--clr: #ff2972">
+        <div class="dots hr_dot"></div>
+        <svg>
+          <circle :cx="circle.cx" :cy="circle.cy" :r="circle.r"></circle>
+          <circle :cx="circle.cx" :cy="circle.cy" :r="circle.r" id="hh"></circle>
+        </svg>
+        <div id="hours">{{ hour }}</div>
+      </div>
+      <div class="circle" style="--clr: #fee800">
+        <div class="dots min_dot"></div>
+        <svg>
+          <circle :cx="circle.cx" :cy="circle.cx" :r="circle.r"></circle>
+          <circle :cx="circle.cx" :cy="circle.cx" :r="circle.r" id="mm"></circle>
+        </svg>
+        <div id="minutes">{{ minute }}</div>
+      </div>
+      <div class="circle" style="--clr: #04fc43">
+        <div class="dots sec_dot"></div>
+        <svg>
+          <circle :cx="circle.cx" :cy="circle.cx" :r="circle.r"></circle>
+          <circle :cx="circle.cx" :cy="circle.cx" :r="circle.r" id="ss"></circle>
+        </svg>
+        <div id="seconds">{{ second }}</div>
+      </div>
+      <div class="ap">
+        <div id="ampm" style="font-size: 0.5em">{{ ampm }}</div>
       </div>
     </div>
-    <div class="dots">
-      <div class="up-dots"></div>
-      <div class="down-dots"></div>
-    </div>
-    <div class="time-section" id="minutes">
-      <div class="time-group">
-        <div class="time-segment">
-          <div class="segment-display">
-            <div class="segment-display__top"></div>
-            <div class="segment-display__bottom"></div>
-            <div class="segment-overlay">
-              <div class="segment-overlay__top"></div>
-              <div class="segment-overlay__bottom"></div>
-            </div>
-          </div>
-        </div>
-        <div class="time-segment">
-          <div class="segment-display">
-            <div class="segment-display__top"></div>
-            <div class="segment-display__bottom"></div>
-            <div class="segment-overlay">
-              <div class="segment-overlay__top"></div>
-              <div class="segment-overlay__bottom"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="dots">
-      <div class="up-dots"></div>
-      <div class="down-dots"></div>
-    </div>
-    <div class="time-section" id="seconds">
-      <div class="time-group">
-        <div class="time-segment">
-          <div class="segment-display">
-            <div class="segment-display__top"></div>
-            <div class="segment-display__bottom"></div>
-            <div class="segment-overlay">
-              <div class="segment-overlay__top"></div>
-              <div class="segment-overlay__bottom"></div>
-            </div>
-          </div>
-        </div>
-        <div class="time-segment">
-          <div class="segment-display">
-            <div class="segment-display__top"></div>
-            <div class="segment-display__bottom"></div>
-            <div class="segment-overlay">
-              <div class="segment-overlay__top"></div>
-              <div class="segment-overlay__bottom"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  </main>
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
-
-.countdown {
-  width: 30%;
+main {
   display: flex;
-  gap: 16px;
-  font-family: sans-serif;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
 }
 
-.time-section {
-  text-align: center;
-  font-size: 16px;
-}
-
-.time-group {
+#time {
+  padding-left: 2rem;
   display: flex;
-  gap: 10px;
+  gap: 40px;
+  color: #000;
 }
 
-.time-segment {
-  display: block;
-  font-size: 90px;
-  font-weight: 700;
-  width: 90px;
-}
-
-.segment-display {
+#time .circle {
   position: relative;
-  height: 100%;
-  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
-}
-
-.segment-display__top,
-.segment-display__bottom {
-  overflow: hidden;
-  text-align: center;
-  width: 100%;
-  height: 50%;
-  position: relative;
-}
-
-.segment-display__top {
-  line-height: 1.5;
-  color: #ccc;
-  background-color: #333;
-}
-
-.segment-display__bottom {
-  line-height: 0;
-  color: #ccc;
-  background-color: #333;
-}
-
-.segment-overlay {
-  position: absolute;
-  top: 0;
-  perspective: 300px;
-  height: 100%;
-  width: 89px;
-}
-
-.segment-overlay__top,
-.segment-overlay__bottom {
-  position: absolute;
-  overflow: hidden;
-  text-align: center;
-  width: 100%;
-  height: 50%;
-}
-
-.segment-overlay__top {
-  top: 0;
-  line-height: 1.5;
-  color: #ccc;
-  background-color: #333;
-  transform-origin: bottom;
-}
-
-.segment-overlay__bottom {
-  bottom: 0;
-  line-height: 0;
-  color: #ccc;
-  background-color: #333;
-  border-top: 1px solid black;
-  transform-origin: top;
-}
-
-.segment-overlay.flip .segment-overlay__top {
-  animation: flip-top 0.8s linear;
-}
-
-.segment-overlay.flip .segment-overlay__bottom {
-  animation: flip-bottom 0.8s linear;
-}
-
-@keyframes flip-top {
-  0% {
-    transform: rotateX(0deg);
-  }
-  50%,
-  100% {
-    transform: rotateX(-90deg);
-  }
-}
-
-@keyframes flip-bottom {
-  0%,
-  50% {
-    transform: rotateX(90deg);
-  }
-  100% {
-    transform: rotateX(0deg);
-  }
-}
-
-.dots{
+  width: 150px;
+  height: 150px;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#time .circle svg {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  transform: rotate(270deg);
+}
+
+#time .circle svg circle {
+  width: 100%;
+  height: 100%;
+  fill: transparent;
+  stroke: #808080;
+  stroke-width: 8;
+  transform: translate(5px, 5px);
+}
+
+#time .circle svg circle:nth-child(2) {
+  stroke: var(--clr);
+  stroke-dasharray: 440;
+}
+
+#time div {
+  position: absolute;
+  text-align: center;
+  font-weight: 500;
+  font-size: 3rem;
+}
+
+#time .ap {
+  position: relative;
+  transform: translateX(-20px);
+}
+
+.dots {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: flex;
   justify-content: center;
 }
 
-.up-dots, .down-dots {
-  height: 15px;
+.dots::before {
+  content: '';
+  position: absolute;
+  top: -3px;
   width: 15px;
-  background-color: #333;
+  height: 15px;
+  background: var(--clr);
   border-radius: 50%;
-  margin: 6px 0;
+  box-shadow: 0 0 20px var(--clr), 0 0 60px var(--clr);
+}
+
+@media screen and (max-width : 600px) {
+  .dots::before {
+    top: 0px;
+    width: 12px;
+    height: 12px;
+  }
+
+  #time .circle svg circle:nth-child(2) {
+    stroke: var(--clr);
+    stroke-dasharray: 251.1;
+  }
+
+  #time .circle {
+    width: 90px;
+    height: 90px;
+  }
+
+  #time .circle svg {
+    width: 90px;
+    height: 90px;
+  }
+
+  #time {
+    max-width: 100%;
+    padding-left: 0;
+    gap: 20px
+  }
+  #time div {
+  font-weight: 700;
+  font-size: 2rem;
+}
 }
 </style>
 
 <script setup>
-import {onMounted} from "vue";
+import { onMounted, onUnmounted, reactive, ref } from "vue";
 import moment from "moment"
 
-function getTimeSegmentElements(segmentElement) {
-  const segmentDisplay = segmentElement.querySelector(
-      '.segment-display'
-  );
-  const segmentDisplayTop = segmentDisplay.querySelector(
-      '.segment-display__top'
-  );
-  const segmentDisplayBottom = segmentDisplay.querySelector(
-      '.segment-display__bottom'
-  );
-
-  const segmentOverlay = segmentDisplay.querySelector(
-      '.segment-overlay'
-  );
-  const segmentOverlayTop = segmentOverlay.querySelector(
-      '.segment-overlay__top'
-  );
-  const segmentOverlayBottom = segmentOverlay.querySelector(
-      '.segment-overlay__bottom'
-  );
-
-  return {
-    segmentDisplayTop,
-    segmentDisplayBottom,
-    segmentOverlay,
-    segmentOverlayTop,
-    segmentOverlayBottom,
-  };
-}
-
-function updateSegmentValues(
-    displayElement,
-    overlayElement,
-    value
-) {
-  displayElement.textContent = value;
-  overlayElement.textContent = value;
-}
-
-function updateTimeSegment(segmentElement, timeValue) {
-  const segmentElements =
-      getTimeSegmentElements(segmentElement);
-
-  if (
-      parseInt(
-          segmentElements.segmentDisplayTop.textContent,
-          10
-      ) === timeValue
-  ) {
-    return;
-  }
-
-  segmentElements.segmentOverlay.classList.add('flip');
-
-  updateSegmentValues(
-      segmentElements.segmentDisplayTop,
-      segmentElements.segmentOverlayBottom,
-      timeValue
-  );
-
-  function finishAnimation() {
-    segmentElements.segmentOverlay.classList.remove('flip');
-    updateSegmentValues(
-        segmentElements.segmentDisplayBottom,
-        segmentElements.segmentOverlayTop,
-        timeValue
-    );
-
-    this.removeEventListener(
-        'animationend',
-        finishAnimation
-    );
-  }
-
-  segmentElements.segmentOverlay.addEventListener(
-      'animationend',
-      finishAnimation
-  );
-}
-
-function updateTimeSection(sectionID, timeValue) {
-  const firstNumber = Math.floor(timeValue / 10) || 0;
-  const secondNumber = timeValue % 10 || 0;
-  const sectionElement = document.getElementById(sectionID);
-  const timeSegments =
-      sectionElement.querySelectorAll('.time-segment');
-
-  updateTimeSegment(timeSegments[0], firstNumber);
-  updateTimeSegment(timeSegments[1], secondNumber);
-}
-
-function updateAllSegments() {
-  updateTimeSection('seconds', moment().second());
-  updateTimeSection('minutes', moment().minute());
-  updateTimeSection('hours', moment().hour());
-}
-
-setInterval(() => {
-  updateAllSegments();
-}, 1000);
-
+const hour = ref('')
+const minute = ref('')
+const second = ref('')
+const ampm = ref('')
+const time = ref(0);
+let circle = reactive({
+  cx: 70,
+  cy: 70,
+  r: 70
+})
 onMounted(() => {
-  updateAllSegments();
+  if (window.innerWidth <= 600) {
+    circle.cx = 40;
+    circle.cy = 40
+    circle.r = 40
+  } else {
+    circle.cx = 70;
+    circle.cy = 70
+    circle.r = 70
+  }
+})
+window.addEventListener('resize', () => {
+  console.log(window.innerWidth)
+  if (window.innerWidth <= 600) {
+    circle.cx = 40;
+    circle.cy = 40
+    circle.r = 40
+
+  } else {
+    circle.cx = 70;
+    circle.cy = 70
+    circle.r = 70
+  }
+})
+onMounted(() => {
+  let hh = document.getElementById('hh')
+  let mm = document.getElementById('mm')
+  let ss = document.getElementById('ss')
+  let hr_dot = document.querySelector('.hr_dot')
+  let min_dot = document.querySelector('.min_dot')
+  let sec_dot = document.querySelector('.sec_dot')
+
+  time.value = setInterval(() => {
+    hour.value = moment().format('hh')
+    minute.value = moment().format('mm')
+    second.value = moment().format('ss')
+    ampm.value = moment().format('A')
+
+    hh.style.strokeDashoffset = '' + ((circle.r * 2 * 3.14 - (circle.r * 2 * 3.14 * parseInt(hour.value)) / 12))
+    mm.style.strokeDashoffset = '' + ((circle.r * 2 * 3.14 - (circle.r * 2 * 3.14 * parseInt(minute.value)) / 60))
+    ss.style.strokeDashoffset = '' + ((circle.r * 2 * 3.14 - (circle.r * 2 * 3.14 * parseInt(second.value)) / 60))
+    hr_dot.style.transform = `rotate(${hour.value * 30}deg)`
+    min_dot.style.transform = `rotate(${minute.value * 6}deg)`
+    sec_dot.style.transform = `rotate(${second.value * 6}deg)`
+  }, 1000)
+})
+
+onUnmounted(() => {
+  clearInterval(time.value)
 })
 </script>

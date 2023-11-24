@@ -2,18 +2,25 @@
   <header>
     <div class="header-img">
       <router-link to="/">
-        <img class="logo" :src="logo" alt="Logo" />
+        <img class="logo" :src="logo" alt="Logo"/>
       </router-link>
     </div>
     <span v-if="user.token" style="font-weight: bold; margin-right: 20px">
       <el-dropdown>
         <span class="el-dropdown-link">
-          <span style="line-height: 44px; font-size: larger">{{user.name}} </span>
+          <span style="line-height: 44px; font-size: larger">{{ user.name }} </span>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item v-if="user.role === 'admin'" @click="router.push({name: 'listUser'})">Admin Page</el-dropdown-item>
-            <el-dropdown-item @click="myProfile">My profile</el-dropdown-item>
+            <div class="header-profile">
+              <el-avatar :src="user.avatar" style="margin-right: 12px"></el-avatar>
+              <div style="display: flex; flex-direction: column">
+                <span id="dropdown-name" @click="myProfile">{{ user.name }}</span>
+                <span style="color: #b2b2b2">{{ user.email }}</span>
+              </div>
+            </div>
+            <el-dropdown-item v-if="user.role === 'admin'"
+                              @click="router.push({name: 'listUser'})">Admin Page</el-dropdown-item>
             <el-dropdown-item @click="changePass">Change password</el-dropdown-item>
             <el-dropdown-item @click="logout">Logout</el-dropdown-item>
           </el-dropdown-menu>
@@ -53,23 +60,46 @@ header {
 
 .header-img img {
   max-height: 8vh;
-  margin-left: 50px;
+  margin-left: 2vw;
 }
-.el-dropdown-link{
+
+.el-dropdown-link {
   cursor: pointer;
   border: none;
   color: white;
   outline: none;
+  margin-right: 2vw;
 }
-.el-dropdown-link:hover{
+
+.el-dropdown-link:hover {
   color: #f3952d;
   outline: none;
+}
+
+.header-profile {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  width: 240px;
+  border-bottom: 1px solid #ccc;
+}
+
+#dropdown-name{
+  font-size: 15px;
+  color: #6A679E;
+  font-weight: 600;
+}
+
+#dropdown-name:hover{
+  text-decoration: underline;
+  color: #f3952d;
+  cursor: pointer;
 }
 </style>
 <script setup>
 import logo from "../assets/image/logo.png";
 import schedule from "../assets/image/schedule.png";
-import { reactive } from "vue";
+import {reactive} from "vue";
 import axios from "axios";
 import router from "../router";
 import {useUserStore} from "../stores/user";
@@ -78,13 +108,13 @@ import {useAlertStore} from "../stores/alert";
 const alertStore = useAlertStore()
 const user = useUserStore().user
 
-function myProfile(){
+function myProfile() {
   router.push({
     name: 'my-profile',
   })
 }
 
-function changePass(){
+function changePass() {
   router.push({
     name: 'change-password',
   })
@@ -93,21 +123,21 @@ function changePass(){
 const logout = async () => {
   try {
     await axios
-      .post("http://127.0.0.1:8000/api/logout", null, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      })
-      .then(function (response) {
-        if (response.status === 200) {
-          useUserStore().logout()
+        .post("http://127.0.0.1:8000/api/logout", null, {
+          headers: {Authorization: `Bearer ${user.token}`},
+        })
+        .then(function (response) {
+          if (response.status === 200) {
+            useUserStore().logout()
 
-          //alert success
-          alertStore.alert = true
-          alertStore.type = 'success'
-          alertStore.msg = 'Logged out'
+            //alert success
+            alertStore.alert = true
+            alertStore.type = 'success'
+            alertStore.msg = 'Logged out'
 
-          router.push({ path: "/login" });
-        }
-      });
+            router.push({path: "/login"});
+          }
+        });
   } catch (e) {
     console.log(e);
   }

@@ -14,20 +14,27 @@
             New
           </el-button>
         </div>
-        <el-input v-model="dataSearch.name" placeholder="Search by department name" />
-        <el-input v-model="dataSearch.manager" placeholder="Search by department manager" />
+        <el-input v-model="dataSearch.name" placeholder="Search by name" />
+        <el-input v-model="dataSearch.manager" placeholder="Search by manager" />
         <el-input v-model="dataSearch.address" placeholder="Search by address" />
         <el-input v-model="dataSearch.email" placeholder="Search by email" />
         <el-input v-model="dataSearch.phoneNumber" placeholder="Search by phone number" />
-        <el-input-number v-model="dataSearch.minStaff" controls-position="right" :min="0" placeholder="Min staff"/>
-        <el-input-number v-model="dataSearch.maxStaff" controls-position="right" :min="dataSearch.minStaff" placeholder="Max staff"/>
+        <div class="input-number">
+          <el-text>Min Staff</el-text>
+          <el-input-number v-model="dataSearch.minStaff" controls-position="right" :min="0"></el-input-number>
+        </div>
+        <div class="input-number">
+          <el-text>Max Staff</el-text>
+          <el-input-number v-model="dataSearch.maxStaff" controls-position="right"
+            :min="dataSearch.minStaff"></el-input-number>
+        </div>
       </div>
       <el-table :data="department" height="58vh" style="width: 100%;" border stripe>
         <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
         <el-table-column prop="name" label="Department name" min-width="180"></el-table-column>
         <el-table-column prop="manager.name" label="Department Manager" min-width="200">
           <template #default="scope">
-            <el-button class="el-button--text" v-if="scope.row.manager.name != 'none'"
+            <el-button class="el-button--text" v-if="scope.row.manager.name !== 'none'"
               @click="handleViewManager(scope.row.manager.id)">
               {{ scope.row.manager.name }}
             </el-button>
@@ -46,7 +53,7 @@
               @click="messages('error', 'There are no employees at this department')">View
               Staff</el-button>
             <el-button class="el-button--text" v-else
-              @click="router.push({ path: `/admin/list-user/department/${scope.row.id}` })">View
+              @click="router.push({ path: `/admin/list-user/`, query: { department: scope.row.id } })">View
               Staff</el-button>
           </template>
         </el-table-column>
@@ -57,11 +64,15 @@
           </template>
         </el-table-column>
       </el-table>
+      <div style="text-align: right; width: 100%">
+        <span style="padding-right: 12px; color: #8c8c8c">{{ tableDescription }}</span>
+      </div>
       <div class="pagination">
         <el-button @click="previousPage" :disabled="currentPage === 1">
-          Previous
+          Prev
         </el-button>
-        <span>{{ currentPage }} / {{ totalPage }}</span>
+<!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => currentPage = page"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
@@ -71,11 +82,9 @@
           :departmentId="departmentId" :visible="visibleMode" v-if="visibleMode"></NewDepartment>
       </div>
       <div class="form-department">
-        <User @updateData="displayDepartment" @invisible="managerMode = false" :userId="userId" :visible="managerMode"
-          v-if="managerMode"></User>
+        <User @updateData="displayDepartment" @invisible="managerMode = false" :userId="userId" v-if="managerMode"></User>
       </div>
     </div>
-
     <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this department?" @confirm="deleteDepartment()"
       @cancel="confirmBox = false">
     </ConfirmBox>
@@ -93,6 +102,38 @@ main {
   max-width: 1138px;
   position: absolute;
   bottom: 0%;
+}
+
+.title-table .input-number {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.input-number {
+  width: 12%;
+  min-width: 170px;
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-number .el-input-number {
+  width: 40%;
+  background-color: #262727;
+}
+
+.input-number .el-text {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 10px;
+  white-space: nowrap;
+  border-radius: 4px 0 0 4px;
+  background-color: #262727;
+  color: #909399;
+  box-sizing: border-box;
 }
 
 .el-form {
@@ -113,10 +154,6 @@ label {
 .title-table .el-input {
   margin-left: 10px;
   width: 15%;
-}
-
-.el-input-number {
-  margin-left: 10px;
 }
 
 .pagination {
@@ -177,6 +214,7 @@ import { useAlertStore } from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
 import User from '../../../components/User.vue'
 import NewDepartment from "../../../components/NewDepartment.vue";
+import Pagination from "../../../components/Pagination.vue";
 const user = useUserStore().user;
 const alertStore = useAlertStore();
 const department = ref();
@@ -185,6 +223,7 @@ const deleteId = ref(0)
 const totalPage = ref(0)
 const visibleMode = ref(false)
 const operationMode = ref('create')
+const tableDescription = ref()
 const confirmBox = ref(false)
 const debounceSearch = ref(null);
 const userId = ref(null)
@@ -218,9 +257,10 @@ const displayDepartment = async () => {
         headers: { Authorization: `Bearer ${user.token}` }
       })
       .then(function (response) {
-        console.log(response);
         department.value = response.data.department;
-        totalPage.value = response.data.totalPage;
+        totalPage.value = Math.ceil(response.data.totalDepartment / 10) == 0 ? 1 : Math.ceil(response.data.totalDepartment / 10)
+        let tail = (response.data.totalDepartment < currentPage.value * 10) ? response.data.totalDepartment : currentPage.value * 10
+        tableDescription.value = ((currentPage.value - 1) * 10 + 1) + '..' + tail + ' of ' + response.data.totalDepartment + ' departments'
       });
   } catch (e) {
     console.log(e);
@@ -244,7 +284,7 @@ const deleteDepartment = async () => {
       })
       .then(function (response) {
         console.log(response);
-        if (response.status == 200) {
+        if (response.status === 200) {
           messages("success", response.data.message);
         }
       });
@@ -253,16 +293,18 @@ const deleteDepartment = async () => {
   }
   displayDepartment();
 };
+
+watch(() => currentPage.value, () => {
+  displayDepartment()
+})
 const nextPage = () => {
   if (currentPage.value < totalPage.value) {
     currentPage.value++;
-    displayDepartment()
   }
 };
 const previousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
-    displayDepartment()
   }
 };
 const messages = (type, msg) => {

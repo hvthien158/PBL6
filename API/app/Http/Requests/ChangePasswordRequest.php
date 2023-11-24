@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Rules\NameDepartmentUpdateRule;
-class UpdateDepartmentRequest extends FormRequest
+
+class ChangePasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,8 @@ class UpdateDepartmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'departmentName' => ['required', 'string', new NameDepartmentUpdateRule],
-            'address'=> 'required|string',
-            'email' =>'nullable|email',
-            'phoneNumber' => 'nullable|string'
+            'old_password' => 'required|string|min:6',
+            'new_password' => 'required|string|confirmed|min:6'
         ];
     }
 }

@@ -26,8 +26,13 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/schedule/',
+      path: '/schedule',
       name: 'schedule',
+      component: ScheduleView
+    },
+    {
+      path: '/admin/schedule/:userID',
+      name: 'admin-schedule',
       component: ScheduleView
     },
     {
@@ -96,6 +101,22 @@ router.beforeEach(async () => {
     await router.push({
       name: 'login',
     })
+  }
+})
+
+router.beforeEach(async (to) => {
+  const user = await useUserStore().user
+  if(user.token == '' && !(to.path.includes('login') || to.path.includes('forgot-password') || to.path.includes('reset-password'))) {
+    await router.push({
+      name: 'login',
+    })
+  }
+  else if (to.path.includes('admin')) {
+    if (user.role !== 'admin') {
+      await router.push({
+        name: 'home',
+      })
+    }
   }
 })
 

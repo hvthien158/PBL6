@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Common\ResponseMessage;
 use App\Http\Requests\CreateDepartmentRequest;
 use App\Http\Requests\CreateShiftRequest;
 use App\Http\Requests\UpdateShiftRequest;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\ManageTimeKeepingRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\TimeKeepingResource;
 use App\Http\Resources\ShiftResource;
@@ -19,18 +21,55 @@ use App\Models\TimeKeeping;
 use App\Http\Requests\DateTimeRequest;
 use App\Http\Resources\DepartmentResource;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
     /**
      * @return void
      */
-    public function __construct()
+    public function listUser(Request $request, $id)
     {
-        $this->middleware(['auth:api']);
+        try {
+            $itemsPerPage = 8;
+            $user = User::orderBy('id', 'asc');
+            if ($request->name != '') {
+                $user->whereRaw('LOWER(name) like ?', ['%' . $request->name . '%']);
+            }
+            if ($request->email != '') {
+                $user->whereRaw('LOWER(email) like ?', ['%' . $request->email . '%']);
+            }
+            if ($request->address != '') {
+                $user->whereRaw('LOWER(address) like ?', ['%' . $request->address . '%']);
+            }
+            if ($request->phoneNumber != '') {
+                $user->whereRaw('LOWER(phone_number) like ?', ['%' . $request->phoneNumber . '%']);
+            }
+            if ($request->position != '') {
+                $user->where('position', $request->position);
+            }
+            if ($request->role != '') {
+                $user->where('role', $request->role);
+            }
+            if ($request->department != '') {
+                $user->where('department_id', $request->department);
+            }
+            $totalUser = $user->count();
+            $user = $user->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
+            $response = [
+                'totalUser' => $totalUser,
+                'user' => UserResource::collection($user)
+            ];
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
+
     /**
      * @param CreateUserRequest $request
      *
@@ -40,24 +79,19 @@ class AdminController extends Controller
     {
         $this->authorize('create', User::class);
         try {
-            $password = Str::random(10);
             User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($password),
+                'password' => bcrypt($request->password),
                 'department_id' => $request->department_id,
+                'address' => $request->address,
+                'DOB' => $request->DOB,
+                'phone_number' => $request->phone_number,
                 'salary' => $request->salary,
                 'position' => $request->position,
                 'role' => $request->role
             ]);
-            $account = [
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => $password,
-                'link' => 'http://localhost:5173/login'
-            ];
-            MailInfomationAccount::dispatch($account);
-            return response()->json(['message' => 'Create user successfully']);
+            return response()->json(['message' => ResponseMessage::CREATE_SUCCESS], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -84,7 +118,7 @@ class AdminController extends Controller
                 'position' => $request->position,
                 'role' => $request->role
             ]);
-            return response()->json(['message' => 'Update user successfully']);
+            return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -101,9 +135,9 @@ class AdminController extends Controller
         try {
             $user = DB::table('users')->delete($id);
             if ($user == 1) {
-                return response()->json(['message' => 'Delete user successfully']);
+                return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
             } else {
-                return response()->json(['message' => 'User not found'], 400);
+                return response()->json(['message' => ResponseMessage::NOT_FOUND_ERROR], 404);
             }
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -111,35 +145,41 @@ class AdminController extends Controller
     }
     /**
      * @param mixed $id
-     * 
+     *
      * @return object
      */
     public function listDepartment($id, Request $request)
     {
         try {
             $itemsPerPage = 10;
-            $department = Department::orderBy('id','asc')->with('users')->with('manager');
+            $department = Department::orderBy('id', 'asc')->with('users')->with('manager');
             if ($request->name != '') {
                 $department->whereRaw('LOWER(department_name) like ?', ['%' . $request->name . '%']);
-            } if($request->manager != ''){
-                $department->whereHas('manager', function ($subQuery) use ($request) {
-                    $subQuery->where('name', 'like', '%'.$request->manager.'%');
-                });
-            } if ($request->address != '') {
-                $department->whereRaw('LOWER(address) like ?', ['%' . $request->address . '%']);
-            } if ($request->email != '') {
-                $department->whereRaw('LOWER(email) like ?', ['%' . $request->email . '%']);
-            } if ($request->phoneNumber != '') {
-                $department->whereRaw('LOWER(phone_number) like ?', ['%' . $request->phoneNumber . '%']);
-            } if($request->minStaff != 0){
-                $department->has('users','>=', $request->minStaff);
-            } if($request->maxStaff != 0){
-                $department->has('users','<=', $request->maxStaff);
             }
-            $totalPage = ceil($department->count() / $itemsPerPage);
+            if ($request->manager != '') {
+                $department->whereHas('manager', function ($subQuery) use ($request) {
+                    $subQuery->where('name', 'like', '%' . $request->manager . '%');
+                });
+            }
+            if ($request->address != '') {
+                $department->whereRaw('LOWER(address) like ?', ['%' . $request->address . '%']);
+            }
+            if ($request->email != '') {
+                $department->whereRaw('LOWER(email) like ?', ['%' . $request->email . '%']);
+            }
+            if ($request->phoneNumber != '') {
+                $department->whereRaw('LOWER(phone_number) like ?', ['%' . $request->phoneNumber . '%']);
+            }
+            if ($request->minStaff != 0) {
+                $department->has('users', '>=', $request->minStaff);
+            }
+            if ($request->maxStaff != 0) {
+                $department->has('users', '<=', $request->maxStaff);
+            }
+            $totalDepartment = $department->count();
             $departments = $department->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
             $response = [
-                'totalPage' => $totalPage,
+                'totalDepartment' => $totalDepartment,
                 'department' => DepartmentResource::collection($departments),
             ];
             return response()->json($response);
@@ -163,7 +203,7 @@ class AdminController extends Controller
                 'phone_number' => $request->phoneNumber,
                 'department_manager_id' => $request->manager
             ]);
-            return response()->json(['message' => 'Create department successfully']);
+            return response()->json(['message' => ResponseMessage::CREATE_SUCCESS], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -186,7 +226,7 @@ class AdminController extends Controller
                 'phone_number' => $request->phoneNumber,
                 'department_manager_id' => $request->manager
             ]);
-            return response()->json(['message' => 'Update department successfully']);
+            return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -204,7 +244,7 @@ class AdminController extends Controller
             $department = Department::find($id);
             if ($department)
                 $department->delete();
-            return response()->json(['message' => 'Delete department successfully']);
+            return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -222,7 +262,7 @@ class AdminController extends Controller
             if ($userDepartment) {
                 return UserResource::collection($userDepartment);
             } else {
-                return response()->json(['message' => 'Không có user nào']);
+                return response()->json(['message' => ResponseMessage::NOT_FOUND_ERROR], 404);
             }
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -231,7 +271,7 @@ class AdminController extends Controller
     /**
      * @param mixed $id
      * @param Request $request
-     * 
+     *
      * @return object
      */
     public function listShift($id, Request $request)
@@ -269,7 +309,7 @@ class AdminController extends Controller
                 'time_valid_check_out' => $request->timeValidCheckOut,
                 'amount' => $request->amount
             ]);
-            return response()->json(['message' => 'Create shift successfully']);
+            return response()->json(['message' => ResponseMessage::CREATE_SUCCESS], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -291,7 +331,7 @@ class AdminController extends Controller
                 'time_valid_check_out' => $request->timeValidCheckOut,
                 'amount' => $request->amount
             ]);
-            return response()->json(['message' => 'Update shift successfully']);
+            return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -299,7 +339,7 @@ class AdminController extends Controller
     /**
      * @param mixed $id
      * @param Shift $shift
-     * 
+     *
      * @return object
      */
     public function deleteShift($id, Shift $shift)
@@ -309,103 +349,117 @@ class AdminController extends Controller
             $shift = Shift::find($id);
             if ($shift)
                 $shift->delete();
-            return response()->json(['message' => 'Delete shift successfully']);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
-        }
-    }
-    /**
-     * @param null $id
-     * 
-     * @return object
-     */
-    public function manageTimeKeeping($id, Request $request)
-    {
-        $this->authorize('viewAny',  TimeKeeping::class);
-        try {
-            $itemsPerPage = 10;
-            $query = TimeKeeping::orderBy('time_check_in', 'desc')->with('user')->with('user.department');
-            if ($request->name != '') {
-                $query->whereHas('user', function ($subQuery) use ($request) {
-                    $subQuery->where('name', 'like', '%' . $request->name . '%');
-                });
-            }
-            if ($request->startDate != '' && $request->endDate != '') {
-                $query->whereRaw('DATE(time_check_in) BETWEEN ? AND ?', [$request->startDate, $request->endDate]);
-            }
-            if ($request->department != '') {
-                $query->whereHas('user.department', function ($subQuery) use ($request) {
-                    $subQuery->where('department_name', '=', $request->department);
-                });
-            }
-            $totalPage = floor($query->count() / $itemsPerPage) + 1;
-            $timekeeping = $query->skip($id * $itemsPerPage)->take($itemsPerPage)->get();
-            if ($timekeeping) {
-                $response = [
-                    'totalPage' => $totalPage,
-                    'timekeeping' => TimeKeepingResource::collection($timekeeping),
-                ];
-                return response()->json($response);
-            } else {
-                return response()->json(['message' => 'Not found timekeeping'], 400);
-            }
+            return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 
     /**
-     * @param null $id
-     * 
-     * @return object
+     * @param $skip
+     * @return JsonResponse
+     * @throws AuthorizationException
      */
-    public function updateTimeKeeping(DateTimeRequest $request, TimeKeeping $timekeeping, $id)
+    public function manageTimeKeeping($skip, ManageTimeKeepingRequest $request)
     {
-        $this->authorize('update', $timekeeping);
+        $this->authorize('viewAny',  TimeKeeping::class);
+        $from = $request->from;
+        $to = $request->to;
+        $name = $request->name;
+        $department = $request->department;
+        $count_user = 0;
         try {
-            $timekeeping = TimeKeeping::find($id);
-            if ($timekeeping) {
-                $date = Carbon::createFromFormat('Y-m-d H:i:s', $timekeeping->time_check_in)->format('Y-m-d');
-                $timekeeping->update([
-                    'time_check_in' => $date . ' ' . $request->timeCheckIn,
-                    'time_check_out' => $date . ' ' . $request->timeCheckOut
-                ]);
-                if ($timekeeping->time_check_out) {
-                    $checkin = Carbon::createFromFormat('H:i:s', $request->timeCheckIn);
-                    $checkout = Carbon::createFromFormat('H:i:s', $request->timeCheckOut);
-                    $shifts = Shift::all();
-                    foreach ($shifts as $shift) {
-                        if (
-                            $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&
-                            $checkout->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out)
+            if ($department) {
+                if ($name) {
+                    $users = DB::table('users')
+                        ->where('name', 'like',  '%' . $name . '%')
+                        ->where('department_id', '=', $department);
+                    $count_user = count($users->get());
+                    $users = $users->limit(10)
+                        ->offset($skip * 10)
+                        ->get();
+                } else {
+                    $users = DB::table('users')
+                        ->where('department_id', '=', $department);
+                    $count_user = count($users->get());
+                    $users = $users
+                        ->limit(10)
+                        ->offset($skip * 10)
+                        ->get();
+                }
+            } else {
+                if ($name) {
+                    $users = DB::table('users')
+                        ->where('name', 'like',  '%' . $name . '%');
+                    $count_user = count($users->get());
+                    $users = $users
+                        ->limit(10)
+                        ->offset($skip * 10)
+                        ->get();
+                } else {
+                    $count_user = User::count();
+                    $users = User::limit(10)->offset($skip * 10)->get(['id', 'name', 'department_id']);
+                }
+            }
+            $result = [];
+            foreach ($users as $user) {
+                $timeKeepings = TimeKeeping::where('user_id', $user->id)
+                    ->whereBetween('_date', [$from, $to])
+                    ->orderBy('_date', 'desc')->get();
+                $sumWorkingDays = 0;
+                $sumWorkingTime = '';
+                $sumWorkingHours = 0;
+                $sumWorkingMinutes = 0;
+                $averageWorkingHours = 0;
+                $lateDays = 0;
+                foreach ($timeKeepings as $timeKeeping) {
+                    if ($timeKeeping->time_check_in) {
+                        $sumWorkingDays += 1;
+                        if (Carbon::createFromFormat('H:i:s', $timeKeeping->time_check_in)
+                            ->isAfter(Carbon::createFromFormat('H:i:s', '08:30:00'))
                         ) {
-                            $timekeeping->shift_id = $shift->id;
-                            $timekeeping->save();
-                            break;
+                            $lateDays += 1;
                         }
                     }
+
+                    if ($timeKeeping->time_check_in && $timeKeeping->time_check_out) {
+                        $carbonCheckIn = Carbon::createFromFormat('H:i:s', $timeKeeping->time_check_in);
+                        $carbonCheckOut = Carbon::createFromFormat('H:i:s', $timeKeeping->time_check_out);
+                        $timeWorkHours = $carbonCheckOut->diffInHours($carbonCheckIn);
+                        $timeWorkMinutes = $carbonCheckOut->diffInMinutes($carbonCheckIn) - $timeWorkHours * 60;
+                        $sumWorkingHours += $timeWorkHours;
+                        $sumWorkingMinutes += $timeWorkMinutes;
+                    }
                 }
-                return response()->json(['message' => 'Update successfully']);
-            } else {
-                return response()->json(['message' =>  'Not found time keeping'], 400);
+                $sumWorkingHours += intdiv($sumWorkingMinutes, 60);
+                $sumWorkingMinutes = $sumWorkingMinutes % 60;
+
+                if ($sumWorkingDays != 0) {
+                    $sumWorkingByMinutes = intdiv($sumWorkingHours * 60 + $sumWorkingMinutes, $sumWorkingDays);
+                    $averageWorkingHours = ($sumWorkingByMinutes < 60 ? '00' : str_pad(intdiv($sumWorkingByMinutes, 60), 2, '0', STR_PAD_LEFT))
+                        . ':'
+                        . str_pad($sumWorkingByMinutes % 60, 2, '0', STR_PAD_LEFT);
+                } else {
+                    $averageWorkingHours = '00:00';
+                }
+
+
+                $sumWorkingTime = str_pad($sumWorkingHours, 2, '0', STR_PAD_LEFT)
+                    . ':'
+                    . str_pad($sumWorkingMinutes, 2, '0', STR_PAD_LEFT);
+
+                $result[] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'sumWorkingDays' => $sumWorkingDays,
+                    'sumWorkingTime' => $sumWorkingTime,
+                    'averageWorkingHours' => $averageWorkingHours,
+                    'lateDays' => $lateDays,
+                    'department' => Department::where('id', $user->department_id)->first()->department_name,
+                ];
             }
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
-        }
-    }
-    public function deleteTimeKeeping($id, TimeKeeping $timekeeping)
-    {
-        $this->authorize('delete', $timekeeping);
-        try {
-            $timekeeping = TimeKeeping::find($id);
-            if ($timekeeping) {
-                $systemtime = SystemTime::find($id);
-                $systemtime->delete();
-                $timekeeping->delete();
-                return response()->json(['message' => 'Delete successfully']);
-            } else {
-                return response()->json(['message' =>  'Not found time keeping'], 400);
-            }
+
+            return response()->json(['quantity' => $count_user, 'data' => $result]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }

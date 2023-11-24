@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('systemtimes', function (Blueprint $table) {
-            $table->bigInteger('id')->unsigned();
-            $table->primary('id');
-            $table->date('_date');
-            $table->time('time_check_in')->default('00:00');
-            $table->time('time_check_out')->default('00:00');
+        Schema::create('google_tokens', function (Blueprint $table) {
+            $table->id();
+            $table->text('access_token');
+            $table->text('refresh_token');
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('systemtimes');
+        Schema::dropIfExists('google_tokens');
     }
 };

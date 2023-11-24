@@ -1,107 +1,150 @@
 <template>
-  <div class="new-user-container">
-    <div>
-      <el-input disabled style="width: 50px" type="text" placeholder="ID"></el-input>
-    </div>
-    <div>
-      <el-input v-model="form.name" style="width: 180px;" type="text" placeholder="Name"></el-input>
-    </div>
-    <div>
-      <el-input v-model="form.email" style="width: 220px" type="text" placeholder="Email"></el-input>
-    </div>
-    <div v-if="prop.mode === 'create'">
-      <el-input v-model="form.password" style="width: 220px" type="text"
-                placeholder="Password"></el-input>
-    </div>
-    <div>
-      <el-input v-model="form.address" style="width: 330px" type="text" placeholder="Address"></el-input>
-    </div>
-    <div>
-      <el-date-picker v-model="form.DOB" style="width: 130px" type="date" value-format="YYYY-MM-DD" format="DD/MM/YYYY" placeholder="Date of birth"></el-date-picker>
-    </div>
-    <div>
-      <el-input v-model="form.phone_number" style="width: 120px" type="text" placeholder="Phone Number"></el-input>
-    </div>
-    <div>
-      <el-input v-model="form.salary" style="width: 120px" type="text" placeholder="Salary"></el-input>
-    </div>
-    <div>
-      <el-select v-model="form.position" style="width: 120px" type="text" placeholder="Position">
-        <el-option v-for="item in position" :label="item.name" :value="item.value"></el-option>
-      </el-select>
-    </div>
-    <div>
-      <el-select v-model="form.role" style="width: 100px" type="text" placeholder="Role">
-        <el-option v-for="item in role" :label="item.name" :value="item.value"></el-option>
-      </el-select>
-    </div>
-    <div>
-      <el-select v-model="form.department" style="width: 120px" type="text" placeholder="Department">
-        <el-option v-for="item in department" :label="item.name" :value="item.id"></el-option>
-      </el-select>
-    </div>
-  </div>
-  <div class="operation">
-    <el-button v-if="prop.mode === 'create'" type="primary" plain @click="createUser">Add</el-button>
-    <el-button v-else type="primary" plain @click="updateUser">Change</el-button>
-    <el-button @click="$emit('invisible')">Cancel</el-button>
-    <span style="color: red; margin-top: 0.1rem; margin-left: 16px">{{ fail_validation }}</span>
-  </div>
+  <el-dialog v-model="prop.visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false" 
+        @keyup.esc="$emit('invisible')" min-width="30%">
+    <template #header>
+      <div class="my-header">
+        <h4 v-if="prop.mode === 'create'">Create User</h4>
+        <h4 v-else>Update User</h4>
+        <el-button type="danger" @click="$emit('invisible')">
+          <el-icon class="el-icon--left">
+            <CircleCloseFilled />
+          </el-icon>
+          Close
+        </el-button>
+      </div>
+    </template>
+    <el-form :model="form">
+      <el-form-item v-if="prop.mode === 'update'" label="ID" :label-width="formLabelWidth" :rules="[{ required : true }]">
+        <el-input v-model="prop.userId" autocomplete="off" disabled />
+      </el-form-item>
+      <el-form-item label="Name" :label-width="formLabelWidth" :rules="[{ required : true }]">
+        <el-input v-model="form.name" autocomplete="off" />
+        <small>{{ checkLanding.checkName }}</small>
+      </el-form-item>
+      <el-form-item label="Email" :label-width="formLabelWidth" :rules="[{ required : true }]">
+        <el-input v-model="form.email" autocomplete="off" />
+        <small>{{ checkLanding.checkEmail }}</small>
+      </el-form-item>
+      <el-form-item v-if="prop.mode === 'create'" label="Password" :label-width="formLabelWidth" :rules="[{ required : true }]">
+        <el-input type="password" show-password v-model="form.password" autocomplete="off" />
+        <small>{{ checkLanding.checkPassword }}</small>
+      </el-form-item>
+      <el-form-item label="Date of Birth" :label-width="formLabelWidth">
+        <el-date-picker placeholder="yyyy-mm-dd" v-model="form.DOB">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="Address" :label-width="formLabelWidth">
+        <el-input v-model="form.address" autocomplete="off" />
+        <small>{{ checkLanding.checkAddress }}</small>
+      </el-form-item>
+      <el-form-item label="Phone Number" :label-width="formLabelWidth">
+        <el-input v-model="form.phoneNumber" autocomplete="off" />
+        <small>{{ checkLanding.checkPhoneNumber }}</small>
+      </el-form-item>
+      <el-form-item label="Salary" :label-width="formLabelWidth">
+        <el-input :formatter="(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+          :parser="(value) => value.replace(/\$\s?|(,*)/g, '')" v-model="form.salary" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="Role" :label-width="formLabelWidth" :rules="[{ required : true }]">
+        <el-select v-model="form.role" type="text">
+          <el-option v-for="item in role" :label="item.name" :value="item.value"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="Position" :label-width="formLabelWidth">
+        <el-select v-model="form.position" type="text">
+          <el-option v-for="item in position" :label="item.name" :value="item.value"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="Department" :label-width="formLabelWidth" :rules="[{ required : true }]">
+        <el-select v-model="form.department" type="text">
+          <el-option label="Select Department" :value="0"></el-option>
+          <el-option v-for="item in department" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="$emit('invisible')">Cancel</el-button>
+        <el-button v-if="prop.mode === 'create'" type="primary" @click="createUser">
+          Create
+        </el-button>
+        <el-button v-else type="primary" @click="updateUser">
+          Update
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped>
-.new-user-container {
-  background-color: #ccc;
-  height: 56px;
-  max-width: 80vw;
+.my-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+small {
+  color: red;
+  font-size: 14px;
+  margin-left: 0;
+}
+
+.form-item {
   display: flex;
   align-items: center;
-  overflow-x: scroll;
-  padding-left: 8px;
-  border-radius: 4px;
+  margin-right: 16px;
 }
 
-.new-user-container::-webkit-scrollbar {
-  height: 6px;
-  background-color: #f0f0f0;
+.form-label {
+  margin-right: 8px;
 }
 
-.new-user-container::-webkit-scrollbar-thumb {
-  height: 6px;
-  background-color: #e0e0e0;
+.el-button--text {
+  margin-right: 15px;
 }
 
-.new-user-container div input {
-  padding: 0 8px;
+.el-input {
+  width: 100%;
 }
 
-.new-user-container div {
-  padding-right: 4px;
+.dialog-footer {
+  margin-top: 16px;
 }
 
-.operation {
-  display: flex;
-  width: 80vw;
-  padding: 12px;
+.dialog-footer button:first-child {
+  margin-right: 10px;
 }
+
+.dialog-footer button {
+  margin-right: 8px;
+}
+
+span {
+  display: block;
+  color: red;
+  margin-top: 0.5rem;
+  margin-left: 16px;
+}
+
 </style>
 
 <script setup>
-import {reactive, ref, watch} from "vue";
+import { reactive, ref, watch } from "vue";
 import axios from "axios";
-import {useUserStore} from "../stores/user";
-import {useAlertStore} from "../stores/alert";
-
+import { useUserStore } from "../stores/user";
+import { useAlertStore } from "../stores/alert";
+const formLabelWidth = "150px";
 const user = useUserStore().user
 const alertStore = useAlertStore()
-const fail_validation = ref('')
 const prop = defineProps({
   mode: {
     type: String,
     default: 'create'
   },
-  user_id: {
+  userId: {
     type: Number,
+  },
+  visible: {
+    type: Boolean
   }
 })
 
@@ -111,23 +154,27 @@ const form = reactive({
   password: '',
   address: '',
   DOB: '',
-  phone_number: '',
+  phoneNumber: '',
   salary: '',
   position: '',
-  role: '',
+  role: 'user',
   department: '',
 })
 const role = [
   {
-    name: "Admin",
-    value: "admin",
-  },
-  {
     name: "User",
     value: "user",
   },
+  {
+    name: "Admin",
+    value: "admin",
+  }
 ];
 const position = [
+  {
+    name: "Select Position",
+    value: "none",
+  },
   {
     name: "Intern",
     value: "intern",
@@ -145,52 +192,57 @@ const position = [
     value: "senior",
   },
 ];
+const checkLanding = reactive({
+  checkName: '',
+  checkEmail: '',
+  checkAddress: '',
+  checkPhoneNumber: '',
+  checkPassword: ''
+})
 let department = ref()
 
 const emits = defineEmits(['invisible', 'update_data'])
 
 axios.get("http://127.0.0.1:8000/api/department")
-    .then(function (response) {
-      department.value = response.data.data;
-    });
+  .then(function (response) {
+    department.value = response.data.data;
+  });
 
-watch(() => prop.user_id,
-    () => {
-      loadUser()
-    })
+watch(() => prop.userId,
+  () => {
+    loadUser()
+  })
 watch(() => prop.mode,
-    () => {
-      if(prop.mode === 'create'){
-        form.name = ''
-        form.email = ''
-        form.password = ''
-        form.address = ''
-        form.DOB = ''
-        form.phone_number = ''
-        form.salary = ''
-        form.position = ''
-        form.role = ''
-        form.department = ''
-      }
-    })
-function loadUser(){
+  () => {
+    if (prop.mode === 'create') {
+      form.name = ''
+      form.email = ''
+      form.password = ''
+      form.address = ''
+      form.DOB = ''
+      form.phoneNumber = ''
+      form.salary = ''
+      form.position = ''
+      form.role = ''
+      form.department = ''
+    }
+  })
+function loadUser() {
   if (prop.mode === 'update') {
-    axios.get(`http://127.0.0.1:8000/api/user/${prop.user_id}`, {
+    axios.get(`http://127.0.0.1:8000/api/user/${prop.userId}`, {
       headers: {
         Authorization: `Bearer ${user.token}`
       },
     }).then((response) => {
-      console.log(response.data)
-      form.email = response.data.user[0].email === 'none' ? '' : response.data.user[0].email;
-      form.name = response.data.user[0].name === 'none' ? '' : response.data.user[0].name;
-      form.address = response.data.user[0].address === 'none' ? '' : response.data.user[0].address;
-      form.phone_number = response.data.user[0].phone_number === 'none' ? '' : response.data.user[0].phone_number;
-      form.DOB = response.data.user[0].DOB === 'none' ? '' : response.data.user[0].DOB;
-      form.salary = response.data.user[0].salary === 'none' ? '' : response.data.user[0].salary;
-      form.position = response.data.user[0].position === 'none' ? '' : response.data.user[0].position;
-      form.role =
-          response.data.user[0].role === "admin" ? "admin" : "user";
-      form.department = response.data.user[0].department_id;
+      form.email = response.data.data[0].email === 'none' ? '' : response.data.data[0].email;
+      form.name = response.data.data[0].name === 'none' ? '' : response.data.data[0].name;
+      form.address = response.data.data[0].address === 'none' ? '' : response.data.data[0].address;
+      form.phoneNumber = response.data.data[0].phone_number === 'none' ? '' : response.data.data[0].phone_number;
+      form.DOB = response.data.data[0].DOB === 'none' ? '' : response.data.data[0].DOB;
+      form.salary = response.data.data[0].salary === 'none' ? '' : response.data.data[0].salary.split('$')[1];
+      form.position = response.data.data[0].position === 'none' ? '' : response.data.data[0].position;
+      form.role = response.data.data[0].role;
+      form.department = response.data.data[0].department.id;
     }).catch((e) => {
       console.log(e)
       alertStore.alert = true;
@@ -200,53 +252,90 @@ function loadUser(){
   }
 }
 loadUser()
-
+watch(() => form.name, () => {
+  if (form.name.length <= 4) {
+    checkLanding.checkName = 'Please enter name > 4'
+  } else {
+    checkLanding.checkName = ''
+  }
+})
+watch(() => form.password, () => {
+  if (form.password.length <= 6 && prop.mode === 'create') {
+    checkLanding.checkPassword = 'Please enter password > 6 character'
+  } else {
+    checkLanding.checkPassword = ''
+  }
+})
+watch(() => form.email, () => {
+  if (form.email === '') {
+    checkLanding.checkEmail = 'Please enter email'
+  } if (!isEmail(form.email)) {
+    checkLanding.checkEmail = 'Invalid email'
+  } else {
+    checkLanding.checkEmail = ''
+  }
+})
+watch(() => form.phoneNumber, () => {
+  if (form.phoneNumber === '' || isPhoneNumber(form.phoneNumber)){
+    checkLanding.checkPhoneNumber = ''
+  } else {
+    checkLanding.checkPhoneNumber = 'Invalid phone number'
+  }
+})
+function validate() {
+  if (form.name.length <= 4) {
+    checkLanding.checkName = 'Please enter name > 4'
+  } else {
+    checkLanding.checkName = ''
+  }
+  if (form.password.length <= 6 && prop.mode === 'create') {
+    checkLanding.checkPassword = 'Please enter password > 6 character'
+  } else {
+    checkLanding.checkPassword = ''
+  }
+  if (form.email === '') {
+    checkLanding.checkEmail = 'Please enter email'
+  } if (!isEmail(form.email)) {
+    checkLanding.checkEmail = 'Invalid email'
+  } else {
+    checkLanding.checkEmail = ''
+  }
+  if (form.phoneNumber === '' || isPhoneNumber(form.phoneNumber)){
+    checkLanding.checkPhoneNumber = ''
+  } else {
+    checkLanding.checkPhoneNumber = 'Invalid phone number'
+  }
+  return checkLanding.checkName === '' && checkLanding.checkAddress === '' && checkLanding.checkPhoneNumber === '' && checkLanding.checkEmail === '' && checkLanding.checkPassword === '';
+}
 const isEmail = (email) => {
   let filter =
-      /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return filter.test(email);
 };
-
-function validate() {
-  if(form.name === ''){
-    fail_validation.value = 'Please enter name'
-    return false
-  } else if (form.email === '') {
-    fail_validation.value = 'Please enter email'
-    return false
-  } else if (!isEmail(form.email)) {
-    fail_validation.value = 'Invalid email'
-    return false
-  } else if (form.password === '' && prop.mode === 'create') {
-    fail_validation.value = 'Please enter password'
-    return false
-  } else if (form.department === ''){
-    fail_validation.value = 'Please choice a department'
-    return false
-  }
-  return true
-}
-
+const isPhoneNumber = (phoneNumber) => {
+  let filter = /^([0-9]{10})+$/;
+  return filter.test(phoneNumber);
+};
 function createUser() {
   if (validate()) {
     axios.post(
-        `http://127.0.0.1:8000/api/create-user/`,
-        {
-          name: form.name,
-          email: form.email,
-          password: form.password,
-          password_confirmation: form.confirmPassword,
-          department_id: form.department,
-          address: form.address,
-          DOB: form.DOB,
-          phone_number: form.phone_number,
-          salary: form.salary,
-          position: form.position,
-          role: form.role,
-        },
-        {
-          headers: {Authorization: `Bearer ${user.token}`},
-        }
+      `http://127.0.0.1:8000/api/create-user/`,
+      {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        password_confirmation: form.password,
+        department_id: form.department,
+        address: form.address,
+        DOB: formatToPost(form.DOB),
+        phone_number: form.phoneNumber,
+        salary: form.salary,
+        position: form.position === 'none' ? null : form.position,
+        role: form.role
+      },
+      {
+        headers: { Authorization: `Bearer ${user.token}` },
+      }
     ).then(function () {
       emits('update_data')
       alertStore.alert = true
@@ -263,34 +352,46 @@ function createUser() {
 
 function updateUser() {
   if (validate()) {
-    axios
+    try {
+      axios
         .put(
-            `http://127.0.0.1:8000/api/update-user/${prop.user_id}`,
-            {
-              name: form.name,
-              email: form.email,
-              department_id: form.department,
-              address: form.address,
-              DOB: form.DOB,
-              phone_number: form.phone_number,
-              salary: form.salary,
-              position: form.position,
-              role: form.role,
-            },
-            {
-              headers: {Authorization: `Bearer ${user.token}`},
-            }
-        ).then(function (){
+          `http://127.0.0.1:8000/api/update-user/${prop.userId}`,
+          {
+            name: form.name,
+            email: form.email,
+            department_id: form.department,
+            address: form.address,
+            DOB: formatToPost(form.DOB),
+            phone_number: form.phoneNumber,
+            salary: form.salary,
+            position: form.position === 'none' ? null : form.position,
+            role: form.role
+          },
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        ).then(function () {
           emits('update_data')
           alertStore.alert = true
           alertStore.type = 'success'
-          alertStore.msg = 'Create success'
-        }).catch((e) => {
-          alertStore.alert = true
-          alertStore.type = 'error'
-          alertStore.msg = 'Something went wrong'
-          console.log(e)
+          alertStore.msg = 'Update success'
         })
+    } catch (e) {
+      alertStore.alert = true
+      alertStore.type = 'error'
+      alertStore.msg = 'Update success'
+      console.log(e)
+    }
   }
+}
+const formatToPost = (time) => {
+  if(!time){
+    return ''
+  }
+  const date = new Date(time);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 </script>

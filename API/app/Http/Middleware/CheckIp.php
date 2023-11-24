@@ -2,12 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use App\Common\Role;
 use Closure;
 use Illuminate\Http\Request;
+use Stevebauman\Location\Facades\Location;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckRole
+class CheckIp
 {
     /**
      * Handle an incoming request.
@@ -16,10 +16,10 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->role === Role::ADMIN || auth()->user()->id == $request->id) {
+        if($request->header('X-Forwarded-For') == env('IP_COMPANY')){
             return $next($request);
         } else {
-            return response()->json(["message"=>  Response::HTTP_FORBIDDEN]);
+            return response()->json(["message"=>  'You must be checkin and checkout by IP Company'], 400);
         }
     }
 }

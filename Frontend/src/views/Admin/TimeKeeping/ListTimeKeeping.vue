@@ -5,56 +5,71 @@
       <span style="font-size: 32px; font-weight: 700; text-align: center;">TimeKeeping Management</span>
       <div class="title-table">
         <div>
-          <el-date-picker style="margin-left: 10px" v-model="dataSearch.startDate" type="date"
-            placeholder="For date"></el-date-picker>
-          <el-date-picker style="margin-left: 10px" v-model="dataSearch.endDate" type="date"
-            placeholder="To date"></el-date-picker>
+          <el-date-picker
+              v-model="filter_value"
+              type="daterange"
+              start-placeholder="Start date"
+              end-placeholder="End date"
+              format="YYYY-MM-DD"
+              value-format="YYYY-MM-DD"
+          />
         </div>
-
+        <div class="pagination-month">
+          <el-button type="info" @click="previousMonth">
+            Prev
+          </el-button>
+          <span>{{ monthDisplay + 1 }}/{{ yearDisplay }}</span>
+          <el-button type="info" @click="nextMonth">
+            Next
+          </el-button>
+        </div>
         <div>
-          <el-select v-model="dataSearch.department" placeholder="Select">
-            <el-option key="0" label="Selected department" value="" />
-            <el-option v-for="item in department" :key="item.id" :label="item.name" :value="item.name"
-              :disabled="item.disabled" />
+          <el-select v-model="dataSearch.department" placeholder="Select department">
+            <el-option label="Select Department" :value="0"></el-option>
+            <el-option v-for="item in department" :key="item.id" :label="item.name" :value="item.id"
+                       :disabled="item.disabled"/>
           </el-select>
-          <el-input v-model="dataSearch.name" placeholder="Search by username" />
+          <el-input v-model="dataSearch.name" placeholder="Search by username"/>
         </div>
 
       </div>
       <el-table :data="timekeeping" height="48vh" style="width: 100%;" border stripe>
         <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
-        <el-table-column prop="user.name" label="User name" min-width="200"
-          @click="router.push({ path: `/admin/list-user/${scope.row.user.id}` })"></el-table-column>
-        <el-table-column prop="user.department.name" label="Department name" min-width="300"></el-table-column>
-        <el-table-column prop="date" label="Date" min-width="150"></el-table-column>
-        <el-table-column prop="timeCheckIn" label="Time Check In" min-width="150"></el-table-column>
-        <el-table-column prop="timeCheckOut" label="Time Check Out" min-width="180"></el-table-column>
-        <el-table-column prop="shift.name" label="Shift name" min-width="150"></el-table-column>
-        <el-table-column fixed="right" label="Operations" width="140">
+        <el-table-column prop="name" label="Name" min-width="200">
           <template #default="scope">
-            <el-button link type="primary" @click="handleEdit(scope.row.id)">Edit</el-button>
-            <el-button link type="danger" @click="handleDelete(scope.row.id)">Delete</el-button>
+            <el-button link type="success" @click="router.push({ path: `/admin/schedule/${scope.row.id}`})">
+              {{ scope.row.name }}
+            </el-button>
           </template>
         </el-table-column>
+        <el-table-column prop="department" label="Department name" min-width="200">
+          <template #default="scope">
+            <el-button link type="warning" @click="goToDepartment(scope.row.department)">{{ scope.row.department }}</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column prop="sumWorkingDays" label="Working days" min-width="120"></el-table-column>
+        <el-table-column prop="sumWorkingTime" label="Working time" min-width="120"></el-table-column>
+        <el-table-column prop="averageWorkingHours" label="Average" min-width="120"></el-table-column>
+        <el-table-column prop="lateDays" label="Late days" min-width="120"></el-table-column>
       </el-table>
+      <div style="text-align: right; width: 100%">
+        <span style="padding-right: 12px; color: #8c8c8c">{{ table_description }}</span>
+      </div>
       <div class="pagination">
         <el-button @click="previousPage" :disabled="currentPage === 1">
-          Previous
+          Prev
         </el-button>
-        <span>{{ currentPage }} / {{ totalPage }}</span>
+<!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => currentPage = page"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
       </div>
-      <div class="form-timekeeping">
-      <NewTimeKeeping @updateData="displayTimeKeeping" @invisible="visibleMode = false" :timekeepingId="timekeepingId"
-        v-if="visibleMode"></NewTimeKeeping>
-    </div>
     </div>
     <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this timekeeping?" @confirm="deleteTimekeeping()"
-      @cancel="confirmBox = false">
+                @cancel="confirmBox = false">
     </ConfirmBox>
-    
+
   </main>
 </template>
 <style scoped>
@@ -101,6 +116,17 @@ label {
   align-items: center;
 }
 
+.pagination-month {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.pagination-month span {
+  margin: 0 12px 4px 12px;
+}
+
 .timekeeping {
   width: 80vw;
   display: flex;
@@ -145,15 +171,17 @@ a:hover {
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
-import { ref, onMounted, computed, reactive, watch } from "vue";
+import {ref, onMounted, computed, reactive, watch} from "vue";
 import axios from "axios";
 import router from "../../../router";
-import { useUserStore } from "../../../stores/user";
-import { useAlertStore } from "../../../stores/alert";
+import {useUserStore} from "../../../stores/user";
+import {useAlertStore} from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
-import { saveAs } from "file-saver";
-import { utils, write } from "xlsx";
-import NewTimeKeeping from "../../../components/NewTimeKeeping.vue";
+import {saveAs} from "file-saver";
+import {utils, write} from "xlsx";
+import moment from "moment"
+import Pagination from "../../../components/Pagination.vue";
+
 const user = useUserStore().user;
 const alertStore = useAlertStore();
 const timekeeping = ref();
@@ -163,53 +191,106 @@ const deleteId = ref(0)
 const visibleMode = ref(false)
 const confirmBox = ref(false)
 const debounceSearch = ref(null);
+const user_quantity = ref(0);
 let currentPage = ref(1);
 let totalPage = ref(1);
 let dataSearch = reactive({
   name: '',
-  startDate: '',
-  endDate: '',
-  department: ''
+  department: 0
 })
+const filter_value = ref([])
+const monthDisplay = ref(moment().month())
+const yearDisplay = ref(moment().year())
+const table_description = ref('')
+
+function filterByMonth() {
+  filter_value.value = [
+    yearDisplay.value + '-' + (monthDisplay.value + 1).toString().padStart(2, '0') + '-' + '01',
+    yearDisplay.value + '-' + (monthDisplay.value + 1).toString().padStart(2, '0') + '-' + getDaysInMonth(monthDisplay.value + 1, yearDisplay.value)
+  ]
+}
+
+filterByMonth()
+
+function getDaysInMonth(month, year) {
+  return moment(year + '-' + month.toString().padStart(2, '0')).daysInMonth()
+}
+
+function nextMonth() {
+  if (monthDisplay.value === 11) {
+    monthDisplay.value = 0
+    yearDisplay.value += 1
+  } else {
+    monthDisplay.value += 1
+  }
+  filterByMonth()
+}
+
+function previousMonth() {
+  if (monthDisplay.value === 0) {
+    monthDisplay.value = 11
+    yearDisplay.value -= 1
+  } else {
+    monthDisplay.value -= 1
+  }
+  filterByMonth()
+}
+
+function updateTableDescription() {
+  let tail = (user_quantity.value < currentPage.value * 10) ? user_quantity.value : currentPage.value * 10
+  table_description.value = ((currentPage.value - 1) * 10 + 1) + '..' + tail + ' of ' + user_quantity.value + ' users'
+}
+
 onMounted(() => {
   displayTimeKeeping();
   displayDepartment();
 });
+
 const displayDepartment = async () => {
   try {
     await axios.get("http://127.0.0.1:8000/api/department")
-      .then(function (response) {
-        department.value = response.data.data;
-      });
+        .then(function (response) {
+          department.value = response.data.data;
+        });
   } catch (e) {
     console.log(e)
   }
 }
+
+watch(() => filter_value.value, () => {
+  displayTimeKeeping()
+})
+
 const displayTimeKeeping = async () => {
   visibleMode.value = false
   try {
     await axios
-      .post(`http://127.0.0.1:8000/api/manage-timekeeping/${currentPage.value - 1}`, {
-        name: dataSearch.name,
-        startDate: formatDate(dataSearch.startDate),
-        endDate: formatDate(dataSearch.endDate),
-        department: dataSearch.department
-      }, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      })
-      .then(function (response) {
-        console.log(dataSearch.department)
-        timekeeping.value = response.data.timekeeping;
-        totalPage.value = response.data.totalPage
-      });
+        .post(`http://127.0.0.1:8000/api/manage-timekeeping/${currentPage.value - 1}`, {
+              from: filter_value.value[0],
+              to: filter_value.value[1],
+              name: dataSearch.name,
+              department: dataSearch.department,
+            },
+            {
+              headers: {Authorization: `Bearer ${user.token}`}
+            })
+        .then((response) => {
+          timekeeping.value = response.data.data
+          user_quantity.value = response.data.quantity
+          totalPage.value = Math.ceil(user_quantity.value / 10)
+          if(totalPage.value === 0){
+            totalPage.value = 1
+          }
+          updateTableDescription()
+        });
   } catch (e) {
     console.log(e);
   }
 };
+
 watch(
-  [() => dataSearch.name, () => dataSearch.department, () => dataSearch.startDate, () => dataSearch.endDate],
-  ([name, department, startDate, endDate]) => {
-    console.log(dataSearch.department)
+    [() => dataSearch.name, () => dataSearch.department],
+    () => {
       if (debounceSearch.value) {
         clearTimeout(debounceSearch.value);
       }
@@ -217,29 +298,31 @@ watch(
         currentPage.value = 1;
         displayTimeKeeping();
       }, 500);
-  },
-  { deep: true }
+    },
+    {deep: true}
 );
+
 const deleteTimekeeping = async () => {
   confirmBox.value = false
   try {
     await axios
-      .delete(`http://127.0.0.1:8000/api/delete-timekeeping/${deleteId.value}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      })
-      .then(function (response) {
-        console.log(response);
-        if (response.status == 200) {
-          messages("success", response.data.message);
-        }
-      });
+        .delete(`http://127.0.0.1:8000/api/delete-timekeeping/${deleteId.value}`, {
+          headers: {Authorization: `Bearer ${user.token}`},
+        })
+        .then(function (response) {
+          console.log(response);
+          if (response.status === 200) {
+            messages("success", response.data.message);
+          }
+        });
   } catch (e) {
     messages("error", e.data.message);
   }
   displayTimeKeeping();
 };
+
 const formatDate = (date) => {
-  if (date != '') {
+  if (date !== '') {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
@@ -249,18 +332,23 @@ const formatDate = (date) => {
   }
 };
 
+watch(() => currentPage.value, () => {
+  displayTimeKeeping()
+  updateTableDescription()
+})
+
 const nextPage = () => {
   if (currentPage.value < totalPage.value) {
     currentPage.value++;
-    displayTimeKeeping()
   }
 };
+
 const previousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
-    displayTimeKeeping()
   }
 };
+
 const messages = (type, msg) => {
   alertStore.alert = true;
   alertStore.type = type;
@@ -271,10 +359,22 @@ function handleEdit(id) {
   visibleMode.value = true;
   timekeepingId.value = id
 }
+
 function handleDelete(id) {
   confirmBox.value = true
   deleteId.value = id
 }
+
+function goToDepartment(department_name){
+  department.value.forEach((item) => {
+    if(item.name === department_name){
+      router.push({
+        path: `/admin/list-user/department/${item.id}`
+      })
+    }
+  })
+}
+
 // const exportExcel = () => {
 //   const excelData = filteredData.value.map((item) => {
 //     return {

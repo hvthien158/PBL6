@@ -24,8 +24,8 @@ class CreateDepartmentRequest extends FormRequest
         return [
             'departmentName' => 'required|string|unique:departments,department_name',
             'address'=> 'required|string',
-            'email' =>'required|email',
-            'phoneNumber' => 'required|string'
+            'email' =>'nullable|email',
+            'phoneNumber' => 'nullable|string'
         ];
     }
     /**
