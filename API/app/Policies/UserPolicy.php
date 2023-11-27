@@ -13,7 +13,7 @@ class UserPolicy
      */
     public function adminView(User $user): bool
     {
-        return (auth()->user()->role == Role::ADMIN) ? true : false;
+        return ($user->role == Role::ADMIN) ? true : false;
     }
 
     /**
@@ -27,7 +27,7 @@ class UserPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
         return (auth()->user()->role == Role::ADMIN) ? true : false;
     }
@@ -35,17 +35,17 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
-    {
-        return (auth()->user()->role == Role::ADMIN) ? true : false;
+    public function update(User $loggedInUser): bool
+    {   
+        return ($loggedInUser->role == Role::ADMIN) ? true : false;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $loggedInUser, User $user): bool
     {
-        return (auth()->user()->role == Role::ADMIN) ? true : false;
+        return ($user->role == Role::USER && $loggedInUser->role == Role::ADMIN ) ? true : false;
     }
 
     /**

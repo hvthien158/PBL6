@@ -17,7 +17,7 @@ class TimeKeepingPolicy
      */
     public function viewAny(User $user): bool
     {
-        return auth()->user()->role === Role::ADMIN;
+        return $user->role === Role::ADMIN;
     }
 
     /**

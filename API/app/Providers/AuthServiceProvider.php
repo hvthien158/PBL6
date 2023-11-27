@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
+
+use App\Models\Department;
 use App\Mail\VerifyMail;
 use Gate;
 use http\Url;
@@ -14,6 +16,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\TimeKeeping;
 use App\Policies\TimeKeepingPolicy;
 use App\Models\User;
+use App\Policies\DepartmentPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Mail;
 
@@ -27,6 +30,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         TimeKeeping::class => TimeKeepingPolicy::class,
         User::class => UserPolicy::class,
+        Department::class => DepartmentPolicy::class
     ];
 
     /**
