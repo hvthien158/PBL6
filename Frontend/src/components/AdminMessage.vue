@@ -176,6 +176,7 @@ function checkPass(id){
       Authorization: `Bearer ${user.token}`
     },
   }).then((response) => {
+    loadRequest()
     alertStore.alert = true
     alertStore.type = 'success'
     alertStore.msg = response.data.message

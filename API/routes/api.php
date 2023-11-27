@@ -55,7 +55,7 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::post('list-user/{id}', [AdminController::class, 'listUser']);
         Route::post('create-user', [AdminController::class, 'createUser']);
-        Route::put('update-user/{id}', [AdminController::class, 'updateUser']);
+        Route::put('update-user/{user}', [AdminController::class, 'updateUser']);
         Route::delete('delete-user/{id}', [AdminController::class, 'deleteUser']);
 
         Route::post('list-department/{id}', [AdminController::class, 'listDepartment']);

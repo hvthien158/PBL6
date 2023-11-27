@@ -16,9 +16,9 @@ class EmailUpdateRule implements Rule
     public function passes($attribute, $value)
     {
         $user = User::all();
-        
+
         foreach ($user as $user) {
-            if ($user->email === $value && request()->route('id') != $user->id) {
+            if ($user->email === $value && request()->route('user')->id != $user->id) {
                 return false;
             }
         }

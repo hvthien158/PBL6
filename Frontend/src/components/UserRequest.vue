@@ -126,25 +126,31 @@ const alertBox = useAlertStore()
 
 const leave_remote_content = ref('')
 const checkin_checkout_content = ref('')
+const emits = defineEmits(['update'])
 
 watch(() => prop.visible, () => {
   display.value = true
   view_leave_remote_content.value = false
+  view_checkin_checkout_content.value = false
   status_change_ref.value = prop.status_change
   time_change_ref.value = prop.time_change
 })
 
 function sendStatusRequest(){
+  console.log(prop.today)
   axios.post('http://127.0.0.1:8000/api/message/send', {
     'title': 'Leave/remote work request',
     'content': leave_remote_content.value,
-    'time_keeping_id': prop.time_keeping_id,
+    'time_keeping_date': prop.today,
   }, {
     headers: {
       Authorization: `Bearer ${user.token}`
     },
   }).then((response) => {
     status_change_ref.value = false
+    if(time_change_ref.value === false){
+      emits('update')
+    }
 
     alertBox.alert = true
     alertBox.type = 'success'
@@ -158,13 +164,16 @@ function sendTimeRequest(){
   axios.post('http://127.0.0.1:8000/api/message/send', {
     'title': 'Checkin/checkout request',
     'content': checkin_checkout_content.value,
-    'time_keeping_id': prop.time_keeping_id,
+    'time_keeping_date': prop.today,
   }, {
     headers: {
       Authorization: `Bearer ${user.token}`
     },
   }).then((response) => {
     time_change_ref.value = false
+    if(status_change_ref.value === false){
+      emits('update')
+    }
 
     alertBox.alert = true
     alertBox.type = 'success'

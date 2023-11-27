@@ -306,8 +306,8 @@ class TimeKeepingController extends Controller
                 'time_check_out' => $checkout ? $checkout->format('H:i:s') : null,
                 'status_am' => $status_am ?: 0,
                 'status_pm' => $status_pm ?: 0,
-                'admin_accept_status' => ($checkin || $checkout) ? 0 : null,
-                'admin_accept_time' => ($status_am || $status_pm) ? 0 : null,
+                'admin_accept_status' => ($status_am || $status_pm) ? 0 : null,
+                'admin_accept_time' => ($checkin || $checkout) ? 0 : null,
             ]);
             $check = DB::table('systemtimes')->insert([
                 'id' => $newtimekeep,

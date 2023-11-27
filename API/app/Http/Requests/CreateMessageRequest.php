@@ -24,7 +24,7 @@ class CreateMessageRequest extends FormRequest
         return [
             'title' => ['required', 'regex:(Checkin\/checkout request|Leave\/remote work request)'],
             'content' => 'nullable',
-            'time_keeping_id' => 'required|integer',
+            'time_keeping_date' => 'required',
         ];
     }
 }

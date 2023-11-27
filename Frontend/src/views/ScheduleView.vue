@@ -1,7 +1,6 @@
 <template>
   <div class="timekeeping-management">
     <EditTimeKeep
-        :id="today.id"
         :user_id="user_id"
         :date="today.date"
         :day-of-week="today.dayOfWeek"
@@ -12,6 +11,7 @@
         :status_change="today.adminAcceptStatus === 0"
         :time_change="today.adminAcceptTime === 0"
         @update="getListTimeKeeping(filter_value[0], filter_value[1])"
+        @update_no_reset="updateNoReset"
         @nextday="index += 1"
         @prevday="index -= 1"></EditTimeKeep>
     <el-card>
@@ -497,6 +497,14 @@ function editTime(id) {
       today.value = dataByMonth.value[id]
     }
   }
+}
+
+async function updateNoReset(time_keeping){
+  await getListTimeKeeping(filter_value.value[0], filter_value.value[1]);
+  let check = data.value.find((element) => {
+    return element.date === time_keeping
+  })
+  today.value = check
 }
 
 const handleExportExcel = () => {

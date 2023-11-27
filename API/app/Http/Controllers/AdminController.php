@@ -103,11 +103,11 @@ class AdminController extends Controller
      *
      * @return object
      */
-    public function updateUser(UpdateUserRequest $request, User $user, $id)
+    public function updateUser(UpdateUserRequest $request, User $user)
     {
         $this->authorize('update', $user);
         try {
-            $user = User::find($id)->update([
+            $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'department_id' => $request->department_id,
