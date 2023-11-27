@@ -74,11 +74,8 @@
 
 small {
     color: red;
-    margin-top: 0.1rem;
-    margin-left: 16px;
     font-size: 14px;
     color: red;
-    margin-top: 0.1rem;
     margin-left: 0 px;
     font-size: 14px;
 }
@@ -86,7 +83,7 @@ small {
 .form-item {
     display: flex;
     align-items: center;
-    margin-right: 16px;
+    margin-right: 8px;
 }
 
 .form-label {
@@ -224,59 +221,23 @@ if (prop.mode === 'update') {
 displayUser()
 
 watch(() => form.name, () => {
-    if (form.name === '') {
-        checkLanding.checkName = 'Please enter name'
-    } else {
-        checkLanding.checkName = ''
-    }
+    checkLanding.checkName = (form.name == '') ? 'The name field is required.' : ''
 })
 watch(() => form.address, () => {
-    if (form.address === '') {
-        checkLanding.checkAddress = 'Please enter address'
-    } else {
-        checkLanding.checkAddress = ''
-    }
+    checkLanding.checkAddress = (form.address == '') ? 'The address field is required.' : ''
 })
 watch(() => form.email, () => {
-    if (!isEmail(form.email) && form.email !== '') {
-        checkLanding.checkEmail = 'Invalid email'
-    } else {
-        checkLanding.checkEmail = ''
-    }
+    checkLanding.checkEmail = (!isEmail(form.email) && form.email != '') ? 'The email must be a valid email address.' : ''
 })
 watch(() => form.phoneNumber, () => {
-    if (!isPhoneNumber(form.phoneNumber) && form.phoneNumber != '') {
-        checkLanding.checkPhoneNumber = 'Invalid phone number'
-    } else {
-        checkLanding.checkPhoneNumber = ''
-    }
+    checkLanding.checkPhoneNumber = (form.phoneNumber != '' && !isPhoneNumber(form.phoneNumber)) ? 'The phone number must be a valid phone number.' : ''
 })
 function validate() {
-    if (form.name === '') {
-        checkLanding.checkName = 'Please enter name'
-    } else {
-        checkLanding.checkName = ''
-    }
-    if (form.address === '') {
-        checkLanding.checkAddress = 'Please enter address'
-    } else {
-        checkLanding.checkAddress = ''
-    }
-    if (!isEmail(form.email) && form.email !== '') {
-        checkLanding.checkEmail = 'Invalid email'
-    } else {
-        checkLanding.checkEmail = ''
-    }
-    if (!isPhoneNumber(form.phoneNumber) && form.phoneNumber != '') {
-        checkLanding.checkPhoneNumber = 'Invalid phone number'
-    } else {
-        checkLanding.checkPhoneNumber = ''
-    }
-    if (checkLanding.checkName === '' && checkLanding.checkAddress === '' && checkLanding.checkPhoneNumber === '' && checkLanding.checkEmail === '') {
-        return true;
-    } else {
-        return false;
-    }
+    checkLanding.checkName = (form.name == '') ? 'The name field is required.' : ''
+    checkLanding.checkAddress = (form.address == '') ? 'The address field is required.' : ''
+    checkLanding.checkEmail = (!isEmail(form.email) && form.email != '') ? 'The email must be a valid email address.' : ''
+    checkLanding.checkPhoneNumber = (form.phoneNumber != '' && !isPhoneNumber(form.phoneNumber)) ? 'The phone number must be a valid phone number.' : ''
+    return (checkLanding.checkName === '' && checkLanding.checkAddress === '' && checkLanding.checkPhoneNumber === '' && checkLanding.checkEmail === '') ? true : false
 }
 const isEmail = (email) => {
     let filter =
