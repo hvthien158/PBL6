@@ -48,14 +48,14 @@ Route::middleware('auth:api')->group(function () {
     //Admin 
     Route::post('list-user/{id}', [AdminController::class, 'listUser']);
     Route::post('create-user', [AdminController::class, 'createUser']);
-    Route::put('update-user/{id}', [AdminController::class, 'updateUser']);
-    Route::delete('delete-user/{id}', [AdminController::class, 'deleteUser']);
+    Route::put('update-user/{user}', [AdminController::class, 'updateUser']);
+    Route::delete('delete-user/{user}', [AdminController::class, 'deleteUser']);
     Route::post('list-department/{id}', [AdminController::class, 'listDepartment']);
     Route::post('search-department', [AdminController::class, 'searchDepartment']);
     Route::post('create-department', [AdminController::class, 'createDepartment']);
-    Route::get('user-department/{id}', [AdminController::class, 'getUserDepartment']);
-    Route::put('update-department/{id}', [AdminController::class, 'updateDepartment']);
-    Route::delete('delete-department/{id}', [AdminController::class, 'deleteDepartment']);
+    Route::get('user-department/{department}', [AdminController::class, 'getUserDepartment']);
+    Route::put('update-department/{department}', [AdminController::class, 'updateDepartment']);
+    Route::delete('delete-department/{department}', [AdminController::class, 'deleteDepartment']);
     Route::post('list-shift/{id}', [AdminController::class, 'listShift']);
     Route::post('create-shift', [AdminController::class, 'createShift']);
     Route::put('update-shift/{id}', [AdminController::class, 'updateShift']);

@@ -20,7 +20,6 @@ class GoogleDriveController extends Controller
         $this->gClient->setApplicationName(env('APP_NAME'));
         $this->gClient->setClientId(env('GOOGLE_DRIVE_CLIENT_ID'));
         $this->gClient->setClientSecret(env('GOOGLE_DRIVE_CLIENT_SECRET'));
-        // $this->gClient->setRedirectUri(route('google.login'));
         $this->gClient->setDeveloperKey(env('API_KEY'));
         $this->gClient->setScopes(
             array(
@@ -54,7 +53,7 @@ class GoogleDriveController extends Controller
                 $tokenGoogle->refresh_token = $this->gClient->getRefreshToken();
                 $tokenGoogle->save();
             }
-            $folderName = 'Avatar';
+            $folderName = 'avatar';
             $folderList = $service->files->listFiles(array('q' => "mimeType='application/vnd.google-apps.folder' and name='$folderName'"));
 
             if (count($folderList->getFiles()) > 0) {
@@ -77,10 +76,7 @@ class GoogleDriveController extends Controller
                     'uploadType' => 'media'
                 )
             );
-            $fileId = $result->id;
-            $file = $service->files->get($fileId, array('fields' => 'thumbnailLink'));
-            $fileUrl = $file->thumbnailLink;
-            return $fileUrl;
+            return 'https://drive.google.com/uc?export=view&id='.$result->id;
         }
         return false;
     }

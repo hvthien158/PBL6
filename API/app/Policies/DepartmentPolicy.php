@@ -22,27 +22,31 @@ class DepartmentPolicy
      */
     public function viewUser(User $user, Department $department): bool
     {
-        if(auth()->user()->role == Role::ADMIN || auth()->user()->department()->name == request()->route('name')) {
-            return true;
-        } else {
-            return false;
-        }
+        return ($user->role == Role::ADMIN && $department->users    ->count() != 0) ? true : false;
     }
-
+    /**
+     * @param User $user
+     * 
+     * @return bool
+     */
+    public function viewDepartment(User $user): bool
+    {
+        return $user->role == Role::ADMIN ? true : false;
+    }
     /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-        return (auth()->user()->role == Role::ADMIN) ? true : false;
+        return ($user->role == Role::ADMIN) ? true : false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Department $department): bool
+    public function update(User $user): bool
     {
-        return (auth()->user()->role == Role::ADMIN) ? true : false;
+        return ($user->role == Role::ADMIN) ? true : false;
     }
 
     /**
@@ -50,7 +54,7 @@ class DepartmentPolicy
      */
     public function delete(User $user, Department $department): bool
     {
-        return (auth()->user()->role == Role::ADMIN) ? true : false;
+        return ($user->role == Role::ADMIN && $department->users->count() == 0) ? true : false;
     }
 
     /**

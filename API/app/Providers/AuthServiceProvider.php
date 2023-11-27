@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
+
+use App\Models\Department;
 use Gate;
 use http\Url;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -12,6 +14,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\TimeKeeping;
 use App\Policies\TimeKeepingPolicy;
 use App\Models\User;
+use App\Policies\DepartmentPolicy;
 use App\Policies\UserPolicy;
 
 class AuthServiceProvider extends ServiceProvider
@@ -24,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         TimeKeeping::class => TimeKeepingPolicy::class,
         User::class => UserPolicy::class,
+        Department::class => DepartmentPolicy::class
     ];
 
     /**
