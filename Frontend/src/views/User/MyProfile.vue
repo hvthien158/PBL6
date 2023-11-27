@@ -94,6 +94,10 @@ span{
   margin-top: 20px !important;
 }
 
+.child span:first-child{
+  margin-right: 5px;
+}
+
 .inputfile {
   width: 0.1px;
   height: 0.1px;

@@ -293,6 +293,9 @@ const getTimeKeeping = async () => {
             checkin.value = true;
             checkout.value = false;
           }
+        } else if (response.data.weekend){
+          checkin.value = false;
+          checkout.value = false;
         } else {
           checkin.value = true;
           checkout.value = false;

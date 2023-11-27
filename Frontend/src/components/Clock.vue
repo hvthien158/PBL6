@@ -178,7 +178,6 @@ onMounted(() => {
   }
 })
 window.addEventListener('resize', () => {
-  console.log(window.innerWidth)
   if (window.innerWidth <= 600) {
     circle.cx = 40;
     circle.cy = 40
