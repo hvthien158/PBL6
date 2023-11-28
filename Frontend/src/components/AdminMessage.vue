@@ -2,9 +2,15 @@
   <el-dropdown :hide-on-click="false" max-height="70vh">
         <span class="el-dropdown-link">
           <el-icon size="30"><Message/></el-icon>
+          <span v-if="new_message === true" style="color: red; position: absolute; right: 40%">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                 class="bi bi-circle-fill" viewBox="0 0 16 16">
+              <circle cx="6" cy="6" r="6"/>
+            </svg>
+          </span>
         </span>
     <template #dropdown>
-      <div style="width: 400px; padding: 12px 20px; display: flex; justify-content: space-between">
+      <div style="width: 25vw; padding: 12px 20px 0 20px; display: flex; justify-content: space-between">
         <h4>Message</h4>
         <el-checkbox style="text-align: right" v-model="only_unread" label="Only view unread message"
                      size="default"/>
@@ -22,15 +28,18 @@
                 <el-avatar :src="item.user.avatar"></el-avatar>
               </div>
               <span v-if="item.is_read === 0" class="icon-warn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
-                         class="bi bi-circle-fill" viewBox="0 0 16 16">
-                      <circle cx="6" cy="6" r="6"/>
-                    </svg>
-                  </span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
+                     class="bi bi-circle-fill" viewBox="0 0 16 16">
+                  <circle cx="6" cy="6" r="6"/>
+                </svg>
+              </span>
               <div style="display: flex; flex-direction: column">
-                <div style="display: flex">
-                  <span>{{ item.user.name }}</span>
-                  <div style="height: 6px; width: 6px; border-radius: 50%; background-color: #1cb966" v-if="item.is_check === 0"></div>
+                <div style="display: flex; justify-content: space-between; width: 20vw">
+                  <div style="display: flex">
+                    <span>{{ item.user.name }}</span>
+                    <div style="height: 6px; width: 6px; border-radius: 50%; background-color: #1cb966" v-if="item.is_check === 0"></div>
+                  </div>
+                  <span>{{ moment(item.created_at).fromNow() }}</span>
                 </div>
                 <span style="color: #b2b2b2">{{ item.title }}</span>
               </div>
@@ -99,7 +108,8 @@
 .icon-warn {
   position: absolute;
   color: #ff3c00;
-  right: 12px;
+  left: 0;
+  top: 1em;
 }
 
 pre {
@@ -114,11 +124,13 @@ pre {
 import {ref, watch} from "vue";
 import axios from "axios";
 import {useUserStore} from "../stores/user";
+import moment from "moment";
 
 const status_request = ref(['Work', 'Remote', 'Not work'])
 const only_unread = ref(false)
 const request_data = ref('')
 const user = useUserStore().user
+const new_message = ref(false)
 
 watch(() => only_unread.value, loadRequest)
 
@@ -132,6 +144,9 @@ function loadRequest() {
       request_data.value = response.data.data
       request_data.value.forEach((data) => {
         data.hide = true
+        if(data.is_read === 0){
+          new_message.value = true
+        }
       })
     }).catch((e) => {
       console.log(e)
@@ -145,6 +160,9 @@ function loadRequest() {
       request_data.value = response.data.data
       request_data.value.forEach((data) => {
         data.hide = true
+        if(data.is_read === 0){
+          new_message.value = true
+        }
       })
     }).catch((e) => {
       console.log(e)

@@ -49,12 +49,13 @@ class MessageController extends Controller
                 ]);
             }
 
-            DB::table('messages')->insert([
-                'title' => $request->input('title'),
-                'content' => $request->input('content'),
-                'user_id' => auth()->id(),
-                'time_keeping_id' => $timekeeping->first()->id
-            ]);
+            $message = new Message();
+            $message->title = $request->input('title');
+            $message->content = $request->input('content');
+            $message->user_id = auth()->id();
+            $message->time_keeping_id = $timekeeping->first()->id;
+            $message->save();
+
             return response()->json(['message' => ResponseMessage::OK]);
         } catch (\Exception $e){
             return response()->json(['error' => $e->getMessage()], 400);
