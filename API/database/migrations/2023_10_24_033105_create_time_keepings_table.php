@@ -20,8 +20,8 @@ return new class extends Migration
             $table->integer('status_am')->default(0);
             $table->integer('status_pm')->default(0);
             //0: User not request, 1: Waiting admin, 2: Admin accepted
-            $table->integer('admin_accept_status')->default(0);
-            $table->integer('admin_accept_time')->default(0);
+            $table->integer('admin_accept_status')->nullable();
+            $table->integer('admin_accept_time')->nullable();
             $table->foreignId('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('shift_id')->nullable();
         });

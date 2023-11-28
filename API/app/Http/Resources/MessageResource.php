@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
@@ -37,6 +38,8 @@ class MessageResource extends JsonResource
             ],
             'is_read' => $this->is_read,
             'is_check' => $this->is_check,
+            'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $this->created_at, 'UTC')
+                ->setTimezone('Asia/Ho_Chi_Minh')->format('Y-m-d H:i:s'),
         ];
     }
 }
