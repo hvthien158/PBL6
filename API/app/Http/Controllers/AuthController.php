@@ -6,14 +6,19 @@ use App\Common\ResponseMessage;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\EmailRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\GoogleDriveController;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Str;
 
@@ -45,28 +50,10 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
-            'department_id' => 'required',
-            'address' => 'string|nullable',
-            'DOB' => 'nullable|date',
-            'phone_number' => 'nullable',
-            'avatar' => 'nullable',
-            'salary' => 'nullable',
-            'position' => 'nullable',
-            'role' => 'nullable',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 422);
-        }
-
         $user = User::create(array_merge(
-            $validator->validated(),
+            $request->validated(),
             ['password' => bcrypt($request->password)]
         ));
 
@@ -116,17 +103,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function changePassword(Request $request)
+    public function changePassword(ChangePasswordRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'old_password' => 'required|string|min:6',
-            'new_password' => 'required|string|confirmed|min:6'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(ResponseMessage::VALIDATION_ERROR, 422);
-        }
-
         if (!Hash::check($request->old_password, auth()->user()->getAuthPassword())) {
             return response()->json(['error' => 'Current password is incorrect'], 400);
         }
@@ -152,26 +130,16 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateProfileRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'address' => 'string|nullable',
-            'DOB' => 'nullable',
-            'phone_number' => 'nullable',
-            'avatar' => 'nullable|image',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 422);
-        }
-
-        $user = DB::table('users')->where('id', '=', auth()->id());
+        $user = User::where('id', auth()->id());
         if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar');
-            $path = Storage::disk('public')->put('avatar/' . auth()->id(), $avatar);
-            $user->update(array_merge($validator->validated(), ['avatar' => $path]));
+            $googleDriver = new GoogleDriveController;
+            $path = $googleDriver->googleDriveFileUpload($avatar);
+            $user->update(array_merge($request->validated(), ['avatar' => $path]));
         } else {
-            $user->update(array_merge($validator->validated()));
+            $user->update(array_merge($request->validated()));
         }
         $user = User::where('id', auth()->id())->get();
         return response()->json([
@@ -179,16 +147,13 @@ class AuthController extends Controller
             'user' => UserResource::collection($user)
         ], 201);
     }
-
     /**
      * @param Request $request
      *
      * @return object
      */
-    public function forgotPassword(Request $request)
+    public function forgotPassword(EmailRequest $request)
     {
-        $request->validate(['email' => 'required|email']);
-
         $status = Password::sendResetLink(
             $request->only('email')
         );
@@ -203,10 +168,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function checkEmail(Request $request)
+    public function checkEmail(EmailRequest $request)
     {
-        $request->validate(['email' => 'required|email']);
-
         $email = DB::table('users')->where('email', '=', $request->input('email'))->first();
         if ($email) {
             return response()->json(['message' => ResponseMessage::OK], 200);
@@ -220,14 +183,8 @@ class AuthController extends Controller
      *
      * @return object
      */
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'email|required',
-            'password' => 'required|min:6|confirmed',
-        ]);
-
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {

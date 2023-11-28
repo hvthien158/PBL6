@@ -82,7 +82,7 @@ main {
   background-color: white;
   border-radius: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 400px;
+  min-width: 25vw;
 }
 
 .login__field {
@@ -198,7 +198,6 @@ const login = async () => {
             if(response.data.verify_quest){
               verifyQuest.value = true
             } else {
-              console.log(response)
               user.id = response.data.user[0].id
               user.token = response.data.access_token
               user.name = response.data.user[0].name

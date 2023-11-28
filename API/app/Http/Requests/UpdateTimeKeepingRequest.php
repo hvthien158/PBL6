@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateMessageRequest extends FormRequest
+class UpdateTimeKeepingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,12 @@ class CreateMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'regex:(Checkin\/checkout request|Leave\/remote work request)'],
-            'content' => 'nullable',
-            'time_keeping_date' => 'required',
+            'user_id' => 'required',
+            'date' => 'required',
+            'time_check_in' => 'nullable',
+            'time_check_out' => 'nullable',
+            'status_am' => 'nullable|integer|between:0,2',
+            'status_pm' => 'nullable|integer|between:0,2',
         ];
     }
 }

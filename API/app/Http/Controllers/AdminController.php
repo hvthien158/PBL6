@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateShiftRequest;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\ManageTimeKeepingRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\TimeKeepingResource;
 use App\Http\Resources\ShiftResource;
@@ -33,28 +34,29 @@ class AdminController extends Controller
      */
     public function listUser(Request $request, $id)
     {
+        $this->authorize('adminView', User::class);
         try {
             $itemsPerPage = 8;
             $user = User::orderBy('id', 'asc');
-            if($request->name != '') {
-                $user->whereRaw('LOWER(name) like ?' , ['%'.$request->name.'%']);
+            if ($request->name != '') {
+                $user->whereRaw('LOWER(name) like ?', ['%' . $request->name . '%']);
             }
-            if($request->email != '') {
-                $user->whereRaw('LOWER(email) like ?' , ['%'.$request->email.'%']);
+            if ($request->email != '') {
+                $user->whereRaw('LOWER(email) like ?', ['%' . $request->email . '%']);
             }
-            if($request->address != '') {
-                $user->whereRaw('LOWER(address) like ?' , ['%'.$request->address.'%']);
+            if ($request->address != '') {
+                $user->whereRaw('LOWER(address) like ?', ['%' . $request->address . '%']);
             }
-            if($request->phoneNumber != '') {
-                $user->whereRaw('LOWER(phone_number) like ?' , ['%'.$request->phoneNumber.'%']);
+            if ($request->phoneNumber != '') {
+                $user->whereRaw('LOWER(phone_number) like ?', ['%' . $request->phoneNumber . '%']);
             }
-            if($request->position != '') {
+            if ($request->position != '') {
                 $user->where('position', $request->position);
             }
-            if($request->role != '') {
+            if ($request->role != '') {
                 $user->where('role', $request->role);
             }
-            if($request->department != '') {
+            if ($request->department != '') {
                 $user->where('department_id', $request->department);
             }
             $totalUser = $user->count();
@@ -102,11 +104,11 @@ class AdminController extends Controller
      *
      * @return object
      */
-    public function updateUser(UpdateUserRequest $request, User $user, $id)
+    public function updateUser(UpdateUserRequest $request, User $user)
     {
-        $this->authorize('update', $user);
+        $this->authorize('update', User::class);
         try {
-            $user = User::find($id)->update([
+            $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'department_id' => $request->department_id,
@@ -128,16 +130,12 @@ class AdminController extends Controller
      *
      * @return object
      */
-    public function deleteUser(User $user, $id)
+    public function deleteUser(User $user)
     {
         $this->authorize('delete', $user);
         try {
-            $user = DB::table('users')->delete($id);
-            if ($user == 1) {
-                return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
-            } else {
-                return response()->json(['message' => ResponseMessage::NOT_FOUND_ERROR], 404);
-            }
+            $user->delete();
+            return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -149,6 +147,7 @@ class AdminController extends Controller
      */
     public function listDepartment($id, Request $request)
     {
+        $this->authorize('viewDepartment', Department::class);
         try {
             $itemsPerPage = 10;
             $department = Department::orderBy('id', 'asc')->with('users')->with('manager');
@@ -214,11 +213,11 @@ class AdminController extends Controller
      *
      * @return object
      */
-    public function updateDepartment(UpdateDepartmentRequest $request, Department $department, $id)
+    public function updateDepartment(UpdateDepartmentRequest $request, Department $department)
     {
-        $this->authorize('update', $department);
+        $this->authorize('update', Department::class);
         try {
-            Department::find($id)->update([
+            $department->update([
                 'department_name' => $request->departmentName,
                 'address' => $request->address,
                 'email' => $request->email,
@@ -236,13 +235,11 @@ class AdminController extends Controller
      *
      * @return object
      */
-    public function deleteDepartment($id, Department $department)
+    public function deleteDepartment(Department $department)
     {
         $this->authorize('delete', $department);
         try {
-            $department = Department::find($id);
-            if ($department)
-                $department->delete();
+            $department->delete();
             return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -253,11 +250,11 @@ class AdminController extends Controller
      *
      * @return object
      */
-    public function getUserDepartment($id, Department $department)
+    public function getUserDepartment(Department $department)
     {
         $this->authorize('viewUser', $department);
         try {
-            $userDepartment = Department::find($id)->users()->get();
+            $userDepartment = $department->users()->get();
             if ($userDepartment) {
                 return UserResource::collection($userDepartment);
             } else {
@@ -300,7 +297,6 @@ class AdminController extends Controller
      */
     public function createShift(CreateShiftRequest $request)
     {
-        $this->authorize('create', Shift::class);
         try {
             Shift::create([
                 'name' => $request->name,
@@ -322,7 +318,6 @@ class AdminController extends Controller
      */
     public function updateShift(UpdateShiftRequest $request, Shift $shift, $id)
     {
-        $this->authorize('update', $shift);
         try {
             Shift::find($id)->update([
                 'name' => $request->name,
@@ -343,7 +338,6 @@ class AdminController extends Controller
      */
     public function deleteShift($id, Shift $shift)
     {
-        $this->authorize('delete', $shift);
         try {
             $shift = Shift::find($id);
             if ($shift)
@@ -359,31 +353,19 @@ class AdminController extends Controller
      * @return JsonResponse
      * @throws AuthorizationException
      */
-    public function manageTimeKeeping($skip, Request $request)
+    public function manageTimeKeeping($skip, ManageTimeKeepingRequest $request)
     {
-        $this->authorize('viewAny',  TimeKeeping::class);
-        $validator = Validator::make($request->all(), [
-            'from' => 'required',
-            'to' => 'required',
-            'name' => 'nullable',
-            'department' => 'nullable'
-        ]);
-
-        if($validator->fails()){
-            return response()->json(['message' => ResponseMessage::VALIDATION_ERROR], 422);
-        }
-
+        $this->authorize('viewAny',  TimeKeeping::class);   
         $from = $request->from;
         $to = $request->to;
         $name = $request->name;
         $department = $request->department;
         $count_user = 0;
-
         try {
-            if($department){
-                if($name){
+            if ($department) {
+                if ($name) {
                     $users = DB::table('users')
-                        ->where('name', 'like',  '%'.$name.'%')
+                        ->where('name', 'like',  '%' . $name . '%')
                         ->where('department_id', '=', $department);
                     $count_user = count($users->get());
                     $users = $users->limit(10)
@@ -399,9 +381,9 @@ class AdminController extends Controller
                         ->get();
                 }
             } else {
-                if($name){
+                if ($name) {
                     $users = DB::table('users')
-                        ->where('name', 'like',  '%'.$name.'%');
+                        ->where('name', 'like',  '%' . $name . '%');
                     $count_user = count($users->get());
                     $users = $users
                         ->limit(10)
@@ -413,7 +395,7 @@ class AdminController extends Controller
                 }
             }
             $result = [];
-            foreach ($users as $user){
+            foreach ($users as $user) {
                 $timeKeepings = TimeKeeping::where('user_id', $user->id)
                     ->whereBetween('_date', [$from, $to])
                     ->orderBy('_date', 'desc')->get();
@@ -423,21 +405,21 @@ class AdminController extends Controller
                 $sumWorkingMinutes = 0;
                 $averageWorkingHours = 0;
                 $lateDays = 0;
-                foreach ($timeKeepings as $timeKeeping){
-                    if($timeKeeping->time_check_in){
+                foreach ($timeKeepings as $timeKeeping) {
+                    if ($timeKeeping->time_check_in) {
                         $sumWorkingDays += 1;
-                        if(Carbon::createFromFormat('H:i:s', $timeKeeping->time_check_in)
+                        if (Carbon::createFromFormat('H:i:s', $timeKeeping->time_check_in)
                             ->isAfter(Carbon::createFromFormat('H:i:s', '08:30:00'))
-                        ){
+                        ) {
                             $lateDays += 1;
                         }
                     }
 
-                    if($timeKeeping->time_check_in && $timeKeeping->time_check_out){
+                    if ($timeKeeping->time_check_in && $timeKeeping->time_check_out) {
                         $carbonCheckIn = Carbon::createFromFormat('H:i:s', $timeKeeping->time_check_in);
                         $carbonCheckOut = Carbon::createFromFormat('H:i:s', $timeKeeping->time_check_out);
                         $timeWorkHours = $carbonCheckOut->diffInHours($carbonCheckIn);
-                        $timeWorkMinutes = $carbonCheckOut->diffInMinutes($carbonCheckIn) - $timeWorkHours*60;
+                        $timeWorkMinutes = $carbonCheckOut->diffInMinutes($carbonCheckIn) - $timeWorkHours * 60;
                         $sumWorkingHours += $timeWorkHours;
                         $sumWorkingMinutes += $timeWorkMinutes;
                     }
@@ -445,19 +427,19 @@ class AdminController extends Controller
                 $sumWorkingHours += intdiv($sumWorkingMinutes, 60);
                 $sumWorkingMinutes = $sumWorkingMinutes % 60;
 
-                if($sumWorkingDays != 0){
-                    $sumWorkingByMinutes = intdiv($sumWorkingHours * 60 + $sumWorkingMinutes, $sumWorkingDays) ;
+                if ($sumWorkingDays != 0) {
+                    $sumWorkingByMinutes = intdiv($sumWorkingHours * 60 + $sumWorkingMinutes, $sumWorkingDays);
                     $averageWorkingHours = ($sumWorkingByMinutes < 60 ? '00' : str_pad(intdiv($sumWorkingByMinutes, 60), 2, '0', STR_PAD_LEFT))
-                        .':'
-                        .str_pad($sumWorkingByMinutes % 60, 2, '0', STR_PAD_LEFT);
+                        . ':'
+                        . str_pad($sumWorkingByMinutes % 60, 2, '0', STR_PAD_LEFT);
                 } else {
                     $averageWorkingHours = '00:00';
                 }
 
 
                 $sumWorkingTime = str_pad($sumWorkingHours, 2, '0', STR_PAD_LEFT)
-                    .':'
-                    .str_pad($sumWorkingMinutes, 2, '0', STR_PAD_LEFT);
+                    . ':'
+                    . str_pad($sumWorkingMinutes, 2, '0', STR_PAD_LEFT);
 
                 $result[] = [
                     'id' => $user->id,

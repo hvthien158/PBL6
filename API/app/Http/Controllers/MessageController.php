@@ -32,7 +32,8 @@ class MessageController extends Controller
     public function createRequest(CreateMessageRequest $request){
         try {
             $timekeeping = DB::table('time_keepings')
-                ->where('id', '=', $request->time_keeping_id);
+                ->where('_date', '=', $request->time_keeping_date)
+                ->where('user_id', '=', auth()->id());
 
             if($timekeeping->first()->user_id != auth()->id()){
                 return response()->json(['error' => 'Not allow'], 405);
@@ -52,7 +53,7 @@ class MessageController extends Controller
                 'title' => $request->input('title'),
                 'content' => $request->input('content'),
                 'user_id' => auth()->id(),
-                'time_keeping_id' => $request->input('time_keeping_id')
+                'time_keeping_id' => $timekeeping->first()->id
             ]);
             return response()->json(['message' => ResponseMessage::OK]);
         } catch (\Exception $e){

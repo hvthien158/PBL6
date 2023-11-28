@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('systemtimes', function (Blueprint $table) {
+        Schema::create('google_tokens', function (Blueprint $table) {
             $table->id();
+            $table->text('access_token');
+            $table->text('refresh_token');
             $table->timestamps();
         });
     }
@@ -22,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('systemtimes');
+        Schema::dropIfExists('google_tokens');
     }
 };

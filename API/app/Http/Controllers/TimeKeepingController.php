@@ -6,6 +6,7 @@ use App\Common\ResponseMessage;
 use App\Common\Role;
 use App\Http\Requests\MonthYearRequest;
 use App\Http\Requests\TimeRequest;
+use App\Http\Requests\UpdateTimeKeepingRequest;
 use App\Http\Resources\TimeKeepingResource;
 use App\Models\Systemtime;
 use App\Models\TimeKeeping;
@@ -232,20 +233,8 @@ class TimeKeepingController extends Controller
         return $timekeepingRecords;
     }
 
-    public function updateTimeKeeping(Request $request)
+    public function updateTimeKeeping(UpdateTimeKeepingRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required',
-            'date' => 'required',
-            'time_check_in' => 'nullable',
-            'time_check_out' => 'nullable',
-            'status_am' => 'nullable|integer|between:0,2',
-            'status_pm' => 'nullable|integer|between:0,2',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['data' => $validator->failed(), 'message' => ResponseMessage::VALIDATION_ERROR], 422);
-        }
         $status_am = $request->get('status_am');
         $status_pm = $request->get('status_pm');
 
@@ -264,7 +253,10 @@ class TimeKeepingController extends Controller
             ->where('_date', '=', $date)->first();
 
         if ($timekeep) {
-            $need_request_status = $status_am !== $timekeep->status_am || $status_pm !== $timekeep->status_pm;
+            $need_request_status = ($status_am !== 0 && $status_am !== $timekeep->status_am)
+                || ($status_pm !== 0 && $status_pm !== $timekeep->status_pm);
+            //Situation: User change status to default (0, 0)
+            $default_status = $status_am == 0 && $status_pm == 0;
             $need_request_time = ($checkin && $checkin->format('H:i:s') !== $timekeep->time_check_in)
                 || ($checkout && $checkout->format('H:i:s') !== $timekeep->time_check_out);
 
@@ -275,7 +267,7 @@ class TimeKeepingController extends Controller
                     'time_check_out' => $checkout ? $checkout->format('H:i:s') : $timekeep->time_check_out,
                     'status_am' => $status_am >= 0 ? $status_am : $timekeep->status_am,
                     'status_pm' => $status_pm >= 0 ? $status_pm : $timekeep->status_pm,
-                    'admin_accept_status' => $need_request_status ? 0 : $timekeep->admin_accept_status,
+                    'admin_accept_status' => $default_status ? null : ($need_request_status ? 0 : $timekeep->admin_accept_status),
                     'admin_accept_time' => $need_request_time ? 0 : $timekeep->admin_accept_time,
                 ]);
 
@@ -314,8 +306,8 @@ class TimeKeepingController extends Controller
                 'time_check_out' => $checkout ? $checkout->format('H:i:s') : null,
                 'status_am' => $status_am ?: 0,
                 'status_pm' => $status_pm ?: 0,
-                'admin_accept_status' => ($checkin || $checkout) ? 0 : null,
-                'admin_accept_time' => ($status_am || $status_pm) ? 0 : null,
+                'admin_accept_status' => ($status_am || $status_pm) ? 0 : null,
+                'admin_accept_time' => ($checkin || $checkout) ? 0 : null,
             ]);
             $check = DB::table('systemtimes')->insert([
                 'id' => $newtimekeep,

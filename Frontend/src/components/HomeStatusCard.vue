@@ -11,18 +11,15 @@
         <div class="user">
           <div v-for="item in data">
             <el-avatar style="margin-right: 12px" :src="item.avatar" :size="40" />
-            <div v-if="item.id !== user.id" style="height: 20px; display: flex; flex-direction: column; justify-content: space-between">
-              <span style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E">{{ item.name }}</span>
+            <div style="height: 20px; display: flex; flex-direction: column; justify-content: space-between">
+              <span v-if="item.id !== user.id"
+                style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E"> {{ item.id + ' - ' + item.name
+                }}</span>
+              <span v-else style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E">{{ item.id }} -
+                You</span>
               <div style="display: flex">
                 <div :class="bg_color[item.status_AM]" style="height: 6px; width: 40px; margin-right: 1px;"></div>
                 <div :class="bg_color[item.status_PM]" style="height: 6px; width: 40px;"></div>
-              </div>
-            </div>
-            <div v-else style="height: 20px; display: flex; flex-direction: column; justify-content: space-between">
-              <span style="font-size: 14px; margin-top: -12px; font-weight: 600; color: #6A679E">You</span>
-              <div style="display: flex">
-                <div :class="bg_color[status.status_AM]" style="height: 6px; width: 40px; margin-right: 1px;"></div>
-                <div :class="bg_color[status.status_PM]" style="height: 6px; width: 40px;"></div>
               </div>
             </div>
           </div>
@@ -32,8 +29,9 @@
         <el-button size="small" @click="previousPage" :disabled="currentPage === 1">
           Prev
         </el-button>
-<!--        <span style="margin: 0 10px">{{ currentPage }} / {{ totalPage }}</span>-->
-        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => currentPage = page"></Pagination>
+        <!--        <span style="margin: 0 10px">{{ currentPage }} / {{ totalPage }}</span>-->
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage"
+          @change-page="(page) => currentPage = page"></Pagination>
         <el-button size="small" @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
@@ -82,7 +80,7 @@
   align-items: center;
 }
 
-.bg-green{
+.bg-green {
   background-color: #04fc43;
 }
 
@@ -99,7 +97,7 @@
 import { ref, watch } from "vue";
 import axios from "axios";
 import { useUserStore } from "../stores/user";
-import {useStatusStore} from "../stores/status";
+import { useStatusStore } from "../stores/status";
 import Pagination from "./Pagination.vue";
 
 const value = ref('')
@@ -112,19 +110,25 @@ const totalPage = ref(1);
 const user = useUserStore().user
 const bg_color = ref(['bg-green', 'bg-purple', 'bg-gray'])
 const status = useStatusStore()
+const displayDepartment = async () => {
+  try {
+    await axios.get("http://127.0.0.1:8000/api/department")
+      .then(function (response) {
+        department.value = response.data.data;
+        value.value = department.value[0].id
+        department.value.forEach((department) => {
+          options.value.push({
+            value: department.id,
+            label: department.name,
+          })
+        })
+      });
+  } catch (e) {
+    console.log(e)
+  }
 
-axios.get("http://127.0.0.1:8000/api/department")
-  .then(function (response) {
-    department.value = response.data.data;
-    value.value = department.value[0].id
-    department.value.forEach((department) => {
-      options.value.push({
-        value: department.id,
-        label: department.name,
-      })
-    })
-  });
-
+}
+displayDepartment()
 watch(() => value.value, () => {
   displayUser()
 })

@@ -126,6 +126,14 @@
       <path value="$PROJECT_DIR$/API/vendor/tymon/jwt-auth" />
       <path value="$PROJECT_DIR$/API/vendor/lcobucci/jwt" />
       <path value="$PROJECT_DIR$/API/vendor/lcobucci/clock" />
+      <path value="$PROJECT_DIR$/API/vendor/psr/cache" />
+      <path value="$PROJECT_DIR$/API/vendor/firebase/php-jwt" />
+      <path value="$PROJECT_DIR$/API/vendor/google/auth" />
+      <path value="$PROJECT_DIR$/API/vendor/google/apiclient-services" />
+      <path value="$PROJECT_DIR$/API/vendor/paragonie/random_compat" />
+      <path value="$PROJECT_DIR$/API/vendor/paragonie/constant_time_encoding" />
+      <path value="$PROJECT_DIR$/API/vendor/google/apiclient" />
+      <path value="$PROJECT_DIR$/API/vendor/phpseclib/phpseclib" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1" />

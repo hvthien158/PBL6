@@ -1,7 +1,6 @@
 <template>
   <div class="timekeeping-management">
     <EditTimeKeep
-        :id="today.id"
         :user_id="user_id"
         :date="today.date"
         :day-of-week="today.dayOfWeek"
@@ -12,6 +11,7 @@
         :status_change="today.adminAcceptStatus === 0"
         :time_change="today.adminAcceptTime === 0"
         @update="getListTimeKeeping(filter_value[0], filter_value[1])"
+        @update_no_reset="updateNoReset"
         @nextday="index += 1"
         @prevday="index -= 1"></EditTimeKeep>
     <el-card>
@@ -21,14 +21,17 @@
         <span style="position: absolute; right: calc(4vw + 36px)" v-if="admin_view">User: {{ admin_view }}</span>
       </div>
       <div class="card-content">
-        <el-form inline>
-          <el-date-picker style="margin: 40px 30px 0 15%" v-model="filter_value" type="daterange"
-                          start-placeholder="Start date" end-placeholder="End date" format="YYYY-MM-DD"
-                          value-format="YYYY-MM-DD"/>
-          <el-form-item>
-            <el-button type="warning" @click="handleExportExcel">Export Excel</el-button>
-            <el-button type="warning" @click="handleExportCSV">Export CSV</el-button>
-          </el-form-item>
+        <el-form>
+          <div class="responsive-menu">
+            <el-date-picker style="max-width: 250px" v-model="filter_value" type="daterange"
+              start-placeholder="Start date" end-placeholder="End date" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
+            <div class="export">
+              <el-form-item>
+                <el-button type="warning" @click="handleExportExcel">Export Excel</el-button>
+                <el-button type="warning" @click="handleExportCSV">Export CSV</el-button>
+              </el-form-item>
+            </div>
+          </div>
         </el-form>
         <div>
           <div class="pagination">
@@ -82,9 +85,9 @@
           </el-table-column>
           <el-table-column prop="date" label="Date" width="100"></el-table-column>
           <el-table-column label="Status" width="120"></el-table-column>
-          <el-table-column prop="timeCheckIn" label="Checkin"></el-table-column>
-          <el-table-column prop="timeCheckOut" label="Checkout"></el-table-column>
-          <el-table-column prop="timeWork" label="Working time" width="110"></el-table-column>
+          <el-table-column prop="timeCheckIn" label="Checkin" min-width="110"></el-table-column>
+          <el-table-column prop="timeCheckOut" label="Checkout" min-width="110"></el-table-column>
+          <el-table-column prop="timeWork" label="Working time" min-width="110"></el-table-column>
           <el-table-column prop="shift" label="Shift" width="80"></el-table-column>
           <el-table-column label="Operations" width="100">
             <template #default="scope">
@@ -93,8 +96,8 @@
           </el-table-column>
         </el-table>
         <div class="form-export">
-          <ExportData @invisible="visibleMode = false" :mode="operationMode"
-                      :userId="user_id" v-if="visibleMode"></ExportData>
+          <ExportData @invisible="visibleMode = false" :mode="operationMode" :userId="user_id" v-if="visibleMode">
+          </ExportData>
         </div>
         <div class="pagination">
           <el-button type="info" @click="previousMonth">
@@ -119,6 +122,8 @@
 
 .el-form {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
 }
 
 .card-header {
@@ -163,6 +168,41 @@
 
 .pagination span {
   margin: 0 10px;
+}
+
+.responsive-menu {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+@media screen and (max-width: 1440px) {
+  .edit-timekeeping {
+    display: none;
+  }
+
+  .el-card {
+    width: 90vw;
+  }
+}
+
+@media screen and (max-width: 608px) {
+  .el-form {
+    display: flex;
+    justify-content: center;
+  }
+
+  .el-form .responsive-menu {
+    width: auto;
+    display: block;
+  }
+
+  .export {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 }
 </style>
 
@@ -457,6 +497,14 @@ function editTime(id) {
       today.value = dataByMonth.value[id]
     }
   }
+}
+
+async function updateNoReset(time_keeping){
+  await getListTimeKeeping(filter_value.value[0], filter_value.value[1]);
+  let check = data.value.find((element) => {
+    return element.date === time_keeping
+  })
+  today.value = check
 }
 
 const handleExportExcel = () => {

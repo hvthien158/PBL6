@@ -18,7 +18,7 @@ class MessageResource extends JsonResource
     {
         $user = User::where('id', $this->user_id)->first();
         if($user->avatar){
-            $avatar = env('STORAGE_URL').$user->avatar;
+            $avatar = $user->avatar;
         } else {
             $avatar = 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg';
         }

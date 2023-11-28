@@ -19,13 +19,14 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $salary = '$'.$this->salary;
         if($this->DOB){
             $DOB_format = $this->DOB;
         } else {
             $DOB_format = 'none';
         }
         if($this->avatar){
-            $avatar = env('STORAGE_URL').$this->avatar;
+            $avatar = $this->avatar;
         } else {
             $avatar = 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg';
         }
@@ -50,7 +51,9 @@ class UserResource extends JsonResource
                 $status_PM = 0;
             }
         }
-
+        if($this->salary == null){
+            $salary = 'none';
+        }
         return [
             'id' => $this->id,
             'name'=> $this->name,
@@ -60,7 +63,7 @@ class UserResource extends JsonResource
             'DOB' => $DOB_format,
             'role' => $this->role ?: Role::USER,
             'phone_number' => $this->phone_number ?: 'none',
-            'salary' => '$'.$this->salary ?: 'none',
+            'salary' => $salary,
             'position' => $this->position ?: 'none',
             'department' => new DepartmentResource($this->department),
             'status_AM' => $status_AM,

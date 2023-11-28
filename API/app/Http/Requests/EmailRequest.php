@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateMessageRequest extends FormRequest
+class EmailRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,7 @@ class CreateMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'regex:(Checkin\/checkout request|Leave\/remote work request)'],
-            'content' => 'nullable',
-            'time_keeping_date' => 'required',
+            'email' => 'required|email'
         ];
     }
 }
