@@ -2,7 +2,7 @@
   <el-dropdown :hide-on-click="false" max-height="70vh">
         <span class="el-dropdown-link">
           <el-icon size="30"><Message/></el-icon>
-          <span v-if="new_message === true" style="color: red; position: absolute; right: 40%">
+          <span v-if="new_message > 0" style="color: red; position: absolute; right: 40%">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
                  class="bi bi-circle-fill" viewBox="0 0 16 16">
               <circle cx="6" cy="6" r="6"/>
@@ -130,7 +130,7 @@ const status_request = ref(['Work', 'Remote', 'Not work'])
 const only_unread = ref(false)
 const request_data = ref('')
 const user = useUserStore().user
-const new_message = ref(false)
+const new_message = ref(0)
 
 watch(() => only_unread.value, loadRequest)
 
@@ -142,10 +142,11 @@ function loadRequest() {
       },
     }).then((response) => {
       request_data.value = response.data.data
+      new_message.value = 0
       request_data.value.forEach((data) => {
         data.hide = true
         if(data.is_read === 0){
-          new_message.value = true
+          new_message.value += 1
         }
       })
     }).catch((e) => {
@@ -158,10 +159,11 @@ function loadRequest() {
       },
     }).then((response) => {
       request_data.value = response.data.data
+      new_message.value = 0
       request_data.value.forEach((data) => {
         data.hide = true
         if(data.is_read === 0){
-          new_message.value = true
+          new_message.value += 1
         }
       })
     }).catch((e) => {
@@ -173,7 +175,7 @@ loadRequest()
 
 function checkRead(id, read){
   if(read === 0){
-    console.log(1)
+    new_message.value -= 1
     axios.post('http://127.0.0.1:8000/api/message/read', {
       id: id
     }, {

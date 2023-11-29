@@ -37,7 +37,7 @@
       <el-form-item label="Address" :label-width="formLabelWidth">
         <el-input v-model="form.address" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="Phone Number" :label-width="formLabelWidth">
+      <el-form-item label="Phone Number" :label-width="formLabelWidth" :rules="[{ required: true }]">
         <el-input v-model="form.phoneNumber" autocomplete="off" />
         <small>{{ checkLanding.checkPhoneNumber }}</small>
       </el-form-item>
@@ -237,15 +237,15 @@ function loadUser() {
         Authorization: `Bearer ${user.token}`
       },
     }).then((response) => {
-      form.email = response.data.data[0].email === 'none' ? '' : response.data.data[0].email;
-      form.name = response.data.data[0].name === 'none' ? '' : response.data.data[0].name;
-      form.address = response.data.data[0].address === 'none' ? '' : response.data.data[0].address;
-      form.phoneNumber = response.data.data[0].phone_number === 'none' ? '' : response.data.data[0].phone_number;
-      form.DOB = response.data.data[0].DOB === 'none' ? '' : response.data.data[0].DOB;
-      form.salary = response.data.data[0].salary === 'none' ? '' : response.data.data[0].salary.split('$')[1];
-      form.position = response.data.data[0].position === 'none' ? '' : response.data.data[0].position;
-      form.role = response.data.data[0].role;
-      form.department = response.data.data[0].department.id;
+      form.email = response.data.data.email === 'none' ? '' : response.data.data.email;
+      form.name = response.data.data.name === 'none' ? '' : response.data.data.name;
+      form.address = response.data.data.address === 'none' ? '' : response.data.data.address;
+      form.phoneNumber = response.data.data.phone_number === 'none' ? '' : response.data.data.phone_number;
+      form.DOB = response.data.data.DOB === 'none' ? '' : response.data.data.DOB;
+      form.salary = response.data.data.salary === 'none' ? '' : response.data.data.salary.split('$')[1];
+      form.position = response.data.data.position === 'none' ? '' : response.data.data.position;
+      form.role = response.data.data.role;
+      form.department = response.data.data.department.id;
     }).catch((e) => {
       console.log(e)
       alertStore.alert = true;
@@ -284,7 +284,7 @@ const validate = () => {
   }
   checkLanding.checkPhoneNumber = (form.phoneNumber != '' && !isPhoneNumber(form.phoneNumber)) ? 'The phone number must be a valid phone number.' : ''
   checkLanding.department = form.department == 0 ? 'The department must be required.' : ''
-  return checkLanding.checkName === '' && checkLanding.checkAddress === '' && checkLanding.checkPhoneNumber === '' && checkLanding.checkEmail === '' && checkLanding.checkPassword === '' && checkLanding.department === '';
+  return checkLanding.checkName === '' && checkLanding.checkEmail === '' && checkLanding.checkPassword === '' && checkLanding.department === '';
 }
 const isEmail = (email) => {
   let filter =
