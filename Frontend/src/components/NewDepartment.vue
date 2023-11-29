@@ -190,11 +190,11 @@ const loadDepartment = async () => {
                     Authorization: `Bearer ${user.token}`
                 },
             }).then((response) => {
-                form.email = response.data.data[0].email
-                form.name = response.data.data[0].name
-                form.address = response.data.data[0].address
-                form.phoneNumber = response.data.data[0].phoneNumber
-                form.manager = response.data.data[0].manager.id
+                form.email = response.data.data.email
+                form.name = response.data.data.name
+                form.address = response.data.data.address
+                form.phoneNumber = response.data.data.phoneNumber
+                form.manager = response.data.data.manager.id
             })
         } catch (e) {
             console.log(e)

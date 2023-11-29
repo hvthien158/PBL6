@@ -6,5 +6,15 @@ use App\Repositories\RepositoryInterface;
 
 interface MessageRepositoryInterface extends RepositoryInterface
 {
+    public function getLimit5Message();
 
+    public function getLimitUnreadMessage();
+
+    public function customCreate($request, $userID);
+
+    //Change status after admin read request
+    public function checkReadMessage($id);
+
+    //Change status after admin confirm request
+    public function checkPassMessage($id);
 }

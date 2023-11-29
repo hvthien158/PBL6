@@ -188,10 +188,10 @@ function updateProfile() {
       },
     })
     .then((response) => {
-      user.address = response.data.user[0].address
-      user.phone_number = response.data.user[0].phone_number
-      user.DOB = response.data.user[0].DOB
-      user.avatar = response.data.user[0].avatar
+      user.address = response.data.user.address
+      user.phone_number = response.data.user.phone_number
+      user.DOB = response.data.user.DOB
+      user.avatar = response.data.user.avatar
       imgPath.value = user.avatar
       mapData()
 
