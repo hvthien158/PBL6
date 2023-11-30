@@ -21,7 +21,7 @@
               </div>
             </div>
             <el-dropdown-item v-if="user.role === 'admin'"
-                              @click="router.push({name: 'listUser'})">Admin Page</el-dropdown-item>
+                              @click="router.push({name: 'list-timekeeping'})">Admin Page</el-dropdown-item>
             <el-dropdown-item @click="changePass">Change password</el-dropdown-item>
             <el-dropdown-item @click="logout">Logout</el-dropdown-item>
           </el-dropdown-menu>

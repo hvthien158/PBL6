@@ -42,15 +42,25 @@
             </el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="department" label="Department name" min-width="200">
+        <el-table-column prop="department" label="Department name" min-width="110">
           <template #default="scope">
             <el-button link type="warning" @click="goToDepartment(scope.row.department)">{{ scope.row.department }}</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="sumWorkingDays" label="Working days" min-width="120"></el-table-column>
-        <el-table-column prop="sumWorkingTime" label="Working time" min-width="120"></el-table-column>
-        <el-table-column prop="averageWorkingHours" label="Average" min-width="120"></el-table-column>
-        <el-table-column prop="lateDays" label="Late days" min-width="120"></el-table-column>
+        <el-table-column prop="regularWorkingDays" label="The number of days specified" min-width="120"></el-table-column>
+        <el-table-column label="Working days">
+          <el-table-column prop="sumWorkingDays" label="Total" min-width="120"></el-table-column>
+          <el-table-column prop="remoteDays" label="Remote" min-width="120"></el-table-column>
+          <el-table-column prop="leaveDays" label="Not work" min-width="120"></el-table-column>
+          <el-table-column prop="lateDays" label="Late arrival" min-width="120"></el-table-column>
+        </el-table-column>
+        <el-table-column prop="regularWorkingTime" label="Predetermined time" min-width="120"></el-table-column>
+        <el-table-column label="Working time">
+          <el-table-column prop="sumWorkingTime" label="Total" min-width="120"></el-table-column>
+          <el-table-column prop="scheduledWorkingTime" label="Scheduled" min-width="120"></el-table-column>
+          <el-table-column prop="overtimeWorkingTime" label="Overtime" min-width="120"></el-table-column>
+          <el-table-column prop="averageWorkingHours" label="Average" min-width="120"></el-table-column>
+        </el-table-column>
       </el-table>
       <div style="text-align: right; width: 100%">
         <span style="padding-right: 12px; color: #8c8c8c">{{ table_description }}</span>
@@ -262,7 +272,6 @@ watch(() => filter_value.value, () => {
 })
 
 const displayTimeKeeping = async () => {
-  visibleMode.value = false
   try {
     await axios
         .post(`http://127.0.0.1:8000/api/manage-timekeeping/${currentPage.value - 1}`, {

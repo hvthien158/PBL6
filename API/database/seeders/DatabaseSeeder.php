@@ -24,14 +24,14 @@ class DatabaseSeeder extends Seeder
         //         [
         //             'name' => 'AM',
         //             'amount' => 0.5,
-        //             'time_valid_check_in' => '08:30:00',
+        //             'time_valid_check_in' => '00:00:01',
         //             'time_valid_check_out' => '13:00:00',
         //         ],
         //         [
         //             'name' => 'PM',
         //             'amount' => 0.5,
         //             'time_valid_check_in' => '13:00:00',
-        //             'time_valid_check_out' => '17:45:00',
+        //             'time_valid_check_out' => '23:59:59',
         //         ],
         //         [
         //             'name' => 'Full',
