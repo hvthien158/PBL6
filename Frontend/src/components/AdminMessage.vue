@@ -121,7 +121,7 @@ pre {
 </style>
 
 <script setup>
-import {ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import axios from "axios";
 import {useUserStore} from "../stores/user";
 import moment from "moment";
@@ -171,7 +171,10 @@ function loadRequest() {
     })
   }
 }
-loadRequest()
+
+onMounted(() => {
+  loadRequest()
+})
 
 function checkRead(id, read){
   if(read === 0){
