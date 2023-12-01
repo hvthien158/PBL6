@@ -147,6 +147,7 @@ onMessage(messaging, (payload) => {
 });
 watch(notification, () => {
     openNotification()
+    only_unread.value = true
     loadRequest()
 })
 const openNotification = () => {
