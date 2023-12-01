@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Common\ResponseMessage;
 use App\Models\User;
+use App\Repositories\User\UserRepository;
+use App\Repositories\User\UserRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
@@ -25,6 +27,11 @@ use App\Models\UserDeviceToken;
 
 class AuthController extends Controller
 {
+
+    public function __construct(protected UserRepositoryInterface $userRepo)
+    {
+    }
+
     /**
      * @param LoginRequest $request
      *
@@ -51,25 +58,6 @@ class AuthController extends Controller
             ]);
         }
         return $this->createNewToken($token);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return object
-     */
-    public function register(RegisterRequest $request)
-    {
-        $user = User::create(array_merge(
-            $request->validated(),
-            ['password' => bcrypt($request->password)]
-        ));
-
-
-        return response()->json([
-            'message' => ResponseMessage::CREATE_SUCCESS,
-            'user' => $user
-        ], 201);
     }
 
     /**
@@ -101,12 +89,12 @@ class AuthController extends Controller
      */
     protected function createNewToken($token)
     {
-        $user = User::where('id', auth()->id())->get();
+        $user = $this->userRepo->find(auth()->id());
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_at' => Carbon::now('Asia/Ho_Chi_Minh')->add('second', 3600)->toDateTimeString(),
-            'user' => UserResource::collection($user)
+            'user' => new UserResource($user)
         ]);
     }
 
@@ -121,13 +109,13 @@ class AuthController extends Controller
             return response()->json(['error' => 'Current password is incorrect'], 400);
         }
 
-        $userId = auth()->user()->id;
+        $userId = auth()->id();
 
-        $check = User::where('id', $userId)->update(
-            ['password' => bcrypt($request->new_password)]
+        $check = $this->userRepo->updateByID($userId, [
+            'password' => bcrypt($request->new_password)]
         );
 
-        if ($check == 1) {
+        if ($check != false) {
             return response()->json([
                 'message' => ResponseMessage::OK,
             ], 201);
@@ -144,19 +132,11 @@ class AuthController extends Controller
      */
     public function updateProfile(UpdateProfileRequest $request)
     {
-        $user = User::where('id', auth()->id());
-        if ($request->hasFile('avatar')) {
-            $avatar = $request->file('avatar');
-            $googleDriver = new GoogleDriveController;
-            $path = $googleDriver->googleDriveFileUpload($avatar);
-            $user->update(array_merge($request->validated(), ['avatar' => $path]));
-        } else {
-            $user->update(array_merge($request->validated()));
-        }
-        $user = User::where('id', auth()->id())->get();
+        $user = $this->userRepo->find(auth()->id());
+        $this->userRepo->updateProfile($user, $request);
         return response()->json([
             'message' => ResponseMessage::UPDATE_SUCCESS,
-            'user' => UserResource::collection($user)
+            'user' => new UserResource($user)
         ], 201);
     }
     /**
@@ -182,7 +162,7 @@ class AuthController extends Controller
      */
     public function checkEmail(EmailRequest $request)
     {
-        $email = DB::table('users')->where('email', '=', $request->input('email'))->first();
+        $email = $this->userRepo->checkEmail($request->input('email'));
         if ($email) {
             return response()->json(['message' => ResponseMessage::OK], 200);
         } else {

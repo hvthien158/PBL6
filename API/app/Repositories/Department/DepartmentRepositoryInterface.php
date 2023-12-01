@@ -6,5 +6,5 @@ use App\Repositories\RepositoryInterface;
 
 interface DepartmentRepositoryInterface extends RepositoryInterface
 {
-
+    public function getAllFiltered($skip, $request);
 }

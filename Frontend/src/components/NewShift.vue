@@ -109,10 +109,10 @@ const loadShift = async () => {
                 },
             }).then((response) => {
                 console.log(response)
-                form.name = response.data.data[0].name
-                form.timeValidCheckIn = formatToDisplay(response.data.data[0].timeValidCheckIn)
-                form.timeValidCheckOut = formatToDisplay(response.data.data[0].timeValidCheckOut)
-                form.amount = response.data.data[0].amount
+                form.name = response.data.data.name
+                form.timeValidCheckIn = formatToDisplay(response.data.data.timeValidCheckIn)
+                form.timeValidCheckOut = formatToDisplay(response.data.data.timeValidCheckOut)
+                form.amount = response.data.data.amount
             })
         } catch (e) {
             console.log(e)

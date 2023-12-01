@@ -26,11 +26,20 @@ interface RepositoryInterface
 
     /**
      * Update
+     * @param $model
+     * @param array $attributes
+     * @return mixed
+     */
+    public function update($model, $attributes = []);
+
+
+    /**
+     * Update
      * @param $id
      * @param array $attributes
      * @return mixed
      */
-    public function update($id, $attributes = []);
+    public function updateByID($id, $attributes = []);
 
     /**
      * Delete

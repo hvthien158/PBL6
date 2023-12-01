@@ -84,7 +84,7 @@ const loadUser = async () => {
             },
         }).then((response) => {
             console.log(response)
-            manager.value = response.data.data[0]
+            manager.value = response.data.data
             visible.value = true
         })
     } catch (e) {

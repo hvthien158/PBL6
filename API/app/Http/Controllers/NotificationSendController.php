@@ -23,10 +23,9 @@ class NotificationSendController extends Controller
             'func_name' => config('firebase.notification.func'),
             'screen' => config('firebase.notification.screen'),
             'device_type' => 'web',
-            "title" => $dataRequest['title'], 
-            "content" => $dataRequest['content'], 
-            'user' => auth()->user(), 
-            'time_keeping' => TimeKeepingResource::collection($timekeeping),
+            "title" => $dataRequest->title, 
+            "content" => $dataRequest->content, 
+            'user' => auth()->user()
         ];
         $content = [
             'sound' => config('firebase.sound') 

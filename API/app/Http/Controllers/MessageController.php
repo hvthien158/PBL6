@@ -6,113 +6,98 @@ use App\Common\ResponseMessage;
 use App\Http\Requests\CreateMessageRequest;
 use App\Http\Resources\MessageResource;
 use App\Models\Message;
+use App\Repositories\Message\MessageRepository;
+use App\Repositories\Message\MessageRepositoryInterface;
+use App\Repositories\TimeKeeping\TimeKeepingRepository;
+use App\Repositories\TimeKeeping\TimeKeepingRepositoryInterface;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\NotificationSendController;
+
 class MessageController extends Controller
 {
-    public function getAllMessage(){
-        return MessageResource::collection(Message::all());
+
+    public function __construct(
+        protected MessageRepositoryInterface $messageRepo,
+        protected TimeKeepingRepositoryInterface $timeKeepingRepository
+    ) {
     }
 
-    public function getLimitMessage(){
-        return MessageResource::collection(DB::table('messages')
-            ->orderBy('id', 'desc')
-            ->take(5)->get());
+    /**
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function getAllMessage()
+    {
+        return MessageResource::collection($this->messageRepo->getAll());
     }
 
-    public function getLimitUnreadMessage(){
-        return MessageResource::collection(DB::table('messages')
-            ->where('is_read', '=', 0)
-            ->orderBy('id', 'desc')
-            ->take(5)->get());
+    /**
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function getLimitMessage()
+    {
+        return MessageResource::collection($this->messageRepo->getLimit5Message());
     }
 
-    public function createRequest(CreateMessageRequest $request){
+    /**
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function getLimitUnreadMessage()
+    {
+        return MessageResource::collection($this->messageRepo->getLimitUnreadMessage());
+    }
+
+    /**
+     * @param CreateMessageRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function createRequest(CreateMessageRequest $request)
+    {
         try {
-            $timekeeping = DB::table('time_keepings')
-                ->where('_date', '=', $request->time_keeping_date)
-                ->where('user_id', '=', auth()->id());
-
-            if($timekeeping->first()->user_id != auth()->id()){
-                return response()->json(['error' => 'Not allow'], 405);
+            if ($this->messageRepo->customCreate($request, auth()->id())) {
+                $notification = new NotificationSendController();
+                $notification->sendNotification($request);
+                return response()->json(['message' => ResponseMessage::OK]);
             }
-
-            if($request->input('title') == 'Leave/remote work request'){
-                $timekeeping->update([
-                   'admin_accept_status' => 1
-                ]);
-            } else if ($request->input('title') == 'Checkin/checkout request'){
-                $timekeeping->update([
-                    'admin_accept_time' => 1
-                ]);
-            }
-            $data = array(
-                'title' => $request->input('title'),
-                'content' => $request->input('content'),
-                'user_id' => auth()->id(),
-                'time_keeping_id' => $timekeeping->first()->id
-            );
-            DB::table('messages')->insert([ $data ]);
-            $notification = new NotificationSendController();
-            $notification->sendNotification(array_merge($data, ['device_token' => $request->input('deviceToken')]));
+            return response()->json([], 400);
             return response()->json(['message' => ResponseMessage::OK]);
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 
-    public function checkReadMessage(Request $request){ //change from unread to read
-        $validator = Validator::make($request->all(), [
-           'id' => 'required|integer'
-        ]);
-
-        if($validator->fails()){
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkReadMessage(Request $request)
+    { //change from unread to read
+        if (!$request->input('id')) {
             return response()->json(['message' => ResponseMessage::VALIDATION_ERROR], 422);
         }
 
         try {
-            DB::table('messages')
-                ->where('id', '=', $request->input('id'))
-                ->update(['is_read' => 1]);
+            $this->messageRepo->checkReadMessage($request->input('id'));
             return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 
-    public function checkPassMassage(Request $request){ //accept user request
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|integer'
-        ]);
-
-        if($validator->fails()){
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkPassMassage(Request $request)
+    { //accept user request
+        if (!$request->input('id')) {
             return response()->json(['message' => ResponseMessage::VALIDATION_ERROR], 422);
         }
 
         try {
-            $messages = DB::table('messages')
-                ->where('id', '=', $request->input('id'));
-
-            $message = $messages->first();
-            $timekeeping = DB::table('time_keepings')
-                ->where('id', '=', $message->time_keeping_id);
-            if($message->title == 'Leave/remote work request'){
-                $timekeeping->update(['admin_accept_status' => 2]);
-            } else if($message->title === 'Checkin/checkout request') {
-                $timekeeping->update(['admin_accept_time' => 2]);
-                DB::table('systemtimes')
-                    ->where('id', '=', $message->time_keeping_id)
-                    ->update([
-                        'time_check_in' => $timekeeping->first()->time_check_in,
-                        'time_check_out' => $timekeeping->first()->time_check_out,
-                    ]);
-            } else {
-                return response()->json(['error' => 'Title incorrect'], 400);
-            }
-
-            $messages->update(['is_check' => 1, 'is_read' => 1]);
+            $this->messageRepo->checkPassMessage($request->input('id'));
             return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

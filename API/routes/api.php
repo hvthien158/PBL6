@@ -84,7 +84,6 @@ Route::middleware('auth:api')->group(function () {
 
 //User
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
 
 
 //Forgot password
