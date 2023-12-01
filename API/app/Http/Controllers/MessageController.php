@@ -9,7 +9,7 @@ use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
+use App\Http\Controllers\NotificationSendController;
 class MessageController extends Controller
 {
     public function getAllMessage(){
@@ -48,13 +48,15 @@ class MessageController extends Controller
                     'admin_accept_time' => 1
                 ]);
             }
-
-            DB::table('messages')->insert([
+            $data = array(
                 'title' => $request->input('title'),
                 'content' => $request->input('content'),
                 'user_id' => auth()->id(),
                 'time_keeping_id' => $timekeeping->first()->id
-            ]);
+            );
+            DB::table('messages')->insert([ $data ]);
+            $notification = new NotificationSendController();
+            $notification->sendNotification(array_merge($data, ['device_token' => $request->input('deviceToken')]));
             return response()->json(['message' => ResponseMessage::OK]);
         } catch (\Exception $e){
             return response()->json(['error' => $e->getMessage()], 400);

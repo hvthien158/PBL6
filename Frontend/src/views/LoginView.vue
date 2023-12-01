@@ -151,7 +151,19 @@ import {ref} from "vue";
 import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
 import ButtonLoading from "../components/ButtonLoading.vue";
-
+import { messaging } from "../firebase";
+import { getToken } from "firebase/messaging";
+const deviceToken = ref('')
+getToken(messaging, { vapidKey: 'BHW9QlvgnPaaI8yaD6hfHBRptgq7IcJaEqFXdte7MV_N8xb03QwU2tLY57ATmbQgwCwJamjCPrD-V2m961Ppry8' }).then((currentToken) => {
+  if (currentToken) {
+    console.log(currentToken)
+    deviceToken.value = currentToken
+  } else {
+    console.log('No registration token available. Request permission to generate one.');
+  }
+}).catch((err) => {
+  console.log('An error occurred while retrieving token. ', err);
+});
 const verifyQuest = ref(false)
 const alertStore = useAlertStore()
 const user = useUserStore().user
@@ -160,7 +172,6 @@ const passwordInput = ref(null)
 const email_error = ref('')
 const password_error = ref('')
 const loading = ref(false)
-
 if(user.token !== ''){
   router.push({name : 'home'})
 }
@@ -193,6 +204,7 @@ const login = async () => {
           .post('http://127.0.0.1:8000/api/login', {
             email: info.email,
             password: info.password,
+            deviceToken: deviceToken.value
           })
           .then(function (response) {
             if(response.data.verify_quest){
@@ -210,6 +222,7 @@ const login = async () => {
               user.position = response.data.user[0].position
               user.expired = response.data.expires_at
               user.role = response.data.user[0].role
+              user.deviceToken = deviceToken.value
               //alert success
               alertStore.alert = true
               alertStore.type = 'success'
@@ -220,6 +233,7 @@ const login = async () => {
     } catch (e) {
       fail_login.value = true
       loading.value = false
+      console.log(e)
     }
   }
 };

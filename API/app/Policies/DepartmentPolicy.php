@@ -22,7 +22,7 @@ class DepartmentPolicy
      */
     public function viewUser(User $user, Department $department): bool
     {
-        return ($user->role == Role::ADMIN && $department->users    ->count() != 0) ? true : false;
+        return ($user->role == Role::ADMIN && $department->users->count() != 0) ? true : false;
     }
     /**
      * @param User $user
@@ -46,7 +46,7 @@ class DepartmentPolicy
      */
     public function update(User $user): bool
     {
-        return ($user->role == Role::ADMIN) ? true : false;
+        return ($user->role == Role::ADMIN);
     }
 
     /**

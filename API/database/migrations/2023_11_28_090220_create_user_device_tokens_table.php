@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('systemtimes', function (Blueprint $table) {
+        Schema::create('user_device_tokens', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('device_token');
+            $table->foreignId('user_id')->references('id')->on('users');
+            $table->string('device')->nullable();
         });
     }
 
@@ -22,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('systemtimes');
+        Schema::dropIfExists('user_device_tokens');
     }
 };

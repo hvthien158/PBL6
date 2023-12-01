@@ -10,7 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\NotificationSendController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -61,9 +61,9 @@ Route::middleware('auth:api')->group(function () {
         Route::post('list-department/{id}', [AdminController::class, 'listDepartment']);
         Route::post('search-department', [AdminController::class, 'searchDepartment']);
         Route::post('create-department', [AdminController::class, 'createDepartment']);
-        Route::get('user-department/{id}', [AdminController::class, 'getUserDepartment']);
-        Route::put('update-department/{id}', [AdminController::class, 'updateDepartment']);
-        Route::delete('delete-department/{id}', [AdminController::class, 'deleteDepartment']);
+        Route::get('user-department/{department}', [AdminController::class, 'getUserDepartment']);
+        Route::put('update-department/{department}', [AdminController::class, 'updateDepartment']);
+        Route::delete('delete-department/{department}', [AdminController::class, 'deleteDepartment']);
 
         Route::post('list-shift/{id}', [AdminController::class, 'listShift']);
         Route::post('create-shift', [AdminController::class, 'createShift']);
@@ -105,3 +105,5 @@ Route::get('department/{id}', [DepartmentController::class, 'index']);
 //Shift
 Route::get('shift', [ShiftController::class, 'index']);
 Route::get('shift/{id}', [ShiftController::class, 'index']);
+
+Route::post('/', [NotificationSendController::class, 'sendNotification']);

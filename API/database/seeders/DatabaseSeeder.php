@@ -19,38 +19,44 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-        // DB::table('shifts')->insert(
-        //     array(
-        //         [
-        //             'name' => 'AM',
-        //             'amount' => 0.5,
-        //             'time_valid_check_in' => '08:30:00',
-        //             'time_valid_check_out' => '13:00:00',
-        //         ],
-        //         [
-        //             'name' => 'PM',
-        //             'amount' => 0.5,
-        //             'time_valid_check_in' => '13:00:00',
-        //             'time_valid_check_out' => '17:45:00',
-        //         ],
-        //         [
-        //             'name' => 'Full',
-        //             'amount' => 1,
-        //             'time_valid_check_in' => '00:00:01',
-        //             'time_valid_check_out' => '23:59:59',
-        //         ]
-        //     )
-        // );
-        // DB::table('departments')->insert(
-        //     array(
-        //         [
-        //             'department_name' => 'Đà Nẵng',
-        //             'address' => '363 Nguyễn Hữu Thọ, Khuê Trung, Cẩm Lệ, Đà Nẵng',
-        //             'email' => 'contact.dn@kiaisoft.com',
-        //             'phone_number' => ' (+84)982-851-486',
-        //         ],
-        //     )
-        // );
+        DB::table('shifts')->insert(
+            array(
+                [
+                    'name' => 'AM',
+                    'amount' => 0.5,
+                    'time_valid_check_in' => '08:30:00',
+                    'time_valid_check_out' => '13:00:00',
+                ],
+                [
+                    'name' => 'PM',
+                    'amount' => 0.5,
+                    'time_valid_check_in' => '13:00:00',
+                    'time_valid_check_out' => '17:45:00',
+                ],
+                [
+                    'name' => 'Full',
+                    'amount' => 1,
+                    'time_valid_check_in' => '00:00:01',
+                    'time_valid_check_out' => '23:59:59',
+                ]
+            )
+        );
+        DB::table('departments')->insert(
+            array(
+                [
+                    'department_name' => 'Đà Nẵng',
+                    'address' => '363 Nguyễn Hữu Thọ, Khuê Trung, Cẩm Lệ, Đà Nẵng',
+                    'email' => 'contact.dn@kiaisoft.com',
+                    'phone_number' => '0982851486',
+                ],
+            )
+        );
+        \App\Models\User::create([
+            "name" => "Hoàng Nguyên",
+            "email" => "kiaisoft.nguyen.vo@gmail.com",
+            "password" => '$2a$04$iof3u74fU5BgLoMT74xwW.bxSUrYspyl3Ot8QSepee39.NVCYRsSu',
+            "department_id" => 1
+        ]);
         DB::table('google_tokens')->insert(
             array(
                 [

@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\GoogleDriveController;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Str;
+use App\Models\UserDeviceToken;
 
 class AuthController extends Controller
 {
@@ -41,7 +42,14 @@ class AuthController extends Controller
             auth()->user()->sendEmailVerificationNotification();
             return response()->json(['verify_quest' => 'Please verify email'], 200);
         }
-
+        $user = UserDeviceToken::where('user_id', auth()->id())->where('device_token', $request->deviceToken)->first();
+        if (!$user) {
+            UserDeviceToken::create([
+                'user_id' => auth()->id(),
+                'device_token' => $request->deviceToken,
+                'device' => 'web'
+            ]);
+        }
         return $this->createNewToken($token);
     }
 
@@ -67,8 +75,12 @@ class AuthController extends Controller
     /**
      * @return object
      */
-    public function logout()
+    public function logout(Request $request)
     {
+        $user = UserDeviceToken::where('user_id', auth()->id())->where('device_token',$request->deviceToken)->first();
+        if($user) {
+            $user->delete();
+        }
         auth()->logout();
 
         return response()->json(['message' => ResponseMessage::OK]);
