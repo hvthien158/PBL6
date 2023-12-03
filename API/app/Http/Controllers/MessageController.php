@@ -14,6 +14,7 @@ use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\NotificationSendController;
 
 class MessageController extends Controller
 {
@@ -21,7 +22,8 @@ class MessageController extends Controller
     public function __construct(
         protected MessageRepositoryInterface $messageRepo,
         protected TimeKeepingRepositoryInterface $timeKeepingRepository
-    ){}
+    ) {
+    }
 
     /**
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
@@ -55,9 +57,12 @@ class MessageController extends Controller
     {
         try {
             if ($this->messageRepo->customCreate($request, auth()->id())) {
+                $notification = new NotificationSendController();
+                $notification->sendNotification($request);
                 return response()->json(['message' => ResponseMessage::OK]);
             }
             return response()->json([], 400);
+            return response()->json(['message' => ResponseMessage::OK]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

@@ -78,6 +78,8 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail, CanRe
     {
         return $this->hasMany(TimeKeeping::class);
     }
-
-
+    public function userDeviceToken(): hasMany 
+    {
+        return $this->hasMany(UserDeviceToken::class);
+    }
 }

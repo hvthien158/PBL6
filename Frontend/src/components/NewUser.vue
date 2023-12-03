@@ -55,14 +55,14 @@
           <el-option v-for="item in position" :label="item.name" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="Department" :label-width="formLabelWidth" :rules="[{ required: true }]"> 
+      <el-form-item label="Department" :label-width="formLabelWidth" :rules="[{ required: true }]">
         <el-select v-model="form.department" type="text">
           <el-option label="Select Department" :value="0"></el-option>
           <el-option v-for="item in department" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <small>{{ checkLanding.department }}</small>
       </el-form-item>
-      
+
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -107,9 +107,11 @@ small {
 .el-input {
   width: 100%;
 }
+
 .el-select {
-  width: 100% ;
+  width: 100%;
 }
+
 .dialog-footer {
   margin-top: 16px;
 }
@@ -297,35 +299,37 @@ const isPhoneNumber = (phoneNumber) => {
 };
 function createUser() {
   if (validate()) {
-    axios.post(
-      `http://127.0.0.1:8000/api/create-user/`,
-      {
-        name: form.name,
-        email: form.email,
-        password: form.password,
-        password_confirmation: form.password,
-        department_id: form.department,
-        address: form.address,
-        DOB: formatToPost(form.DOB),
-        phone_number: form.phoneNumber,
-        salary: form.salary,
-        position: form.position === 'none' ? null : form.position,
-        role: form.role
-      },
-      {
-        headers: { Authorization: `Bearer ${user.token}` },
-      }
-    ).then(function () {
-      emits('update_data')
-      alertStore.alert = true
-      alertStore.type = 'success'
-      alertStore.msg = 'Create success'
-    }).catch((e) => {
+    try {
+      axios.post(
+        `http://127.0.0.1:8000/api/create-user/`,
+        {
+          name: form.name,
+          email: form.email,
+          password: form.password,
+          password_confirmation: form.password,
+          department_id: form.department,
+          address: form.address,
+          DOB: formatToPost(form.DOB),
+          phone_number: form.phoneNumber,
+          salary: form.salary,
+          position: form.position === 'none' ? null : form.position,
+          role: form.role
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      ).then(function () {
+        emits('update_data')
+        alertStore.alert = true
+        alertStore.type = 'success'
+        alertStore.msg = 'Create success'
+      })
+    } catch (e) {
       alertStore.alert = true
       alertStore.type = 'error'
       alertStore.msg = 'Something went wrong'
       console.log(e)
-    })
+    }
   }
 }
 

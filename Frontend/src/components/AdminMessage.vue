@@ -121,19 +121,42 @@ pre {
 </style>
 
 <script setup>
-import {onMounted, ref, watch} from "vue";
+import {ref, watch, reactive, onMounted} from "vue";
 import axios from "axios";
 import {useUserStore} from "../stores/user";
+import { onMessage } from "firebase/messaging";
+import { messaging } from '../firebase';
+import { ElNotification } from 'element-plus'
 import moment from "moment";
-
 const status_request = ref(['Work', 'Remote', 'Not work'])
 const only_unread = ref(false)
 const request_data = ref('')
 const user = useUserStore().user
+const check = ref()
 const new_message = ref(0)
-
 watch(() => only_unread.value, loadRequest)
-
+let notification = reactive({
+    title: '',
+    body: '',
+    data: ''
+})
+onMessage(messaging, (payload) => {
+    notification.title = payload.data.title
+    notification.user = JSON.parse(payload.data.user)
+    check.value = payload
+});
+watch(notification, () => {
+    openNotification()
+    only_unread.value = true
+    loadRequest()
+})
+const openNotification = () => {
+    ElNotification({
+        title: notification.title,
+        message: notification.user.id+ ' ' + notification.user.name,
+        position: 'bottom-right',
+    })
+}
 function loadRequest() {
   if (only_unread.value) {
     axios.get('http://127.0.0.1:8000/api/message/limit-unread', {

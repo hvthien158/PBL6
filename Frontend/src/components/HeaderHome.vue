@@ -123,7 +123,7 @@ function changePass() {
 const logout = async () => {
   try {
     await axios
-        .post("http://127.0.0.1:8000/api/logout", null, {
+        .post("http://127.0.0.1:8000/api/logout", { deviceToken: user.deviceToken}, {
           headers: {Authorization: `Bearer ${user.token}`},
         })
         .then(function (response) {
