@@ -1,22 +1,23 @@
 <template>
   <el-dropdown :hide-on-click="false" max-height="70vh">
-        <span class="el-dropdown-link">
-          <el-icon size="30"><Message/></el-icon>
-          <span v-if="new_message > 0" style="color: red; position: absolute; right: 40%">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
-                 class="bi bi-circle-fill" viewBox="0 0 16 16">
-              <circle cx="6" cy="6" r="6"/>
-            </svg>
-          </span>
-        </span>
+    <span class="el-dropdown-link">
+      <el-icon size="30">
+        <Message />
+      </el-icon>
+      <span v-if="new_message > 0" style="color: red; position: absolute; right: 40%">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-circle-fill"
+          viewBox="0 0 16 16">
+          <circle cx="6" cy="6" r="6" />
+        </svg>
+      </span>
+    </span>
     <template #dropdown>
       <div style="width: 25vw; padding: 12px 20px 0 20px; display: flex; justify-content: space-between">
         <h4>Message</h4>
-        <el-checkbox style="text-align: right" v-model="only_unread" label="Only view unread message"
-                     size="default"/>
+        <el-checkbox style="text-align: right" v-model="only_unread" label="Only view unread message" size="default" />
       </div>
       <el-dropdown-menu style="padding: 12px">
-        <el-empty v-if="request_data.length === 0" description="No Data"/>
+        <el-empty v-if="request_data.length === 0" description="No Data" />
         <el-dropdown-item
             :divided="true"
             v-for="item in request_data"
@@ -29,8 +30,8 @@
               </div>
               <span v-if="item.is_read === 0" class="icon-warn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
-                     class="bi bi-circle-fill" viewBox="0 0 16 16">
-                  <circle cx="6" cy="6" r="6"/>
+                  class="bi bi-circle-fill" viewBox="0 0 16 16">
+                  <circle cx="6" cy="6" r="6" />
                 </svg>
               </span>
               <div style="display: flex; flex-direction: column">
@@ -118,19 +119,20 @@
 }
 
 pre {
-  white-space: pre-wrap; /* css-3 */
-  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-  white-space: -o-pre-wrap; /* Opera 7 */
-  word-wrap: break-word; /* Internet Explorer 5.5+ */
+  white-space: pre-wrap;
+  /* css-3 */
+  white-space: -moz-pre-wrap;
+  /* Mozilla, since 1999 */
+  white-space: -o-pre-wrap;
+  /* Opera 7 */
+  word-wrap: break-word;
+  /* Internet Explorer 5.5+ */
 }
 </style>
 
 <script setup>
 import {ref, watch, reactive, onMounted} from "vue";
 import {useUserStore} from "../stores/user";
-import {onMessage} from "firebase/messaging";
-import {messaging} from '../firebase';
-import {ElNotification} from 'element-plus'
 import moment from "moment";
 import {useAlertStore} from "../stores/alert";
 import MessageAPI from "../services/MessageAPI";
@@ -139,34 +141,20 @@ const status_request = ref(['Work', 'Remote', 'Not work'])
 const only_unread = ref(false)
 const request_data = ref('')
 const user = useUserStore().user
-const check = ref()
 const new_message = ref(0)
 const alertStore = useAlertStore()
-
+const props = defineProps({
+  notification: {
+    type: Object
+  }
+})
 watch(() => only_unread.value, loadRequest)
-let notification = reactive({
-  title: '',
-  body: '',
-  data: ''
+watch(props, () => {
+  if(props.notification.type == 1){
+    only_unread.value = true
+    loadRequest()
+  }
 })
-onMessage(messaging, (payload) => {
-  notification.title = payload.data.title
-  notification.user = JSON.parse(payload.data.user)
-  check.value = payload
-});
-watch(notification, () => {
-  openNotification()
-  only_unread.value = true
-  loadRequest()
-})
-const openNotification = () => {
-  ElNotification({
-    title: notification.title,
-    message: notification.user.id + ' ' + notification.user.name,
-    position: 'bottom-right',
-  })
-}
-
 function loadRequest() {
   if (only_unread.value) {
     MessageAPI.get5UnreadMessage(user.token)

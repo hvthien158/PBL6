@@ -6,7 +6,7 @@
       </router-link>
     </div>
     <span v-if="user.token" style="font-weight: bold; margin-right: 20px; display: flex; align-items: center">
-      <AdminMessage v-if="user.role === 'admin'"></AdminMessage>
+      <AdminMessage :notification = props.notification></AdminMessage>
       <el-dropdown>
         <span class="el-dropdown-link">
           <span style="line-height: 44px; font-size: larger">{{ user.name }}</span>
@@ -105,6 +105,11 @@ import {useAlertStore} from "../stores/alert";
 import AdminMessage from "./AdminMessage.vue";
 import AuthAPI from "../services/AuthAPI";
 
+const props = defineProps({
+  notification: {
+    type: Object
+  }
+})
 const alertStore = useAlertStore()
 const user = useUserStore().user
 

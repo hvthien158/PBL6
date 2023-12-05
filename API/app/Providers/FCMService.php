@@ -86,11 +86,11 @@ class FCMService
         // Request api fcm by json data
         // $res = $client->post($this->apiConfig['url'], json_encode($fields), ['type' => 'json']);
 
-        $res = json_decode($res->getBody());
+        // $res = json_decode($res->getBody());
     
-        if ($res->failure) {
-            Log::error("ERROR_PUSH_NOTIFICATION: ".$fields['to']);
-        }
+        // if ($res->failure) {
+        //     Log::error("ERROR_PUSH_NOTIFICATION: ".$fields['to']);
+        // }
 
         return true;
     }

@@ -1,12 +1,7 @@
 <template>
-  <el-dialog
-      v-model="display"
-      title="Request"
-      width="40%"
-      style="border-radius: 12px"
-  >
+  <el-dialog v-model="display" title="Request" width="40%" style="border-radius: 12px">
     <div style="display: flex; flex-direction: column">
-      <el-empty description="No request available" v-if="!status_change_ref && !time_change_ref"/>
+      <el-empty description="No request available" v-if="!status_change_ref && !time_change_ref" />
       <el-card class="box-card" style="margin-bottom: 12px" v-if="status_change_ref">
         <div class="card--header">
           <span style="font-weight: bold">Leave/remote work request</span>
@@ -17,22 +12,22 @@
           <div>
             <el-button class="button" v-if="!view_leave_remote_content" @click="view_leave_remote_content = true">
               <el-icon>
-                <EditPen/>
+                <EditPen />
               </el-icon>
             </el-button>
             <el-button class="button" v-if="view_leave_remote_content" @click="view_leave_remote_content = false">
-              <el-icon><Select/></el-icon>
+              <el-icon><Select /></el-icon>
             </el-button>
             <el-button class="button" @click="sendStatusRequest">
               <el-icon>
-                <Promotion/>
+                <Promotion />
               </el-icon>
             </el-button>
           </div>
         </div>
         <div v-if="view_leave_remote_content" style="margin-top: 12px;">
-          <el-input v-model="leave_remote_content" type="textarea" :autosize="{minRows: 2}"
-                    placeholder="Write a message..."></el-input>
+          <el-input v-model="leave_remote_content" type="textarea" :autosize="{ minRows: 2 }"
+            placeholder="Write a message..."></el-input>
         </div>
       </el-card>
       <el-card class="box-card" v-if="time_change_ref">
@@ -40,26 +35,24 @@
           <span style="font-weight: bold">Checkin/checkout request</span>
           <span>{{ checkin }} - {{ checkout }}</span>
           <div>
-            <el-button class="button" v-if="!view_checkin_checkout_content"
-                       @click="view_checkin_checkout_content = true">
+            <el-button class="button" v-if="!view_checkin_checkout_content" @click="view_checkin_checkout_content = true">
               <el-icon>
-                <EditPen/>
+                <EditPen />
               </el-icon>
             </el-button>
-            <el-button class="button" v-if="view_checkin_checkout_content"
-                       @click="view_checkin_checkout_content = false">
-              <el-icon><Select/></el-icon>
+            <el-button class="button" v-if="view_checkin_checkout_content" @click="view_checkin_checkout_content = false">
+              <el-icon><Select /></el-icon>
             </el-button>
             <el-button class="button" @click="sendTimeRequest">
               <el-icon>
-                <Promotion/>
+                <Promotion />
               </el-icon>
             </el-button>
           </div>
         </div>
         <div v-if="view_checkin_checkout_content" style="margin-top: 12px;">
-          <el-input v-model="checkin_checkout_content" type="textarea" :autosize="{minRows: 2}"
-                    placeholder="Write a message..."></el-input>
+          <el-input v-model="checkin_checkout_content" type="textarea" :autosize="{ minRows: 2 }"
+            placeholder="Write a message..."></el-input>
         </div>
       </el-card>
     </div>
@@ -100,12 +93,12 @@ pre {
 </style>
 
 <script setup>
-import {computed, ref, watch} from "vue";
+import { computed, ref, watch } from "vue";
 import moment from "moment";
-import {useUserStore} from "../stores/user";
-import {useAlertStore} from "../stores/alert";
+import { useUserStore } from "../stores/user";
+import { useAlertStore } from "../stores/alert";
 import MessageAPI from "../services/MessageAPI";
-import {STATUS_CHANGE_REQ, TIME_CHANGE_REQ} from "../constants";
+import { STATUS_CHANGE_REQ, TIME_CHANGE_REQ } from "../constants";
 
 const user = useUserStore().user
 const prop = defineProps({
@@ -162,37 +155,38 @@ watch(() => prop.visible, () => {
   time_change_ref.value = prop.time_change
 })
 
+
 function sendStatusRequest() {
   MessageAPI.sendMessage(user.token, prop.today, STATUS_CHANGE_REQ, leave_remote_content.value)
-      .then((response) => {
-        status_change_ref.value = false
-        if (time_change_ref.value === false) {
-          emits('update')
-        }
+    .then((response) => {
+      status_change_ref.value = false
+      if (time_change_ref.value === false) {
+        emits('update')
+      }
 
-        alertBox.alert = true
-        alertBox.type = 'success'
-        alertBox.msg = response.data.message
-      })
-      .catch((e) => {
-        console.log(e)
-      })
+      alertBox.alert = true
+      alertBox.type = 'success'
+      alertBox.msg = response.data.message
+    })
+    .catch((e) => {
+      console.log(e)
+    })
 }
 
 function sendTimeRequest() {
   MessageAPI.sendMessage(user.token, prop.today, TIME_CHANGE_REQ, checkin_checkout_content.value)
-      .then((response) => {
-        time_change_ref.value = false
-        if (status_change_ref.value === false) {
-          emits('update')
-        }
+    .then((response) => {
+      time_change_ref.value = false
+      if (status_change_ref.value === false) {
+        emits('update')
+      }
 
-        alertBox.alert = true
-        alertBox.type = 'success'
-        alertBox.msg = response.data.message
-      })
-      .catch((e) => {
-        console.log(e)
-      })
+      alertBox.alert = true
+      alertBox.type = 'success'
+      alertBox.msg = response.data.message
+    })
+    .catch((e) => {
+      console.log(e)
+    })
 }
 </script>

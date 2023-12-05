@@ -12,6 +12,8 @@ use App\Repositories\TimeKeeping\TimeKeepingRepository;
 use App\Repositories\TimeKeeping\TimeKeepingRepositoryInterface;
 use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
+use App\Repositories\UserDeviceToken\UserDeviceTokenRepository;
+use App\Repositories\UserDeviceToken\UserDeviceTokenRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ShiftRepositoryInterface::class, ShiftRepository::class);
         $this->app->singleton(TimeKeepingRepositoryInterface::class, TimeKeepingRepository::class);
         $this->app->singleton(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->singleton(UserDeviceTokenRepositoryInterface::class, UserDeviceTokenRepository::class);
     }
 
     /**

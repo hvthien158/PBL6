@@ -9,26 +9,23 @@ use App\Repositories\User\UserRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
-use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\EmailRequest;
 use App\Http\Requests\ResetPasswordRequest;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\GoogleDriveController;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Str;
 use App\Models\UserDeviceToken;
+use App\Repositories\UserDeviceToken\UserDeviceTokenRepository;
+use App\Repositories\UserDeviceToken\UserDeviceTokenRepositoryInterface;
 
 class AuthController extends Controller
 {
 
-    public function __construct(protected UserRepositoryInterface $userRepo)
+    public function __construct(protected UserRepositoryInterface $userRepo, protected UserDeviceTokenRepositoryInterface $userDeviceTokenRepo)
     {
     }
 
@@ -49,14 +46,13 @@ class AuthController extends Controller
             auth()->user()->sendEmailVerificationNotification();
             return response()->json(['verify_quest' => 'Please verify email'], 200);
         }
-        $user = UserDeviceToken::where('user_id', auth()->id())->where('device_token', $request->deviceToken)->first();
-        if (!$user) {
-            UserDeviceToken::create([
+        if ($this->userDeviceTokenRepo->deleteToken($request->deviceToken)) {
+            $this->userDeviceTokenRepo->create([
                 'user_id' => auth()->id(),
                 'device_token' => $request->deviceToken,
                 'device' => 'web'
             ]);
-        }
+        } 
         return $this->createNewToken($token);
     }
 
@@ -65,13 +61,12 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $user = UserDeviceToken::where('user_id', auth()->id())->where('device_token',$request->deviceToken)->first();
-        if($user) {
-            $user->delete();
+        $logout = $this->userDeviceTokenRepo->deleteToken($request->device_token);
+        if($logout){
+            auth()->logout();
+            return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
         }
-        auth()->logout();
-
-        return response()->json(['message' => ResponseMessage::OK]);
+        return response()->json(['message' => ResponseMessage::AUTH_ERROR]);
     }
 
     /**
