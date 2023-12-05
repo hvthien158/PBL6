@@ -24,5 +24,4 @@
 </style>
 
 <script setup>
-import logo from '../assets/image/logo.png'
 </script>

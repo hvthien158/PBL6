@@ -11,4 +11,6 @@ interface UserRepositoryInterface extends RepositoryInterface
     public function updateProfile($user, $request);
 
     public function checkEmail($email);
+
+    public function getListAdmin();
 }

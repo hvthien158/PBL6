@@ -1,7 +1,7 @@
 <template>
   <div class="content">
-    <HeaderHome></HeaderHome>
-      <router-view class="main-view" :key="$route.fullPath"></router-view>
+    <HeaderHome :notification="notification"></HeaderHome>
+      <router-view :notification="notification" class="main-view" :key="$route.fullPath"></router-view>
     <Footer></Footer>
     <transition name="slide-fade">
       <AlertBox v-if="isAlert" :type="typeAlert" :msg="msgAlert"></AlertBox>
@@ -48,8 +48,10 @@ import HeaderHome from "./components/HeaderHome.vue";
 import Footer from "./components/Footer.vue";
 import { useAlertStore } from "./stores/alert";
 import AlertBox from "./components/AlertBox.vue";
-import { ref, watch } from "vue";
-
+import { ref, watch, reactive } from "vue";
+import { onMessage } from "firebase/messaging";
+import { messaging } from './firebase';
+import { ElNotification } from 'element-plus'
 const isAlert = ref(false);
 const typeAlert = ref("");
 const msgAlert = ref("");
@@ -69,4 +71,25 @@ watch(
     }
   }
 );
+let notification = reactive({
+  title: '',
+  message: '',
+  type: ''
+})
+console.log(typeof notification)
+onMessage(messaging, (payload) => {
+    notification.title = payload.data.title
+    notification.message = payload.data.message
+    notification.type = payload.data.type
+});
+watch(notification, () => {
+    openNotification()
+})
+const openNotification = () => {
+    ElNotification({
+        title: notification.title,
+        message: notification.message,
+        position: 'bottom-right',
+    })
+}
 </script>

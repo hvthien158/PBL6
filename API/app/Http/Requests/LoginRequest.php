@@ -27,13 +27,5 @@ class LoginRequest extends FormRequest
             'deviceToken' => 'required'
         ];
     }
-    public function messages(): array
-    {
-        return [
-            'email.required' => 'Vui lòng không để trống email',
-            'email.email' => 'Vui lòng nhập đúng định dạng',
-            'password.required' => 'Vui lòng không để trống mật khẩu',
-            'password.min:6' => 'Mật khẩu có ít nhất 6 kí tự trở lên'
-        ];
-    }
+    
 }

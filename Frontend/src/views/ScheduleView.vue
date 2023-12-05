@@ -45,7 +45,7 @@
           </div>
           <el-checkbox v-model="only_show" label="Only show checkin days" size="large"/>
         </div>
-        <el-table :row-style="rowStyle" :cell-style="cellStyle" size="small" style="font-size: 14px"
+        <el-table  :row-style="rowStyle" :cell-style="cellStyle" size="small" style="font-size: 14px"
                   :data="only_show ? dataDisplay : dataByMonth" border>
           <el-table-column prop="dayOfWeek" label="Day of week" width="160">
             <template #default="scope">
@@ -216,7 +216,9 @@ import {useUserStore} from "../stores/user";
 import axios from "axios";
 import moment from "moment";
 import router from "../router";
-import UserRequest from "../components/UserRequest.vue";
+const props = defineProps({
+  notification : Object
+})
 
 const user = useUserStore().user;
 let dataSearch = reactive({
@@ -229,6 +231,7 @@ const monthDisplay = ref(moment().month())
 const yearDisplay = ref(moment().year())
 const only_show = ref(false)
 const filter_value = ref([])
+
 const today = ref({
   dayOfWeek: '',
   date: '',
@@ -245,7 +248,7 @@ const operationMode = ref('Excel')
 const status_change = ref(false)
 const time_change = ref(false)
 const index = ref(0)
-
+const check = ref('')
 const getListTimeKeeping = async (from, to) => {
   if (router.currentRoute.value.fullPath === '/schedule') {
     try {
@@ -292,12 +295,16 @@ const getListTimeKeeping = async (from, to) => {
     }
   }
 };
-
-watch(() => filter_value.value, () => {
+watch(props, () => {
+  if(props.notification.type == 0){
+    getListTimeKeeping(filter_value.value[0], filter_value.value[1])
+  }
+})
+watch(() => filter_value.value,  () => {
   getListTimeKeeping(filter_value.value[0], filter_value.value[1])
 })
-
 filterByMonth()
+
 const dataByMonth = computed(() => {
   let result = []
 

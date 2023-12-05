@@ -6,7 +6,7 @@ use App\Http\Controllers\GoogleDriveController;
 use App\Models\User;
 use App\Repositories\BaseRepository;
 use Illuminate\Support\Facades\DB;
-
+use App\Common\Role;
 class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
 
@@ -77,5 +77,8 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     public function checkEmail($email)
     {
         return DB::table('users')->where('email', '=', $email)->first();
+    }
+    public function getListAdmin() {
+        return User::where('role', ROLE::ADMIN)->get();
     }
 }

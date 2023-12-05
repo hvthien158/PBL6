@@ -137,7 +137,6 @@ watch(() => prop.visible, () => {
 })
 
 function sendStatusRequest(){
-  console.log(prop.today)
   axios.post('http://127.0.0.1:8000/api/message/send', {
     'title': 'Leave/remote work request',
     'content': leave_remote_content.value,
