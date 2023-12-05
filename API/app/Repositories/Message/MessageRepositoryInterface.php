@@ -13,8 +13,8 @@ interface MessageRepositoryInterface extends RepositoryInterface
     public function customCreate($request, $userID);
 
     //Change status after admin read request
-    public function checkReadMessage($id);
+    public function markAsReadMessage($id);
 
     //Change status after admin confirm request
-    public function checkPassMessage($id);
+    public function markAsConfirmedMessage($id);
 }

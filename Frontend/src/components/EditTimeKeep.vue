@@ -2,8 +2,8 @@
   <div>
     <div class="edit-timekeep">
       <el-card style="border-radius: 12px;" class="box-card" :class="{ 'bg-orange': today, 'bg-gray': weekend }">
-      <div class="card-content">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <div class="card-content">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
             <el-button text @click="$emit('prevday')">&lt;&lt;Previous day</el-button>
             <el-button text @click="$emit('nextday')">Next day>></el-button>
           </div>
@@ -20,15 +20,16 @@
             </div>
           </div>
           <p>Check-in: <span style="color: #888">{{ check_in_system }}</span></p>
-        <div>
-          <el-time-select v-model="check_in_format" start="08:30" step="00:15" end="18:30" placeholder="(none)" />
-        </div>
-        <p style="margin-top: 20px">Check-out: <span style="color: #888">{{ check_out_system }}</span></p>
-        <div>
-          <el-time-select v-model="check_out_format" start="08:30" step="00:15" end="18:30" placeholder="(none)" />
-        </div>
-        <ButtonLoading @click="updateTimeKeep" style="font-size: 15px; margin-top: 20px" size="large" type="warning"
-          round>Save</ButtonLoading>
+          <div>
+            <el-time-select v-model="check_in_format" start="08:30" step="00:15" end="18:30" placeholder="(none)"/>
+          </div>
+          <p style="margin-top: 20px">Check-out: <span style="color: #888">{{ check_out_system }}</span></p>
+          <div>
+            <el-time-select v-model="check_out_format" start="08:30" step="00:15" end="18:30" placeholder="(none)"/>
+          </div>
+          <ButtonLoading @click="updateTimeKeep" style="font-size: 15px; margin-top: 20px" size="large" type="warning"
+                         round>Save
+          </ButtonLoading>
           <ButtonLoading :warning="status_change_ref || time_change_ref"
                          @click="dialog_visible = !dialog_visible"
                          style="font-size: 15px; margin-top: 20px" size="large" type="warning"
@@ -92,14 +93,14 @@
 
 <script setup>
 import ButtonLoading from "./ButtonLoading.vue";
-import { computed, ref, watch, watchEffect } from "vue";
-import axios from "axios";
-import { useUserStore } from "../stores/user";
-import { useAlertStore } from "../stores/alert";
+import {computed, ref, watch, watchEffect} from "vue";
+import {useUserStore} from "../stores/user";
+import {useAlertStore} from "../stores/alert";
 import Clock from "./Clock.vue"
 import moment from "moment";
 import StatusButton from "./StatusButton.vue";
 import UserRequest from "./UserRequest.vue";
+import TimeKeepAPI from "../services/TimeKeepAPI";
 
 const prop = defineProps({
   user_id: {
@@ -169,29 +170,30 @@ watch([() => prop.checkin, () => prop.checkout, () => prop.status_AM_prop, () =>
     })
 
 function updateTimeKeep() {
-  axios.post('http://127.0.0.1:8000/api/timekeeping/update', {
-    'user_id': prop.user_id,
-    'date': prop.date,
-    'time_check_in': check_in_format.value,
-    'time_check_out': check_out_format.value,
-    'status_am': status_AM.value,
-    'status_pm': status_PM.value,
-  }, {
-    headers: { Authorization: `Bearer ${user.token}` },
-  }).then(() => {
-    emit('update_no_reset', prop.date)
-    alertStore.alert = true
-    alertStore.type = 'success'
-    alertStore.msg = 'Update success'
-  }).catch((e) => {
-    alertStore.alert = true
-    alertStore.type = 'error'
-    alertStore.msg = 'Something went wrong'
-    console.log(e)
-  })
+  TimeKeepAPI.updateTimeKeep(
+      user.token,
+      prop.user_id,
+      prop.date,
+      check_in_format.value,
+      check_out_format.value,
+      status_AM.value,
+      status_PM.value,
+  )
+      .then(() => {
+        emit('update_no_reset', prop.date)
+        alertStore.alert = true
+        alertStore.type = 'success'
+        alertStore.msg = 'Update success'
+      })
+      .catch((e) => {
+        alertStore.alert = true
+        alertStore.type = 'error'
+        alertStore.msg = 'Something went wrong'
+        console.log(e)
+      })
 }
 
-function emitUpdate(){
+function emitUpdate() {
   status_change_ref.value = false
   time_change_ref.value = false
   emit('update')

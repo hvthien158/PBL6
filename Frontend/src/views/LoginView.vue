@@ -145,7 +145,6 @@ main {
 
 <script setup>
 import { reactive, computed } from "vue";
-import axios from "axios";
 import router from "../router";
 import {ref} from "vue";
 import {useUserStore} from "../stores/user";
@@ -153,10 +152,10 @@ import {useAlertStore} from "../stores/alert";
 import ButtonLoading from "../components/ButtonLoading.vue";
 import { messaging } from "../firebase";
 import { getToken } from "firebase/messaging";
+import AuthAPI from "../services/AuthAPI";
 const deviceToken = ref('')
 getToken(messaging, { vapidKey: 'BHW9QlvgnPaaI8yaD6hfHBRptgq7IcJaEqFXdte7MV_N8xb03QwU2tLY57ATmbQgwCwJamjCPrD-V2m961Ppry8' }).then((currentToken) => {
   if (currentToken) {
-    console.log(currentToken)
     deviceToken.value = currentToken
   } else {
     console.log('No registration token available. Request permission to generate one.');
@@ -172,6 +171,7 @@ const passwordInput = ref(null)
 const email_error = ref('')
 const password_error = ref('')
 const loading = ref(false)
+
 if(user.token !== ''){
   router.push({name : 'home'})
 }
@@ -200,12 +200,7 @@ const login = async () => {
     loading.value = false
   } else if (email_error.value === '' && password_error.value === '') {
     try {
-      await axios
-          .post('http://127.0.0.1:8000/api/login', {
-            email: info.email,
-            password: info.password,
-            deviceToken: deviceToken.value
-          })
+      await AuthAPI.login(info.email, info.password, deviceToken.value)
           .then(function (response) {
             if(response.data.verify_quest){
               verifyQuest.value = true

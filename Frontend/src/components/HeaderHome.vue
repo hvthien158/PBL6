@@ -99,11 +99,11 @@ header {
 </style>
 <script setup>
 import logo from "../assets/image/logo.png";
-import axios from "axios";
 import router from "../router";
 import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
 import AdminMessage from "./AdminMessage.vue";
+import AuthAPI from "../services/AuthAPI";
 
 const alertStore = useAlertStore()
 const user = useUserStore().user
@@ -122,10 +122,7 @@ function changePass() {
 
 const logout = async () => {
   try {
-    await axios
-        .post("http://127.0.0.1:8000/api/logout", { deviceToken: user.deviceToken}, {
-          headers: {Authorization: `Bearer ${user.token}`},
-        })
+    await AuthAPI.logout(user.token, user.deviceToken)
         .then(function (response) {
           if (response.status === 200) {
             useUserStore().logout()

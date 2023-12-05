@@ -15,13 +15,24 @@
             <div style="height: 8px; width: 40px;" :class="bg_color[status_PM]"></div>
           </div>
           <div>
-            <el-button class="button" v-if="!view_leave_remote_content" @click="view_leave_remote_content = true"><el-icon><EditPen /></el-icon></el-button>
-            <el-button class="button" v-if="view_leave_remote_content" @click="view_leave_remote_content = false"><el-icon><Select /></el-icon></el-button>
-            <el-button class="button" @click="sendStatusRequest"><el-icon><Promotion /></el-icon></el-button>
+            <el-button class="button" v-if="!view_leave_remote_content" @click="view_leave_remote_content = true">
+              <el-icon>
+                <EditPen/>
+              </el-icon>
+            </el-button>
+            <el-button class="button" v-if="view_leave_remote_content" @click="view_leave_remote_content = false">
+              <el-icon><Select/></el-icon>
+            </el-button>
+            <el-button class="button" @click="sendStatusRequest">
+              <el-icon>
+                <Promotion/>
+              </el-icon>
+            </el-button>
           </div>
         </div>
         <div v-if="view_leave_remote_content" style="margin-top: 12px;">
-          <el-input v-model="leave_remote_content" type="textarea" :autosize="{minRows: 2}" placeholder="Write a message..."></el-input>
+          <el-input v-model="leave_remote_content" type="textarea" :autosize="{minRows: 2}"
+                    placeholder="Write a message..."></el-input>
         </div>
       </el-card>
       <el-card class="box-card" v-if="time_change_ref">
@@ -29,13 +40,26 @@
           <span style="font-weight: bold">Checkin/checkout request</span>
           <span>{{ checkin }} - {{ checkout }}</span>
           <div>
-            <el-button class="button" v-if="!view_checkin_checkout_content" @click="view_checkin_checkout_content = true"><el-icon><EditPen /></el-icon></el-button>
-            <el-button class="button" v-if="view_checkin_checkout_content" @click="view_checkin_checkout_content = false"><el-icon><Select /></el-icon></el-button>
-            <el-button class="button" @click="sendTimeRequest"><el-icon><Promotion /></el-icon></el-button>
+            <el-button class="button" v-if="!view_checkin_checkout_content"
+                       @click="view_checkin_checkout_content = true">
+              <el-icon>
+                <EditPen/>
+              </el-icon>
+            </el-button>
+            <el-button class="button" v-if="view_checkin_checkout_content"
+                       @click="view_checkin_checkout_content = false">
+              <el-icon><Select/></el-icon>
+            </el-button>
+            <el-button class="button" @click="sendTimeRequest">
+              <el-icon>
+                <Promotion/>
+              </el-icon>
+            </el-button>
           </div>
         </div>
         <div v-if="view_checkin_checkout_content" style="margin-top: 12px;">
-          <el-input v-model="checkin_checkout_content" type="textarea" :autosize="{minRows: 2}" placeholder="Write a message..."></el-input>
+          <el-input v-model="checkin_checkout_content" type="textarea" :autosize="{minRows: 2}"
+                    placeholder="Write a message..."></el-input>
         </div>
       </el-card>
     </div>
@@ -54,6 +78,7 @@
   align-items: center;
 
 }
+
 pre {
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
@@ -61,7 +86,7 @@ pre {
   word-wrap: break-word;
 }
 
-.bg-green{
+.bg-green {
   background-color: #04fc43;
 }
 
@@ -78,8 +103,9 @@ pre {
 import {computed, ref, watch} from "vue";
 import moment from "moment";
 import {useUserStore} from "../stores/user";
-import axios from "axios";
 import {useAlertStore} from "../stores/alert";
+import MessageAPI from "../services/MessageAPI";
+import {STATUS_CHANGE_REQ, TIME_CHANGE_REQ} from "../constants";
 
 const user = useUserStore().user
 const prop = defineProps({
@@ -136,50 +162,37 @@ watch(() => prop.visible, () => {
   time_change_ref.value = prop.time_change
 })
 
-function sendStatusRequest(){
-  console.log(prop.today)
-  axios.post('http://127.0.0.1:8000/api/message/send', {
-    'title': 'Leave/remote work request',
-    'content': leave_remote_content.value,
-    'time_keeping_date': prop.today,
-  }, {
-    headers: {
-      Authorization: `Bearer ${user.token}`
-    },
-  }).then((response) => {
-    status_change_ref.value = false
-    if(time_change_ref.value === false){
-      emits('update')
-    }
+function sendStatusRequest() {
+  MessageAPI.sendMessage(user.token, prop.today, STATUS_CHANGE_REQ, leave_remote_content.value)
+      .then((response) => {
+        status_change_ref.value = false
+        if (time_change_ref.value === false) {
+          emits('update')
+        }
 
-    alertBox.alert = true
-    alertBox.type = 'success'
-    alertBox.msg = response.data.message
-  }).catch((e) => {
-    console.log(e)
-  })
+        alertBox.alert = true
+        alertBox.type = 'success'
+        alertBox.msg = response.data.message
+      })
+      .catch((e) => {
+        console.log(e)
+      })
 }
 
-function sendTimeRequest(){
-  axios.post('http://127.0.0.1:8000/api/message/send', {
-    'title': 'Checkin/checkout request',
-    'content': checkin_checkout_content.value,
-    'time_keeping_date': prop.today,
-  }, {
-    headers: {
-      Authorization: `Bearer ${user.token}`
-    },
-  }).then((response) => {
-    time_change_ref.value = false
-    if(status_change_ref.value === false){
-      emits('update')
-    }
+function sendTimeRequest() {
+  MessageAPI.sendMessage(user.token, prop.today, TIME_CHANGE_REQ, checkin_checkout_content.value)
+      .then((response) => {
+        time_change_ref.value = false
+        if (status_change_ref.value === false) {
+          emits('update')
+        }
 
-    alertBox.alert = true
-    alertBox.type = 'success'
-    alertBox.msg = response.data.message
-  }).catch((e) => {
-    console.log(e)
-  })
+        alertBox.alert = true
+        alertBox.type = 'success'
+        alertBox.msg = response.data.message
+      })
+      .catch((e) => {
+        console.log(e)
+      })
 }
 </script>
