@@ -213,13 +213,12 @@ import {saveAs} from "file-saver";
 import {read, utils, write} from "xlsx";
 import {ref, reactive, onMounted, defineProps, computed, watchEffect, watch} from "vue";
 import {useUserStore} from "../stores/user";
-import axios from "axios";
 import moment from "moment";
 import router from "../router";
+import TimeKeepAPI from "../services/TimeKeepAPI";
 const props = defineProps({
   notification : Object
 })
-
 const user = useUserStore().user;
 let dataSearch = reactive({
   startDate: null,
@@ -252,12 +251,7 @@ const check = ref('')
 const getListTimeKeeping = async (from, to) => {
   if (router.currentRoute.value.fullPath === '/schedule') {
     try {
-      await axios
-          .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to, {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          })
+      await TimeKeepAPI.getListTimeKeep(from, to, user.token)
           .then(function (response) {
             data.value = response.data.data;
             if (first_load.value) {
@@ -274,12 +268,7 @@ const getListTimeKeeping = async (from, to) => {
     let userID = router.currentRoute.value.params.userID
     user_id.value = Number(userID)
     try {
-      await axios
-          .get("http://127.0.0.1:8000/api/get-list-timekeeping/" + from + '/' + to + '/' + userID, {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          })
+      await TimeKeepAPI.getListTimeKeepOfUser(from, to, user.token, userID)
           .then(function (response) {
             data.value = response.data.data;
             admin_view.value = data.value[0].user

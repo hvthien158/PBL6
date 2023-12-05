@@ -9,19 +9,22 @@
           <h3 style="text-align: center; font-weight: 700; color: #e06230">FORGOT PASSWORD</h3>
           <div class="login__field">
             <i class="login__icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill"
-                viewBox="0 0 16 16">
-                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                   class="bi bi-person-fill"
+                   viewBox="0 0 16 16">
+                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
               </svg>
             </i>
             <input v-model="email" type="text" class="login__input" placeholder="Email" @blur="checkmail"
-              @input="checkmail" @keyup.enter="forgot">
+                   @input="checkmail" @keyup.enter="forgot">
             <span class="error">{{ email_error }}</span>
           </div>
 
           <div class="login__field" style="display: flex; justify-content: center">
-            <ButtonLoading :loading="loading" @click="forgot" style="font-size: 15px;" size="large" type="warning" round>
-              Send mail</ButtonLoading>
+            <ButtonLoading :loading="loading" @click="forgot" style="font-size: 15px;" size="large" type="warning"
+                           round>
+              Send mail
+            </ButtonLoading>
           </div>
           <p class="fail-login" v-if="email_not_signed">Email not exist</p>
           <div class="content-bottom">
@@ -123,11 +126,11 @@ main {
 </style>
 
 <script setup>
-import axios from "axios";
 import router from "../../router";
-import { ref } from "vue";
-import { useUserStore } from "../../stores/user";
+import {ref} from "vue";
+import {useUserStore} from "../../stores/user";
 import ButtonLoading from "../../components/ButtonLoading.vue";
+import AuthAPI from "../../services/AuthAPI";
 
 const verifyQuest = ref(false)
 const email_not_signed = ref(false)
@@ -136,7 +139,7 @@ const email_error = ref('')
 const loading = ref(false)
 
 if (user.token !== '') {
-  router.push({ name: 'home' })
+  router.push({name: 'home'})
 }
 
 const email = ref('')
@@ -147,7 +150,7 @@ function checkmail() {
 
 const isEmail = (email) => {
   let filter =
-    /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+      /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return filter.test(email);
 };
 const forgot = async () => {
@@ -156,23 +159,20 @@ const forgot = async () => {
     email_error.value = 'Invalid email'
     loading.value = false
   } else if (email.value !== '') {
-    await axios.post('http://127.0.0.1:8000/api/check-email', {
-      email: email.value
-    }).then(() => {
-      verifyQuest.value = true
-      axios.post('http://127.0.0.1:8000/api/forgot-password', {
-        email: email.value,
-      })
-        .then(function () {
-          localStorage.setItem('email_forgot', email.value)
+    await AuthAPI.checkEmail(email.value)
+        .then(() => {
+          verifyQuest.value = true
+          AuthAPI.forgotPassword(email.value)
+              .then(function () {
+                localStorage.setItem('email_forgot', email.value)
+              })
+              .catch((e) => {
+                console.log(e)
+              })
+        }).catch(() => {
+          email_not_signed.value = true
+          loading.value = false
         })
-        .catch((e) => {
-          console.log(e)
-        })
-    }).catch(() => {
-      email_not_signed.value = true
-      loading.value = false
-    })
   }
 };
 

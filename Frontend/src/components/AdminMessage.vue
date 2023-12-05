@@ -18,8 +18,11 @@
       </div>
       <el-dropdown-menu style="padding: 12px">
         <el-empty v-if="request_data.length === 0" description="No Data" />
-        <el-dropdown-item :divided="true" v-for="item in request_data" style="position: relative"
-          @click="item.hide = !item.hide; checkRead(item.id, item.is_read); item.is_read = 1">
+        <el-dropdown-item
+            :divided="true"
+            v-for="item in request_data"
+            style="position: relative"
+            @click="item.hide = !item.hide; markAsRead(item.id, item.is_read); item.is_read = 1">
           <div>
             <div style="display: flex;">
               <div style="margin-right: 12px;">
@@ -36,7 +39,7 @@
                   <div style="display: flex">
                     <span>{{ item.user.name }}</span>
                     <div style="height: 6px; width: 6px; border-radius: 50%; background-color: #1cb966"
-                      v-if="item.is_check === 0"></div>
+                         v-if="item.is_check === 0"></div>
                   </div>
                   <span>{{ moment(item.created_at).fromNow() }}</span>
                 </div>
@@ -59,10 +62,12 @@
                 <span v-else style="color: #ccc"><br>No message</span>
               </div>
               <div style="margin-top: 4px;">
-                <el-button v-if="item.is_check === 0" @click="checkPass(item.id)" type="success"
-                  style="padding: 12px">Confirm</el-button>
-                <el-button v-else disabled @click="checkPass(item.id)" type="info"
-                  style="padding: 12px">Confirmed</el-button>
+                <el-button v-if="item.is_check === 0" @click="markAsConfirmed(item.id)" type="success"
+                           style="padding: 12px">
+                  Confirm
+                </el-button>
+                <el-button v-else disabled @click="markAsConfirmed(item.id)" type="info" style="padding: 12px">Confirmed
+                </el-button>
               </div>
             </div>
           </div>
@@ -126,11 +131,12 @@ pre {
 </style>
 
 <script setup>
-import { ref, watch, reactive, onMounted } from "vue";
-import axios from "axios";
-import { useUserStore } from "../stores/user";
-import { useAlertStore } from "../stores/alert";
+import {ref, watch, reactive, onMounted} from "vue";
+import {useUserStore} from "../stores/user";
 import moment from "moment";
+import {useAlertStore} from "../stores/alert";
+import MessageAPI from "../services/MessageAPI";
+
 const status_request = ref(['Work', 'Remote', 'Not work'])
 const only_unread = ref(false)
 const request_data = ref('')
@@ -142,46 +148,40 @@ const props = defineProps({
     type: Object
   }
 })
+watch(() => only_unread.value, loadRequest)
 watch(props, () => {
   if(props.notification.type == 1){
     only_unread.value = true
     loadRequest()
   }
 })
-watch(() => only_unread.value, loadRequest)
 function loadRequest() {
   if (only_unread.value) {
-    axios.get('http://127.0.0.1:8000/api/message/limit-unread', {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      },
-    }).then((response) => {
-      request_data.value = response.data.data
-      new_message.value = 0
-      request_data.value.forEach((data) => {
-        data.hide = true
-        if (data.is_read === 0) {
-          new_message.value += 1
-        }
-      })
-    }).catch((e) => {
+    MessageAPI.get5UnreadMessage(user.token)
+        .then((response) => {
+          request_data.value = response.data.data
+          new_message.value = 0
+          request_data.value.forEach((data) => {
+            data.hide = true
+            if (data.is_read === 0) {
+              new_message.value += 1
+            }
+          })
+        }).catch((e) => {
       console.log(e)
     })
   } else {
-    axios.get('http://127.0.0.1:8000/api/message/limit', {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      },
-    }).then((response) => {
-      request_data.value = response.data.data
-      new_message.value = 0
-      request_data.value.forEach((data) => {
-        data.hide = true
-        if (data.is_read === 0) {
-          new_message.value += 1
-        }
-      })
-    }).catch((e) => {
+    MessageAPI.get5Message(user.token)
+        .then((response) => {
+          request_data.value = response.data.data
+          new_message.value = 0
+          request_data.value.forEach((data) => {
+            data.hide = true
+            if (data.is_read === 0) {
+              new_message.value += 1
+            }
+          })
+        }).catch((e) => {
       console.log(e)
     })
   }
@@ -191,37 +191,26 @@ onMounted(() => {
   loadRequest()
 })
 
-function checkRead(id, read) {
+function markAsRead(id, read) {
   if (read === 0) {
     new_message.value -= 1
-    axios.post('http://127.0.0.1:8000/api/message/read', {
-      id: id
-    }, {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      },
-    }).catch((e) => {
-      console.log(e)
-    })
+    MessageAPI.markAsRead(user.token, id)
+        .catch((e) => {
+          console.log(e)
+        })
   }
 }
 
-async function checkPass(id) {
-  try {
-    await axios.post('http://127.0.0.1:8000/api/message/pass', {
-      id: id
-    }, {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      },
-    }).then((response) => {
-      loadRequest()
-      alertStore.alert = true
-      alertStore.type = 'success'
-      alertStore.msg = response.data.message
-    })
-  } catch (e) {
-    console.log(e)
-  }
+function markAsConfirmed(id) {
+  MessageAPI.markAsConfirmed(user.token, id)
+      .then((response) => {
+        loadRequest()
+        alertStore.alert = true
+        alertStore.type = 'success'
+        alertStore.msg = response.data.message
+      })
+      .catch((e) => {
+        console.log(e)
+      })
 }
 </script>

@@ -146,8 +146,8 @@ import { useUserStore } from "../../stores/user";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import ButtonLoading from "../../components/ButtonLoading.vue";
-import axios from "axios";
 import { useAlertStore } from "../../stores/alert";
+import AuthAPI from "../../services/AuthAPI";
 
 const router = useRouter()
 const alertStore = useAlertStore()
@@ -181,12 +181,7 @@ function updateProfile() {
   if (avatar.value) {
     formData.append('avatar', avatar.value)
   }
-  axios.post('http://127.0.0.1:8000/api/update-profile', formData,
-    {
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    })
+  AuthAPI.updateProfile(user.token, formData)
     .then((response) => {
       user.address = response.data.user.address
       user.phone_number = response.data.user.phone_number

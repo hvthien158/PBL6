@@ -95,10 +95,11 @@
 
 <script setup>
 import { ref, watch } from "vue";
-import axios from "axios";
 import { useUserStore } from "../stores/user";
 import { useStatusStore } from "../stores/status";
 import Pagination from "./Pagination.vue";
+import DepartmentAPI from "../services/DepartmentAPI";
+import UserAPI from "../services/UserAPI";
 
 const value = ref('')
 
@@ -112,7 +113,7 @@ const bg_color = ref(['bg-green', 'bg-purple', 'bg-gray'])
 const status = useStatusStore()
 const displayDepartment = async () => {
   try {
-    await axios.get("http://127.0.0.1:8000/api/department")
+    await DepartmentAPI.getAllDepartment()
       .then(function (response) {
         department.value = response.data.data;
         value.value = department.value[0].id
@@ -135,16 +136,11 @@ watch(() => value.value, () => {
 
 const displayUser = async () => {
   try {
-    await axios
-      .post(`http://127.0.0.1:8000/api/list-user/${currentPage.value - 1}`, {
-        department: value.value
-      }, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      })
-      .then(function (response) {
-        data.value = response.data.user
-        totalPage.value = Math.ceil(response.data.totalUser / 8) === 0 ? 1 : Math.ceil(response.data.totalUser / 8)
-      });
+    await UserAPI.getUserInDepartment(user.token, currentPage.value - 1, value.value)
+        .then(function (response) {
+          data.value = response.data.user
+          totalPage.value = Math.ceil(response.data.totalUser / 8) === 0 ? 1 : Math.ceil(response.data.totalUser / 8)
+        });
   } catch (e) {
     console.log(e);
   }

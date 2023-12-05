@@ -192,7 +192,6 @@ main {
 <script setup>
 import { ref, onMounted } from "vue";
 import router from "../router";
-import axios from "axios";
 import { useUserStore } from "../stores/user";
 import moment from "moment";
 import Clock from "../components/Clock.vue";
@@ -200,11 +199,12 @@ import HomeStatusCard from "../components/HomeStatusCard.vue";
 import HomeTimeKeepCard from "../components/HomeTimeKeepCard.vue";
 import { useStatusStore } from "../stores/status";
 import { useAlertStore } from "../stores/alert";
+import TimeKeepAPI from "../services/TimeKeepAPI";
 const user = useUserStore().user
 const status = useStatusStore()
 const alertStore = useAlertStore()
 if (user.token === '') {
-  router.push({ path: "/login" });
+  router.push({ name: 'login' });
 }
 const checkin = ref(false)
 const checkout = ref(false)
@@ -269,12 +269,7 @@ onMounted(() => {
 });
 const getTimeKeeping = async () => {
   try {
-    await axios
-      .get("http://127.0.0.1:8000/api/time-keeping", {
-        headers: {
-          Authorization: `Bearer ${user.token}`
-        },
-      })
+    await TimeKeepAPI.getMyTodayTimeKeep(user.token)
       .then(function (response) {
         today.value.status_AM = response.data.status_AM
         today.value.status_PM = response.data.status_PM
@@ -309,14 +304,7 @@ const getTimeKeeping = async () => {
 
 const handleCheckIn = async () => {
   try {
-    console.log(1)
-    await axios.post("http://127.0.0.1:8000/api/check-in", {},
-      {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      }
-    )
+    await TimeKeepAPI.checkIn(user.token)
       .then(function (response) {
         getTimeKeeping();
       });
@@ -327,14 +315,7 @@ const handleCheckIn = async () => {
 
 const handleCheckOut = async () => {
   try {
-    await axios.put(
-      `http://127.0.0.1:8000/api/check-out/`, null,
-      {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      }
-    )
+    await TimeKeepAPI.checkOut(user.token)
       .then(function (response) {
         getTimeKeeping();
       });

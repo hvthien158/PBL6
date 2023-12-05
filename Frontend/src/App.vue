@@ -76,7 +76,6 @@ let notification = reactive({
   message: '',
   type: ''
 })
-console.log(typeof notification)
 onMessage(messaging, (payload) => {
     notification.title = payload.data.title
     notification.message = payload.data.message

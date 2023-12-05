@@ -63,9 +63,9 @@
   
 <script setup>
 import { ref, defineProps } from "vue";
-import axios from "axios";
 import { useUserStore } from "../stores/user";
 import { useAlertStore } from "../stores/alert";
+import UserAPI from "../services/UserAPI";
 const prop = defineProps({
     userId: {
         type: Number
@@ -78,11 +78,7 @@ const alertStore = useAlertStore()
 const emits = defineEmits(['invisible', 'updateData'])
 const loadUser = async () => {
     try {
-        await axios.get(`http://127.0.0.1:8000/api/user/${prop.userId}`, {
-            headers: {
-                Authorization: `Bearer ${user.token}`
-            },
-        }).then((response) => {
+        await UserAPI.get1User(user.token, prop.userId).then((response) => {
             console.log(response)
             manager.value = response.data.data
             visible.value = true

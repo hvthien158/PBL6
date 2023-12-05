@@ -74,7 +74,7 @@
           Prev
         </el-button>
 <!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
-        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => {currentPage = page}"></Pagination>
+        <Pagination :current_page_prop="currentPage" :total_page_prop="100" @change-page="(page) => {currentPage = page}"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
@@ -161,12 +161,13 @@ import SlideBar from "../../../components/SlideBar.vue";
 import NewUser from "../../../components/NewUser.vue"
 import { ref, onMounted, reactive, watch } from "vue";
 import { useUserStore } from "../../../stores/user";
-import axios from "axios";
 import router from "../../../router";
 import { useRoute } from "vue-router";
 import { useAlertStore } from "../../../stores/alert";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
 import Pagination from "../../../components/Pagination.vue";
+import DepartmentAPI from "../../../services/DepartmentAPI";
+import UserAPI from "../../../services/UserAPI";
 
 const data = ref();
 const user = useUserStore().user;
@@ -218,31 +219,20 @@ const position = [
     value: "senior",
   },
 ];
-axios.get("http://127.0.0.1:8000/api/department")
+DepartmentAPI.getAllDepartment()
   .then(function (response) {
     department.value = response.data.data;
   });
 const displayUser = async () => {
   visible_mode.value = false
   try {
-    await axios
-      .post(`http://127.0.0.1:8000/api/list-user/${currentPage.value - 1}`, {
-        name: dataSearch.name.toLowerCase(),
-        address: dataSearch.address.toLowerCase(),
-        phoneNumber: dataSearch.phoneNumber,
-        email: dataSearch.email.toLowerCase(),
-        position: dataSearch.position === 'none' ? '' : dataSearch.position,
-        role: dataSearch.role === 'none' ? '' : dataSearch.role,
-        department: dataSearch.department === 0 ? '' : dataSearch.department
-      }, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      })
-      .then(function (response) {
-        data.value = response.data.user;
-        totalPage.value = Math.ceil(response.data.totalUser / 8) === 0 ? 1 : Math.ceil(response.data.totalUser / 8)
-        let tail = (response.data.totalUser < currentPage.value * 8) ? response.data.totalUser : currentPage.value * 8
-        tableDescription.value = ((currentPage.value - 1) * 8 + 1) + '..' + tail + ' of ' + response.data.totalUser + ' users'
-      });
+    await UserAPI.getListUser(user.token, currentPage.value - 1, dataSearch)
+        .then(function (response) {
+          data.value = response.data.user;
+          totalPage.value = Math.ceil(response.data.totalUser / 8) === 0 ? 1 : Math.ceil(response.data.totalUser / 8)
+          let tail = (response.data.totalUser < currentPage.value * 8) ? response.data.totalUser : currentPage.value * 8
+          tableDescription.value = ((currentPage.value - 1) * 8 + 1) + '..' + tail + ' of ' + response.data.totalUser + ' users'
+        });
   } catch (e) {
     console.log(e);
   }
@@ -275,13 +265,10 @@ function handleDelete(id) {
 const deleteUser = async () => {
   confirm_box.value = false
   try {
-    await axios
-      .delete(`http://127.0.0.1:8000/api/delete-user/${delete_id.value}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      })
-      .then(function (response) {
-        messages("success", response.data.message);
-      });
+    await UserAPI.deleteUser(user.token, delete_id.value)
+        .then(function (response) {
+          messages("success", response.data.message);
+        });
   } catch (e) {
     messages("error", e.data.message);
   }

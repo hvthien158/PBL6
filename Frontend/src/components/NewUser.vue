@@ -1,33 +1,34 @@
 <template>
   <el-dialog v-model="prop.visible" :close-on-press-escape="false" :close-on-click-modal="false" :show-close="false"
-    @keyup.esc="$emit('invisible')" min-width="30%">
+             @keyup.esc="$emit('invisible')" min-width="30%">
     <template #header>
       <div class="my-header">
         <h4 v-if="prop.mode === 'create'">Create User</h4>
         <h4 v-else>Update User</h4>
         <el-button type="danger" @click="$emit('invisible')">
           <el-icon class="el-icon--left">
-            <CircleCloseFilled />
+            <CircleCloseFilled/>
           </el-icon>
           Close
         </el-button>
       </div>
     </template>
     <el-form :model="form">
-      <el-form-item v-if="prop.mode === 'update'" label="ID" :label-width="formLabelWidth" :rules="[{ required: true }]">
-        <el-input v-model="prop.userId" autocomplete="off" disabled />
+      <el-form-item v-if="prop.mode === 'update'" label="ID" :label-width="formLabelWidth"
+                    :rules="[{ required: true }]">
+        <el-input v-model="prop.userId" autocomplete="off" disabled/>
       </el-form-item>
       <el-form-item label="Name" :label-width="formLabelWidth" :rules="[{ required: true }]">
-        <el-input v-model="form.name" autocomplete="off" />
+        <el-input v-model="form.name" autocomplete="off"/>
         <small>{{ checkLanding.checkName }}</small>
       </el-form-item>
       <el-form-item label="Email" :label-width="formLabelWidth" :rules="[{ required: true }]">
-        <el-input v-model="form.email" autocomplete="off" />
+        <el-input v-model="form.email" autocomplete="off"/>
         <small>{{ checkLanding.checkEmail }}</small>
       </el-form-item>
       <el-form-item v-if="prop.mode === 'create'" label="Password" :label-width="formLabelWidth"
-        :rules="[{ required: true }]">
-        <el-input type="password" show-password v-model="form.password" autocomplete="off" />
+                    :rules="[{ required: true }]">
+        <el-input type="password" show-password v-model="form.password" autocomplete="off"/>
         <small>{{ checkLanding.checkPassword }}</small>
       </el-form-item>
       <el-form-item label="Date of Birth" :label-width="formLabelWidth">
@@ -35,15 +36,15 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item label="Address" :label-width="formLabelWidth">
-        <el-input v-model="form.address" autocomplete="off" />
+        <el-input v-model="form.address" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="Phone Number" :label-width="formLabelWidth" :rules="[{ required: true }]">
-        <el-input v-model="form.phoneNumber" autocomplete="off" />
+        <el-input v-model="form.phoneNumber" autocomplete="off"/>
         <small>{{ checkLanding.checkPhoneNumber }}</small>
       </el-form-item>
       <el-form-item label="Salary" :label-width="formLabelWidth">
         <el-input :formatter="(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-          :parser="(value) => value.replace(/\$\s?|(,*)/g, '')" v-model="form.salary" autocomplete="off" />
+                  :parser="(value) => value.replace(/\$\s?|(,*)/g, '')" v-model="form.salary" autocomplete="off"/>
       </el-form-item>
       <el-form-item label="Role" :label-width="formLabelWidth" :rules="[{ required: true }]">
         <el-select v-model="form.role" type="text">
@@ -133,10 +134,12 @@ span {
 </style>
 
 <script setup>
-import { reactive, ref, watch } from "vue";
-import axios from "axios";
-import { useUserStore } from "../stores/user";
-import { useAlertStore } from "../stores/alert";
+import {reactive, ref, watch} from "vue";
+import {useUserStore} from "../stores/user";
+import {useAlertStore} from "../stores/alert";
+import DepartmentAPI from "../services/DepartmentAPI";
+import UserAPI from "../services/UserAPI";
+
 const formLabelWidth = "150px";
 const user = useUserStore().user
 const alertStore = useAlertStore()
@@ -208,54 +211,54 @@ let department = ref()
 
 const emits = defineEmits(['invisible', 'update_data'])
 
-axios.get("http://127.0.0.1:8000/api/department")
-  .then(function (response) {
-    department.value = response.data.data;
-  });
+DepartmentAPI.getAllDepartment()
+    .then(function (response) {
+      department.value = response.data.data;
+    });
 
 watch(() => prop.userId,
-  () => {
-    loadUser()
-  })
+    () => {
+      loadUser()
+    })
 watch(() => prop.mode,
-  () => {
-    if (prop.mode === 'create') {
-      form.name = ''
-      form.email = ''
-      form.password = ''
-      form.address = ''
-      form.DOB = ''
-      form.phoneNumber = ''
-      form.salary = ''
-      form.position = ''
-      form.role = ''
-      form.department = ''
-    }
-  })
+    () => {
+      if (prop.mode === 'create') {
+        form.name = ''
+        form.email = ''
+        form.password = ''
+        form.address = ''
+        form.DOB = ''
+        form.phoneNumber = ''
+        form.salary = ''
+        form.position = ''
+        form.role = ''
+        form.department = ''
+      }
+    })
+
 function loadUser() {
   if (prop.mode === 'update') {
-    axios.get(`http://127.0.0.1:8000/api/user/${prop.userId}`, {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      },
-    }).then((response) => {
-      form.email = response.data.data.email === 'none' ? '' : response.data.data.email;
-      form.name = response.data.data.name === 'none' ? '' : response.data.data.name;
-      form.address = response.data.data.address === 'none' ? '' : response.data.data.address;
-      form.phoneNumber = response.data.data.phone_number === 'none' ? '' : response.data.data.phone_number;
-      form.DOB = response.data.data.DOB === 'none' ? '' : response.data.data.DOB;
-      form.salary = response.data.data.salary === 'none' ? '' : response.data.data.salary.split('$')[1];
-      form.position = response.data.data.position === 'none' ? '' : response.data.data.position;
-      form.role = response.data.data.role;
-      form.department = response.data.data.department.id;
-    }).catch((e) => {
-      console.log(e)
-      alertStore.alert = true;
-      alertStore.type = 'error';
-      alertStore.msg = 'Something wrong'
-    })
+    UserAPI.get1User(user.token, prop.userId)
+        .then((response) => {
+          form.email = response.data.data.email === 'none' ? '' : response.data.data.email;
+          form.name = response.data.data.name === 'none' ? '' : response.data.data.name;
+          form.address = response.data.data.address === 'none' ? '' : response.data.data.address;
+          form.phoneNumber = response.data.data.phone_number === 'none' ? '' : response.data.data.phone_number;
+          form.DOB = response.data.data.DOB === 'none' ? '' : response.data.data.DOB;
+          form.salary = response.data.data.salary === 'none' ? '' : response.data.data.salary.split('$')[1];
+          form.position = response.data.data.position === 'none' ? '' : response.data.data.position;
+          form.role = response.data.data.role;
+          form.department = response.data.data.department.id;
+        })
+        .catch((e) => {
+          console.log(e)
+          alertStore.alert = true;
+          alertStore.type = 'error';
+          alertStore.msg = 'Something wrong'
+        })
   }
 }
+
 loadUser()
 watch(() => form.name, () => {
   checkLanding.checkName = (form.name.length <= 4) ? 'The name must be at least 4 characters.' : ''
@@ -290,40 +293,24 @@ const validate = () => {
 }
 const isEmail = (email) => {
   let filter =
-    /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+      /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   return filter.test(email);
 };
 const isPhoneNumber = (phoneNumber) => {
   let filter = /^([0-9]{10})+$/;
   return filter.test(phoneNumber);
 };
+
 function createUser() {
   if (validate()) {
     try {
-      axios.post(
-        `http://127.0.0.1:8000/api/create-user/`,
-        {
-          name: form.name,
-          email: form.email,
-          password: form.password,
-          password_confirmation: form.password,
-          department_id: form.department,
-          address: form.address,
-          DOB: formatToPost(form.DOB),
-          phone_number: form.phoneNumber,
-          salary: form.salary,
-          position: form.position === 'none' ? null : form.position,
-          role: form.role
-        },
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
-      ).then(function () {
-        emits('update_data')
-        alertStore.alert = true
-        alertStore.type = 'success'
-        alertStore.msg = 'Create success'
-      })
+      UserAPI.createUser(user.token, form, formatToPost(form.DOB))
+          .then(function () {
+            emits('update_data')
+            alertStore.alert = true
+            alertStore.type = 'success'
+            alertStore.msg = 'Create success'
+          })
     } catch (e) {
       alertStore.alert = true
       alertStore.type = 'error'
@@ -336,29 +323,13 @@ function createUser() {
 function updateUser() {
   if (validate()) {
     try {
-      axios
-        .put(
-          `http://127.0.0.1:8000/api/update-user/${prop.userId}`,
-          {
-            name: form.name,
-            email: form.email,
-            department_id: form.department,
-            address: form.address,
-            DOB: formatToPost(form.DOB),
-            phone_number: form.phoneNumber,
-            salary: form.salary,
-            position: form.position === 'none' ? null : form.position,
-            role: form.role
-          },
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }
-        ).then(function () {
-          emits('update_data')
-          alertStore.alert = true
-          alertStore.type = 'success'
-          alertStore.msg = 'Update success'
-        })
+      UserAPI.updateUser(user.token, form, formatToPost(form.DOB), prop.userId)
+          .then(function () {
+            emits('update_data')
+            alertStore.alert = true
+            alertStore.type = 'success'
+            alertStore.msg = 'Update success'
+          })
     } catch (e) {
       alertStore.alert = true
       alertStore.type = 'error'
@@ -367,6 +338,7 @@ function updateUser() {
     }
   }
 }
+
 const formatToPost = (time) => {
   if (!time) {
     return ''
