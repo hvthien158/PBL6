@@ -119,13 +119,13 @@ main {
 import SlideBar from "../../../components/SlideBar.vue";
 import { ref, onMounted, watch} from "vue";
 import { useUserStore } from "../../../stores/user";
-import axios from "axios";
 import router from "../../../router";
 import { useAlertStore } from "../../../stores/alert";
 import { saveAs } from "file-saver";
 import { utils, write } from "xlsx";
 import ConfirmBox from "../../../components/ConfirmBox.vue";
 import Pagination from "../../../components/Pagination.vue";
+import ShiftAPI from "../../../services/ShiftAPI";
 let dataSearch = ref('');
 let currentPage = ref(1)
 const totalPage = ref(1)
@@ -142,17 +142,11 @@ onMounted(() => {
 
 const displayShift = async () => {
   try {
-    await axios
-      .post(`http://127.0.0.1:8000/api/list-shift/${currentPage.value - 1}`, {
-        name: dataSearch.value
-      },
-        {
-          headers: { Authorization: `Bearer ${user.token}` }
-        })
-      .then(function (response) {
-        shift.value = response.data.shift;
-        totalPage.value = (response.data.totalPage === 0) ? 1 : response.data.totalPage
-      });
+    await ShiftAPI.getListShift(user.token, currentPage.value - 1, dataSearch.value)
+        .then(function (response) {
+          shift.value = response.data.shift;
+          totalPage.value = (response.data.totalPage === 0) ? 1 : response.data.totalPage
+        });
   } catch (e) {
     console.log(e);
   }

@@ -62,7 +62,6 @@ class MessageController extends Controller
                 return response()->json(['message' => ResponseMessage::OK]);
             }
             return response()->json([], 400);
-            return response()->json(['message' => ResponseMessage::OK]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -72,14 +71,14 @@ class MessageController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function checkReadMessage(Request $request)
+    public function markAsRead(Request $request)
     { //change from unread to read
         if (!$request->input('id')) {
             return response()->json(['message' => ResponseMessage::VALIDATION_ERROR], 422);
         }
 
         try {
-            $this->messageRepo->checkReadMessage($request->input('id'));
+            $this->messageRepo->markAsReadMessage($request->input('id'));
             return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
@@ -90,14 +89,14 @@ class MessageController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function checkPassMassage(Request $request)
+    public function markAsConfirmed(Request $request)
     { //accept user request
         if (!$request->input('id')) {
             return response()->json(['message' => ResponseMessage::VALIDATION_ERROR], 422);
         }
 
         try {
-            $this->messageRepo->checkPassMessage($request->input('id'));
+            $this->messageRepo->markAsConfirmedMessage($request->input('id'));
             return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

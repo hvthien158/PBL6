@@ -5,11 +5,13 @@
       <sourceFolder url="file://$MODULE_DIR$/API/app" isTestSource="false" packagePrefix="App\" />
       <sourceFolder url="file://$MODULE_DIR$/API/database/factories" isTestSource="false" packagePrefix="Database\Factories\" />
       <sourceFolder url="file://$MODULE_DIR$/API/database/seeders" isTestSource="false" packagePrefix="Database\Seeders\" />
+      <sourceFolder url="file://$MODULE_DIR$/API/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/API/tests" isTestSource="true" packagePrefix="Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/API/tests/Feature" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/API/tests/Unit" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/API/spec" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/brick/math" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/dflydev/dot-access-data" />
@@ -132,6 +134,20 @@
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/paragonie/random_compat" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/phpseclib/phpseclib" />
       <excludeFolder url="file://$MODULE_DIR$/API/vendor/psr/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/beste/clock" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/beste/json" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/fig/http-message-util" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/google/cloud-core" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/google/cloud-storage" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/kreait/firebase-php" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/kreait/firebase-tokens" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/kreait/laravel-firebase" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/mtdowling/jmespath.php" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/rize/uri-template" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/spatie/image-optimizer" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/symfony/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/symfony/cache-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/API/vendor/symfony/var-exporter" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

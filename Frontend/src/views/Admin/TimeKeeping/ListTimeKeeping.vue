@@ -44,10 +44,14 @@
         </el-table-column>
         <el-table-column prop="department" label="Department name" min-width="110">
           <template #default="scope">
-            <el-button link type="warning" @click="goToDepartment(scope.row.department)">{{ scope.row.department }}</el-button>
+            <el-button link type="warning" @click="goToDepartment(scope.row.department)">{{
+                scope.row.department
+              }}
+            </el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="regularWorkingDays" label="The number of days specified" min-width="120"></el-table-column>
+        <el-table-column prop="regularWorkingDays" label="The number of days specified"
+                         min-width="120"></el-table-column>
         <el-table-column label="Working days">
           <el-table-column prop="sumWorkingDays" label="Total" min-width="120"></el-table-column>
           <el-table-column prop="remoteDays" label="Remote" min-width="120"></el-table-column>
@@ -69,17 +73,14 @@
         <el-button @click="previousPage" :disabled="currentPage === 1">
           Prev
         </el-button>
-<!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
-        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => currentPage = page"></Pagination>
+        <!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage"
+                    @change-page="(page) => currentPage = page"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
       </div>
     </div>
-    <ConfirmBox v-if="confirmBox" title="Are you sure?" msg="Delete this timekeeping?" @confirm="deleteTimekeeping()"
-                @cancel="confirmBox = false">
-    </ConfirmBox>
-
   </main>
 </template>
 <style scoped>
@@ -182,15 +183,15 @@ a:hover {
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
 import {ref, onMounted, computed, reactive, watch} from "vue";
-import axios from "axios";
 import router from "../../../router";
 import {useUserStore} from "../../../stores/user";
 import {useAlertStore} from "../../../stores/alert";
-import ConfirmBox from "../../../components/ConfirmBox.vue";
 import {saveAs} from "file-saver";
 import {utils, write} from "xlsx";
 import moment from "moment"
 import Pagination from "../../../components/Pagination.vue";
+import DepartmentAPI from "../../../services/DepartmentAPI";
+import TimeKeepAPI from "../../../services/TimeKeepAPI";
 
 const user = useUserStore().user;
 const alertStore = useAlertStore();
@@ -199,7 +200,6 @@ const department = ref()
 const timekeepingId = ref(0)
 const deleteId = ref(0)
 const visibleMode = ref(false)
-const confirmBox = ref(false)
 const debounceSearch = ref(null);
 const user_quantity = ref(0);
 let currentPage = ref(1);
@@ -258,7 +258,7 @@ onMounted(() => {
 
 const displayDepartment = async () => {
   try {
-    await axios.get("http://127.0.0.1:8000/api/department")
+    await DepartmentAPI.getAllDepartment()
         .then(function (response) {
           department.value = response.data.data;
         });
@@ -273,21 +273,17 @@ watch(() => filter_value.value, () => {
 
 const displayTimeKeeping = async () => {
   try {
-    await axios
-        .post(`http://127.0.0.1:8000/api/manage-timekeeping/${currentPage.value - 1}`, {
-              from: filter_value.value[0],
-              to: filter_value.value[1],
-              name: dataSearch.name,
-              department: dataSearch.department,
-            },
-            {
-              headers: {Authorization: `Bearer ${user.token}`}
-            })
+    await TimeKeepAPI.statisticTimeKeep(
+        user.token,
+        currentPage.value - 1,
+        filter_value.value,
+        dataSearch
+    )
         .then((response) => {
           timekeeping.value = response.data.data
           user_quantity.value = response.data.quantity
           totalPage.value = Math.ceil(user_quantity.value / 10)
-          if(totalPage.value === 0){
+          if (totalPage.value === 0) {
             totalPage.value = 1
           }
           updateTableDescription()
@@ -310,25 +306,6 @@ watch(
     },
     {deep: true}
 );
-
-const deleteTimekeeping = async () => {
-  confirmBox.value = false
-  try {
-    await axios
-        .delete(`http://127.0.0.1:8000/api/delete-timekeeping/${deleteId.value}`, {
-          headers: {Authorization: `Bearer ${user.token}`},
-        })
-        .then(function (response) {
-          console.log(response);
-          if (response.status === 200) {
-            messages("success", response.data.message);
-          }
-        });
-  } catch (e) {
-    messages("error", e.data.message);
-  }
-  displayTimeKeeping();
-};
 
 const formatDate = (date) => {
   if (date !== '') {
@@ -369,14 +346,9 @@ function handleEdit(id) {
   timekeepingId.value = id
 }
 
-function handleDelete(id) {
-  confirmBox.value = true
-  deleteId.value = id
-}
-
-function goToDepartment(department_name){
+function goToDepartment(department_name) {
   department.value.forEach((item) => {
-    if(item.name === department_name){
+    if (item.name === department_name) {
       router.push({
         path: `/admin/list-user/department/${item.id}`
       })

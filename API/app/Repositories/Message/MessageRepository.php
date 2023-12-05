@@ -73,7 +73,7 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
      * @param $id
      * @return void
      */
-    public function checkReadMessage($id)
+    public function markAsReadMessage($id)
     {
         DB::table('messages')
             ->where('id', '=', $id)
@@ -84,7 +84,7 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
      * @param $id
      * @return \Illuminate\Http\JsonResponse|void
      */
-    public function checkPassMessage($id)
+    public function markAsConfirmedMessage($id)
     {
         $messages = DB::table('messages')
             ->where('id', '=', $id);
