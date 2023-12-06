@@ -47,15 +47,15 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
             ->where('_date', '=', $request->time_keeping_date)
             ->where('user_id', '=', $userID);
 
-        if($timekeeping->first()->user_id != $userID){
+        if ($timekeeping->first()->user_id != $userID) {
             return response()->json(['error' => 'Not allow'], 405);
         }
 
-        if($request->input('title') == 'Leave/remote work request'){
+        if ($request->input('title') == 'Leave/remote work request') {
             $timekeeping->update([
                 'admin_accept_status' => 1
             ]);
-        } else if ($request->input('title') == 'Checkin/checkout request'){
+        } else if ($request->input('title') == 'Checkin/checkout request') {
             $timekeeping->update([
                 'admin_accept_time' => 1
             ]);
@@ -92,9 +92,9 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
         $message = $messages->first();
         $timekeeping = DB::table('time_keepings')
             ->where('id', '=', $message->time_keeping_id);
-        if($message->title == 'Leave/remote work request'){
+        if ($message->title == 'Leave/remote work request') {
             $timekeeping->update(['admin_accept_status' => 2]);
-        } else if($message->title === 'Checkin/checkout request') {
+        } else if ($message->title === 'Checkin/checkout request') {
             $timekeeping->update(['admin_accept_time' => 2]);
             DB::table('systemtimes')
                 ->where('id', '=', $message->time_keeping_id)

@@ -23,4 +23,7 @@ interface TimeKeepingRepositoryInterface extends RepositoryInterface
     public function customUpdate($request);
 
     public function timeKeepingStatistic($skip, $request);
+
+    public function findTimeKeepingWaitingAccept($fromMonth, $toMonth);
+
 }

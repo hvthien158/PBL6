@@ -3,16 +3,16 @@
     <SlideBar></SlideBar>
     <div class="timekeeping">
       <span style="font-size: 32px; font-weight: 700; text-align: center;">TimeKeeping Management</span>
+      <div class="export">
+        <el-form-item>
+          <el-button type="warning" @click="handleExportExcel">Export Excel</el-button>
+          <el-button type="warning" @click="handleExportCSV">Export CSV</el-button>
+        </el-form-item>
+      </div>
       <div class="title-table">
         <div>
-          <el-date-picker
-              v-model="filter_value"
-              type="daterange"
-              start-placeholder="Start date"
-              end-placeholder="End date"
-              format="YYYY-MM-DD"
-              value-format="YYYY-MM-DD"
-          />
+          <el-date-picker v-model="filter_value" type="daterange" start-placeholder="Start date"
+            end-placeholder="End date" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
         </div>
         <div class="pagination-month">
           <el-button type="info" @click="previousMonth">
@@ -27,9 +27,9 @@
           <el-select v-model="dataSearch.department" placeholder="Select department">
             <el-option label="Select Department" :value="0"></el-option>
             <el-option v-for="item in department" :key="item.id" :label="item.name" :value="item.id"
-                       :disabled="item.disabled"/>
+              :disabled="item.disabled" />
           </el-select>
-          <el-input v-model="dataSearch.name" placeholder="Search by username"/>
+          <el-input v-model="dataSearch.name" placeholder="Search by username" />
         </div>
 
       </div>
@@ -37,7 +37,7 @@
         <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
         <el-table-column prop="name" label="Name" min-width="200">
           <template #default="scope">
-            <el-button link type="success" @click="router.push({ path: `/admin/schedule/${scope.row.id}`})">
+            <el-button link type="success" @click="router.push({ path: `/admin/schedule/${scope.row.id}` })">
               {{ scope.row.name }}
             </el-button>
           </template>
@@ -45,13 +45,12 @@
         <el-table-column prop="department" label="Department name" min-width="110">
           <template #default="scope">
             <el-button link type="warning" @click="goToDepartment(scope.row.department)">{{
-                scope.row.department
-              }}
+              scope.row.department
+            }}
             </el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="regularWorkingDays" label="The number of days specified"
-                         min-width="120"></el-table-column>
+        <el-table-column prop="regularWorkingDays" label="The number of days specified" min-width="120"></el-table-column>
         <el-table-column label="Working days">
           <el-table-column prop="sumWorkingDays" label="Total" min-width="120"></el-table-column>
           <el-table-column prop="remoteDays" label="Remote" min-width="120"></el-table-column>
@@ -75,11 +74,15 @@
         </el-button>
         <!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
         <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage"
-                    @change-page="(page) => currentPage = page"></Pagination>
+          @change-page="(page) => currentPage = page"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>
       </div>
+    </div>
+    <div class="form-export">
+      <ExportData @invisible="visibleMode = false" :mode="operationMode" v-if="visibleMode">
+      </ExportData>
     </div>
   </main>
 </template>
@@ -179,15 +182,25 @@ a:hover {
 .pagination span {
   margin: 0 10px;
 }
+
+.export {
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.export .el-form-item {
+  margin-bottom: 0px;
+}
 </style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
-import {ref, onMounted, computed, reactive, watch} from "vue";
+import { ref, onMounted, reactive, watch } from "vue";
 import router from "../../../router";
-import {useUserStore} from "../../../stores/user";
-import {useAlertStore} from "../../../stores/alert";
-import {saveAs} from "file-saver";
-import {utils, write} from "xlsx";
+import { useUserStore } from "../../../stores/user";
+import { useAlertStore } from "../../../stores/alert";
+import ExportData from "../../../components/ExportData.vue";
 import moment from "moment"
 import Pagination from "../../../components/Pagination.vue";
 import DepartmentAPI from "../../../services/DepartmentAPI";
@@ -197,9 +210,8 @@ const user = useUserStore().user;
 const alertStore = useAlertStore();
 const timekeeping = ref();
 const department = ref()
-const timekeepingId = ref(0)
-const deleteId = ref(0)
 const visibleMode = ref(false)
+const operationMode = ref('Excel')
 const debounceSearch = ref(null);
 const user_quantity = ref(0);
 let currentPage = ref(1);
@@ -259,9 +271,9 @@ onMounted(() => {
 const displayDepartment = async () => {
   try {
     await DepartmentAPI.getAllDepartment()
-        .then(function (response) {
-          department.value = response.data.data;
-        });
+      .then(function (response) {
+        department.value = response.data.data;
+      });
   } catch (e) {
     console.log(e)
   }
@@ -274,49 +286,40 @@ watch(() => filter_value.value, () => {
 const displayTimeKeeping = async () => {
   try {
     await TimeKeepAPI.statisticTimeKeep(
-        user.token,
-        currentPage.value - 1,
-        filter_value.value,
-        dataSearch
+      user.token,
+      currentPage.value - 1,
+      filter_value.value,
+      dataSearch
     )
-        .then((response) => {
-          timekeeping.value = response.data.data
-          user_quantity.value = response.data.quantity
-          totalPage.value = Math.ceil(user_quantity.value / 10)
-          if (totalPage.value === 0) {
-            totalPage.value = 1
-          }
-          updateTableDescription()
-        });
+      .then((response) => {
+        timekeeping.value = response.data.data
+        console.log(response.data.data)
+        user_quantity.value = response.data.quantity
+        totalPage.value = Math.ceil(user_quantity.value / 10)
+        if (totalPage.value === 0) {
+          totalPage.value = 1
+        }
+        updateTableDescription()
+      });
   } catch (e) {
     console.log(e);
   }
 };
 
 watch(
-    [() => dataSearch.name, () => dataSearch.department],
-    () => {
-      if (debounceSearch.value) {
-        clearTimeout(debounceSearch.value);
-      }
-      debounceSearch.value = setTimeout(() => {
-        currentPage.value = 1;
-        displayTimeKeeping();
-      }, 500);
-    },
-    {deep: true}
+  [() => dataSearch.name, () => dataSearch.department],
+  () => {
+    if (debounceSearch.value) {
+      clearTimeout(debounceSearch.value);
+    }
+    debounceSearch.value = setTimeout(() => {
+      currentPage.value = 1;
+      displayTimeKeeping();
+    }, 500);
+  },
+  { deep: true }
 );
 
-const formatDate = (date) => {
-  if (date !== '') {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${year}-${month}-${day}`;
-  } else {
-    return date;
-  }
-};
 
 watch(() => currentPage.value, () => {
   displayTimeKeeping()
@@ -341,11 +344,6 @@ const messages = (type, msg) => {
   alertStore.msg = msg;
 };
 
-function handleEdit(id) {
-  visibleMode.value = true;
-  timekeepingId.value = id
-}
-
 function goToDepartment(department_name) {
   department.value.forEach((item) => {
     if (item.name === department_name) {
@@ -355,55 +353,12 @@ function goToDepartment(department_name) {
     }
   })
 }
-
-// const exportExcel = () => {
-//   const excelData = filteredData.value.map((item) => {
-//     return {
-//       id: item.id,
-//       name: item.name,
-//       address: item.address,
-//       phoneNumber: item.phoneNumber,
-//       email: item.email,
-//       quantityUser: item.quantityUser
-//     };
-//   });
-//   const worksheet = utils.json_to_sheet(excelData);
-//   const workbook = utils.book_new();
-//   utils.book_append_sheet(workbook, worksheet, "ListDepartment");
-//   const excelBuffer = write(workbook, {
-//     bookType: "xlsx",
-//     type: "array",
-//   });
-//   const dataBlob = new Blob([excelBuffer], {
-//     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-//   });
-//   saveAs(dataBlob, "list_department.xlsx");
-// };
-
-// const exportCSV = () => {
-//   let csvContent = "data:text/csv;charset=utf-8,";
-//   const headers = [
-//     "id",
-//     "name",
-//     "address",
-//     "phoneNumber",
-//     "email",
-//     "quantityUser"
-//   ];
-//   csvContent += headers.join(",") + "\n";
-//   filteredData.value.forEach((item) => {
-//     const row = headers
-//       .map((header) => {
-//         return item[header];
-//       })
-//       .join(",");
-//     csvContent += row + "\n";
-//   });
-
-//   const encodedUri = encodeURI(csvContent);
-//   const link = document.createElement("a");
-//   link.setAttribute("href", encodedUri);
-//   link.setAttribute("download", `list_department.csv`);
-//   link.click();
-// };
+const handleExportExcel = () => {
+  visibleMode.value = true
+  operationMode.value = 'Excel'
+}
+const handleExportCSV = () => {
+  visibleMode.value = true
+  operationMode.value = 'CSV'
+}
 </script>
