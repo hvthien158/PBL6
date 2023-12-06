@@ -96,7 +96,7 @@
           </el-table-column>
         </el-table>
         <div class="form-export">
-          <ExportData @invisible="visibleMode = false" :mode="operationMode" :userId="user_id" v-if="visibleMode">
+          <ExportData @invisible="visibleMode = false" :mode="operationMode" type="schedule" :userId="user_id" v-if="visibleMode">
           </ExportData>
         </div>
         <div class="pagination">
@@ -209,9 +209,7 @@
 <script setup>
 import EditTimeKeep from "../components/EditTimeKeep.vue"
 import ExportData from "../components/ExportData.vue"
-import {saveAs} from "file-saver";
-import {read, utils, write} from "xlsx";
-import {ref, reactive, onMounted, defineProps, computed, watchEffect, watch} from "vue";
+import {ref, reactive, defineProps, computed, watchEffect, watch} from "vue";
 import {useUserStore} from "../stores/user";
 import moment from "moment";
 import router from "../router";
@@ -244,10 +242,7 @@ const admin_view = ref('')
 const user_id = ref(user.id)
 const visibleMode = ref(false)
 const operationMode = ref('Excel')
-const status_change = ref(false)
-const time_change = ref(false)
 const index = ref(0)
-const check = ref('')
 const getListTimeKeeping = async (from, to) => {
   if (router.currentRoute.value.fullPath === '/schedule') {
     try {

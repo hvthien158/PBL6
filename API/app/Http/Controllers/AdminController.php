@@ -22,6 +22,8 @@ use App\Http\Requests\DateTimeRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Repositories\Department\DepartmentRepository;
 use App\Repositories\Department\DepartmentRepositoryInterface;
+use App\Repositories\Message\MessageRepository;
+use App\Repositories\Message\MessageRepositoryInterface;
 use App\Repositories\Shift\ShiftRepositoryInterface;
 use App\Repositories\TimeKeeping\TimeKeepingRepositoryInterface;
 use App\Repositories\User\UserRepository;
@@ -40,7 +42,8 @@ class AdminController extends Controller
         protected DepartmentRepositoryInterface $departmentRepo,
         protected ShiftRepositoryInterface $shiftRepo,
         protected TimeKeepingRepositoryInterface $timeKeepRepo,
-    ){}
+    ) {
+    }
 
     /**
      * @return JsonResponse
@@ -298,12 +301,56 @@ class AdminController extends Controller
      */
     public function manageTimeKeeping($skip, ManageTimeKeepingRequest $request)
     {
-        try{
+        try {
             $this->authorize('viewAny', TimeKeeping::class);
             $result = $this->timeKeepRepo->timeKeepingStatistic($skip, $request);
             return response()->json([
                 'quantity' => $result['count_user'],
                 'data' => $result['result']
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+    /**
+     * @param ManageTimeKeepingRequest $request
+     * 
+     * @return object
+     */
+    public function ExportTimeKeepingStatistic(ManageTimeKeepingRequest $request)
+    {
+        try {
+            $this->authorize('viewAny', TimeKeeping::class);
+            $fromMonth = Carbon::parse($request->from)->startOfMonth();
+            $toMonth = Carbon::parse($request->to)->endOfMonth();
+            $timekeeping = $this->timeKeepRepo->findTimeKeepingWaitingAccept($fromMonth, $toMonth);
+            $userWaitingAccept = array_unique($timekeeping->pluck('user_id')->toArray());
+            $month = [];
+
+            $startDate = $fromMonth;
+            while ($startDate <= $toMonth) {
+                $endDate = $startDate->copy()->endOfMonth();
+                $month[] = [
+                    'from' => $startDate->toDateString(),
+                    'to' => $endDate->toDateString()
+                ];
+                $startDate = $startDate->addMonth();
+            }
+            $data = [];
+            foreach ($month as $months) {
+                $dataRequest = array_merge($months, ['limit' => 0, 'name' => null, 'department' => null]);
+                $result = $this->timeKeepRepo->timeKeepingStatistic(0, json_decode(json_encode($dataRequest)));
+                $filteredResult = array_filter($result['result'], function ($item) use ($userWaitingAccept) {
+                    return !in_array($item['id'], $userWaitingAccept);
+                });
+                $data[] = [
+                    'month' => Carbon::parse($months['from'])->format('Y-m'),
+                    'data' => array_values($filteredResult)
+                ];
+            }
+            return response()->json([
+                'userWaitingAccept' => array_values($userWaitingAccept),
+                'data' => $data
             ]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);

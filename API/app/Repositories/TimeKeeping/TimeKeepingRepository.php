@@ -432,6 +432,10 @@ class TimeKeepingRepository extends BaseRepository implements TimeKeepingReposit
 
     public function timeKeepingStatistic($skip, $request)
     {
+        $pageSize = 10;
+        if($request->limit){
+            $pageSize = $request->limit;
+        }
         $from = $request->from;
         $to = $request->to;
         $name = $request->name;
@@ -453,16 +457,16 @@ class TimeKeepingRepository extends BaseRepository implements TimeKeepingReposit
                     ->where('name', 'like', '%' . $name . '%')
                     ->where('department_id', '=', $department);
                 $count_user = count($users->get());
-                $users = $users->limit(10)
-                    ->offset($skip * 10)
+                $users = $users->limit($pageSize)
+                    ->offset($skip * $pageSize)
                     ->get();
             } else {
                 $users = DB::table('users')
                     ->where('department_id', '=', $department);
                 $count_user = count($users->get());
                 $users = $users
-                    ->limit(10)
-                    ->offset($skip * 10)
+                    ->limit($pageSize)
+                    ->offset($skip * $pageSize)
                     ->get();
             }
         } else {
@@ -471,12 +475,12 @@ class TimeKeepingRepository extends BaseRepository implements TimeKeepingReposit
                     ->where('name', 'like', '%' . $name . '%');
                 $count_user = count($users->get());
                 $users = $users
-                    ->limit(10)
-                    ->offset($skip * 10)
+                    ->limit($pageSize)
+                    ->offset($skip * $pageSize)
                     ->get();
             } else {
                 $count_user = User::count();
-                $users = User::limit(10)->offset($skip * 10)->get(['id', 'name', 'department_id']);
+                $users = User::limit($pageSize)->offset($skip * $pageSize)->get(['id', 'name', 'department_id']);
             }
         }
         $result = [];
@@ -493,5 +497,18 @@ class TimeKeepingRepository extends BaseRepository implements TimeKeepingReposit
             'count_user' => $count_user,
             'result' => $result,
         ];
+    }
+    /**
+     * @param mixed $fromMonth
+     * @param mixed $toMonth
+     * 
+     * @return object
+     */
+    public function findTimeKeepingWaitingAccept($fromMonth, $toMonth)
+    {
+        return TimeKeeping::whereBetween('_date', [$fromMonth, $toMonth])
+            ->where('admin_accept_status', 1)
+            ->orWhere('admin_accept_time', 1)
+            ->get();
     }
 }

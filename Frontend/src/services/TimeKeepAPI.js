@@ -1,5 +1,5 @@
 import axios from "axios";
-import {API_URL} from "../constants";
+import { API_URL } from "../constants";
 
 const url = API_URL + '/timekeeping'
 
@@ -43,7 +43,7 @@ export default {
             }
         )
     },
-    updateTimeKeep(token, userID, date, checkin, checkout, status_AM, status_PM){
+    updateTimeKeep(token, userID, date, checkin, checkout, status_AM, status_PM) {
         return axios.post(url + '/update', {
             user_id: userID,
             date: date,
@@ -55,14 +55,14 @@ export default {
             headers: { Authorization: `Bearer ${token}` },
         })
     },
-    updateStatus(token, userID, date, status_AM, status_PM){
+    updateStatus(token, userID, date, status_AM, status_PM) {
         return axios.post('http://127.0.0.1:8000/api/timekeeping/update', {
             user_id: userID,
             date: date,
             status_am: status_AM,
             status_pm: status_PM,
         }, {
-            headers: {Authorization: `Bearer ${token}`},
+            headers: { Authorization: `Bearer ${token}` },
         })
     },
     statisticTimeKeep(token, page, dateInterval, data) {
@@ -72,14 +72,23 @@ export default {
             name: data.name,
             department: data.department,
         }, {
-            headers: {Authorization: `Bearer ${token}`}
+            headers: { Authorization: `Bearer ${token}` }
         })
     },
-    exportData(token, start, end, userID){
+    exportData(token, start, end, userID) {
         return axios.get(url + `/export/${start}/${end}/${userID}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
+        })
+    },
+    exportTimeKeeping(token, start, end) {
+        return axios.post(url + `/export-statistic`,
+            {
+                from: start,
+                to: end
+            }, 
+            { headers: { Authorization: `Bearer ${token}` }
         })
     }
 }

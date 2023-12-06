@@ -84,6 +84,7 @@ Route::middleware('auth:api')->group(function () {
         });
 
         Route::group(['prefix' => '/timekeeping'], function () {
+            Route::post('/export-statistic', [AdminController::class, 'ExportTimeKeepingStatistic']);
             Route::post('/manage/{skip}', [AdminController::class, 'manageTimeKeeping']);
         });
 
@@ -124,5 +125,3 @@ Route::group(['prefix' => '/shift'], function () {
     Route::get('/', [ShiftController::class, 'index']);
     Route::get('/{id}', [ShiftController::class, 'index']);
 });
-
-Route::post('/', [NotificationSendController::class, 'sendNotification']);
