@@ -80,6 +80,7 @@ onMessage(messaging, (payload) => {
     notification.title = payload.data.title
     notification.message = payload.data.message
     notification.type = payload.data.type
+    notification.MessageId = payload.messageId
 });
 watch(notification, () => {
     openNotification()

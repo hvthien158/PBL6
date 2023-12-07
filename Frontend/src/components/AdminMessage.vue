@@ -150,10 +150,7 @@ const props = defineProps({
 })
 watch(() => only_unread.value, loadRequest)
 watch(props, () => {
-  if(props.notification.type == 1){
-    only_unread.value = true
     loadRequest()
-  }
 })
 function loadRequest() {
   if (only_unread.value) {

@@ -23,7 +23,8 @@ class MessageResource extends JsonResource
         } else {
             $avatar = 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg';
         }
-
+        $create = ($this->create_at) ? Carbon::createFromFormat('Y-m-d H:i:s', $this->created_at, 'UTC')
+                ->setTimezone('Asia/Ho_Chi_Minh')->format('Y-m-d H:i:s') : '2023-02-02 05:00:00';
         $timekeeping = DB::table('time_keepings')
             ->where('id', '=', $this->time_keeping_id)->first();
         return [
@@ -38,8 +39,7 @@ class MessageResource extends JsonResource
             ],
             'is_read' => $this->is_read,
             'is_check' => $this->is_check,
-            'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $this->created_at, 'UTC')
-                ->setTimezone('Asia/Ho_Chi_Minh')->format('Y-m-d H:i:s'),
+            'created_at' => $create
         ];
     }
 }

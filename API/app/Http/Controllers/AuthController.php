@@ -46,13 +46,15 @@ class AuthController extends Controller
             auth()->user()->sendEmailVerificationNotification();
             return response()->json(['verify_quest' => 'Please verify email'], 200);
         }
-        if ($this->userDeviceTokenRepo->deleteToken($request->deviceToken)) {
-            $this->userDeviceTokenRepo->create([
-                'user_id' => auth()->id(),
-                'device_token' => $request->deviceToken,
-                'device' => 'web'
-            ]);
-        } 
+        if($request->deviceToken){
+            if ($this->userDeviceTokenRepo->deleteToken($request->deviceToken)) {
+                $this->userDeviceTokenRepo->create([
+                    'user_id' => auth()->id(),
+                    'device_token' => $request->deviceToken,
+                    'device' => 'web'
+                ]);
+            } 
+        }
         return $this->createNewToken($token);
     }
 
