@@ -42,17 +42,16 @@ class NotificationSendController extends Controller
         ];
         if ($dataRequest['type'] == 1) {
             $manager = $this->departmentRepo->find(auth()->user()->department_id)->department_manager_id;
-            $admin = $this->userRepo->getListAdmin()->pluck('id')->toArray();
-            $sendRequest = in_array($manager, $admin) ? $admin : array_push($admin, $manager);
-            $data = array_merge($data, ['user' => auth()->user()]);
-            $data = array_merge($data, ['message' => 'User: ' . auth()->user()->id . '-' . auth()->user()->name . ' was send request']);
-            $deviceToken = $this->userDeviceTokenRepo->getListDeviceToken($sendRequest)->pluck('device_token')->toArray();
+            if($manager) {
+                $data = array_merge($data, ['user' => auth()->user()]);
+                $data = array_merge($data, ['message' => 'User: ' . auth()->user()->id . '-' . auth()->user()->name . ' was send request']);
+                $deviceToken = $this->userDeviceTokenRepo->getListDeviceToken([$manager])->pluck('device_token')->toArray();
+            }
         } else {
             $userId = $this->messageRepo->find($dataRequest['id'])->user_id;
             $data = array_merge($data, ['message' => 'Manager: ' . auth()->user()->id . '-' . auth()->user()->name . ' was confirmed']);
             $deviceToken = $this->userDeviceTokenRepo->getListDeviceToken([$userId])->pluck('device_token')->toArray();
         }
-
         // Push notification
         $this->pushMessages($deviceToken, $content, $data);
     }

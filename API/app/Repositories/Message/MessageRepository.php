@@ -3,6 +3,7 @@
 namespace App\Repositories\Message;
 
 use App\Models\Message;
+use App\Models\Department;
 use App\Repositories\BaseRepository;
 use App\Repositories\RepositoryInterface;
 use Illuminate\Support\Facades\DB;
@@ -20,20 +21,25 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
      */
     public function getLimit5Message()
     {
-        return DB::table('messages')
-            ->orderBy('id', 'desc')
-            ->take(5)->get();
+        $userDepartment = Department::where('department_manager_id', auth()->id())->first()->users()->get()->pluck('id')->toArray();
+        if ($userDepartment) {
+            return Message::whereIn('user_id', $userDepartment)->orderBy('id', 'desc')->take(5)->get();
+        }
+        // return DB::table('messages')
+        //     ->orderBy('id', 'desc')
+        //     ->take(5)->get();
     }
-
     /**
      * @return \Illuminate\Support\Collection
      */
     public function getLimitUnreadMessage()
     {
-        return DB::table('messages')
-            ->where('is_read', '=', 0)
-            ->orderBy('id', 'desc')
-            ->take(5)->get();
+        $userDepartment = Department::where('department_manager_id', auth()->id())->first()->users()->get()->pluck('id')->toArray();
+        return Message::whereIn('user_id', $userDepartment)->where('is_read', 0)->orderBy('id', 'desc')->take(5)->get();
+        // return DB::table('messages')
+        //     ->where('is_read', '=', 0)
+        //     ->orderBy('id', 'desc')
+        //     ->take(5)->get();
     }
 
     /**

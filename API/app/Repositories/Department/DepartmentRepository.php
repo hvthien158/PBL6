@@ -49,4 +49,12 @@ class DepartmentRepository extends BaseRepository implements DepartmentRepositor
             'department' => DepartmentResource::collection($departments),
         ];
     }
+    /**
+     * @param mixed $id
+     * 
+     * @return boolean
+     */
+    public function checkManager($id) {
+        return Department::whereIn('department_manager_id', [$id])->first();
+    }
 }

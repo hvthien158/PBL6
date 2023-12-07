@@ -46,7 +46,14 @@ class MessageController extends Controller
      */
     public function getLimitMessage()
     {
-        return MessageResource::collection($this->messageRepo->getLimit5Message());
+        try {
+            if ($this->departmentRepo->checkManager(auth()->id())) {
+                return MessageResource::collection($this->messageRepo->getLimit5Message());
+            }
+            return response()->json(['message' => ResponseMessage::AUTHORIZATION_ERROR], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
 
     /**
@@ -54,7 +61,14 @@ class MessageController extends Controller
      */
     public function getLimitUnreadMessage()
     {
-        return MessageResource::collection($this->messageRepo->getLimitUnreadMessage());
+        try {
+            if ($this->departmentRepo->checkManager(auth()->id())) {
+                return MessageResource::collection($this->messageRepo->getLimitUnreadMessage());
+            }
+            return response()->json(['message' => ResponseMessage::AUTHORIZATION_ERROR], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
 
     /**
@@ -98,14 +112,14 @@ class MessageController extends Controller
      */
 
     public function markAsConfirmed(Request $request)
-    { 
+    {
         if (!$request->input('id')) {
             return response()->json(['message' => ResponseMessage::VALIDATION_ERROR], 422);
         }
         try {
             $this->messageRepo->markAsConfirmedMessage($request->input('id'));
             $notification = new NotificationSendController($this->departmentRepo, $this->userRepo, $this->userDeviceTokenRepo, $this->messageRepo);
-                $notification->sendNotification(array_merge($request->toArray(), 
+            $notification->sendNotification(array_merge($request->toArray(),
                 [
                     'type' => 0,
                     'title' => 'Manager department confirm your request',
