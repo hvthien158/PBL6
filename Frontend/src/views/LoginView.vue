@@ -233,6 +233,7 @@ const login = async () => {
             user.expired = response.data.expires_at
             user.role = response.data.user.role
             user.deviceToken = deviceToken.value
+            user.manager = response.data.user.manager
             //alert success
             alertStore.alert = true
             alertStore.type = 'success'

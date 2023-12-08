@@ -37,7 +37,7 @@
           </ButtonLoading>
         </div>
       </el-card>
-      <div style="margin-top: -5vh; margin-left: -7vw">
+      <div style="margin-top: -10vh; margin-left: -7vw; margin-bottom: -17vh">
         <Clock style="scale: 0.5"></Clock>
       </div>
     </div>

@@ -74,7 +74,7 @@ class AdminController extends Controller
         try {
             $this->userRepo->create([
                 'name' => $request->name,
-                'email' => $request->email,
+                'email' => strtolower($request->email),
                 'password' => bcrypt($request->password),
                 'department_id' => $request->department_id,
                 'address' => $request->address,
@@ -314,7 +314,7 @@ class AdminController extends Controller
     }
     /**
      * @param ManageTimeKeepingRequest $request
-     * 
+     *
      * @return object
      */
     public function ExportTimeKeepingStatistic(ManageTimeKeepingRequest $request)

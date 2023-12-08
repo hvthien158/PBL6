@@ -17,7 +17,8 @@ export const useUserStore = defineStore('user', () => {
             position: '',
             expired: '',
             role: '',
-            deviceToken: ''
+            deviceToken: '',
+            manager: false,
         })
     )
 
@@ -35,6 +36,7 @@ export const useUserStore = defineStore('user', () => {
         user.value.expired = ''
         user.value.role = ''
         user.value.deviceToken = ''
+        user.value.manager = false
     }
 
     function isExpired(){

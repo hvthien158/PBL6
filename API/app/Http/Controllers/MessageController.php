@@ -41,9 +41,6 @@ class MessageController extends Controller
         return MessageResource::collection($this->messageRepo->getAll());
     }
 
-    /**
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-     */
     public function getLimitMessage()
     {
         try {
@@ -57,7 +54,7 @@ class MessageController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function getLimitUnreadMessage()
     {

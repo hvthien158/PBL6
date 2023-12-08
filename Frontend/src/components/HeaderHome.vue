@@ -6,7 +6,7 @@
       </router-link>
     </div>
     <span v-if="user.token" style="font-weight: bold; margin-right: 20px; display: flex; align-items: center">
-      <AdminMessage :notification = props.notification></AdminMessage>
+      <AdminMessage v-if="user.manager" :notification = props.notification></AdminMessage>
       <el-dropdown>
         <span class="el-dropdown-link">
           <span style="line-height: 44px; font-size: larger">{{ user.name }}</span>

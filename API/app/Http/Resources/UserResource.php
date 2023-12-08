@@ -54,10 +54,16 @@ class UserResource extends JsonResource
         if($this->salary == null){
             $salary = 'none';
         }
+
+        $isManger = false;
+        if(Department::where('department_manager_id', $this->id)->get()){
+            $isManger = true;
+        }
+
         return [
             'id' => $this->id,
             'name'=> $this->name,
-            'email'=> $this->email,
+            'email'=> strtolower($this->email),
             'avatar'=> $avatar,
             'address' => $this->address ?: 'none',
             'DOB' => $DOB_format,
@@ -68,6 +74,7 @@ class UserResource extends JsonResource
             'department' => new DepartmentResource($this->department),
             'status_AM' => $status_AM,
             'status_PM' => $status_PM,
+            'manager' => $isManger,
         ];
     }
 }

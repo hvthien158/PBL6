@@ -12,8 +12,8 @@
         :time_change="today.adminAcceptTime === 0"
         @update="getListTimeKeeping(filter_value[0], filter_value[1])"
         @update_no_reset="updateNoReset"
-        @nextday="index += 1"
-        @prevday="index -= 1"></EditTimeKeep>
+        @nextday="index < moment().daysInMonth() ? index += 1 : null"
+        @prevday="index > 0 ? index -= 1 : null"></EditTimeKeep>
     <el-card>
       <el-backtop :right="20" :bottom="100"/>
       <div slot="header" class="card-header">
@@ -469,9 +469,17 @@ function cellStyle({rowIndex, columnIndex}) {
 watch(() => index.value, () => {
   if (only_show.value === false) {
     if (dataByMonth.value[index.value].dayOfWeek === 'Saturday') {
-      index.value += 2
+      if(dataByMonth.value.length > index.value + 2){
+        index.value += 2
+      } else {
+        index.value -= 1
+      }
     } else if (dataByMonth.value[index.value].dayOfWeek === 'Sunday'){
-      index.value -= 2
+      if(index.value >= 2){
+        index.value -= 2
+      } else {
+        index.value += 1
+      }
     }
   }
   editTime(index.value)

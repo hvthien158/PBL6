@@ -111,7 +111,7 @@ class TimeKeepingRepository extends BaseRepository implements TimeKeepingReposit
             ];
         } else {
             $dayOfWeek = Carbon::now('Asia/Ho_Chi_Minh')->dayOfWeek;
-            if ($dayOfWeek == 5 || $dayOfWeek == 6) {
+            if ($dayOfWeek == 6 || $dayOfWeek == 7) {
                 $status_AM = 2;
                 $status_PM = 2;
                 return [
@@ -501,7 +501,7 @@ class TimeKeepingRepository extends BaseRepository implements TimeKeepingReposit
     /**
      * @param mixed $fromMonth
      * @param mixed $toMonth
-     * 
+     *
      * @return object
      */
     public function findTimeKeepingWaitingAccept($fromMonth, $toMonth)
