@@ -18,6 +18,23 @@
   </div>
 </template>
 
+<script setup>
+const props = defineProps({
+  title: String,
+  msg: String
+})
+
+const emits = defineEmits(['confirm', 'cancel'])
+
+function confirmHandle(){
+  emits('confirm')
+}
+
+function cancelHandle(){
+  emits('cancel')
+}
+</script>
+
 <style scoped>
 .dialog-overlay {
   position: absolute;
@@ -97,20 +114,3 @@
   margin: 0 6px;
 }
 </style>
-
-<script setup>
-const props = defineProps({
-  title: String,
-  msg: String
-})
-
-const emits = defineEmits(['confirm', 'cancel'])
-
-function confirmHandle(){
-  emits('confirm')
-}
-
-function cancelHandle(){
-  emits('cancel')
-}
-</script>

@@ -9,39 +9,6 @@
   </div>
 </template>
 
-<style>
-*.table tbody td {
-  color: black;
-}
-*.table thead td {
-  color: rgb(255, 255, 255);
-}
-
-.main-view {
-  margin-top: 60px;
-  min-height: calc(100vh - 120px);
-  display: flex;
-  background-image: url("assets/background.jpg");
-  background-size: 100%;
-}
-input {
-  color: black;
-}
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
-}
-
-.slide-fade-leave-active {
-  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateX(20px);
-  opacity: 0;
-}
-</style>
-
 <script setup>
 import { RouterView } from "vue-router";
 import HeaderHome from "./components/HeaderHome.vue";
@@ -93,3 +60,36 @@ const openNotification = () => {
     })
 }
 </script>
+
+<style>
+*.table tbody td {
+  color: black;
+}
+*.table thead td {
+  color: rgb(255, 255, 255);
+}
+
+.main-view {
+  margin-top: 60px;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  background-image: url("assets/background.jpg");
+  background-size: 100%;
+}
+input {
+  color: black;
+}
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+</style>

@@ -64,34 +64,6 @@
   </el-dialog>
 </template>
 
-<style scoped>
-.card--header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-}
-
-pre {
-  white-space: pre-wrap;
-  white-space: -moz-pre-wrap;
-  white-space: -o-pre-wrap;
-  word-wrap: break-word;
-}
-
-.bg-green {
-  background-color: #04fc43;
-}
-
-.bg-purple {
-  background-color: rgba(0, 120, 248, 0.57);
-}
-
-.bg-gray {
-  background-color: #ccc;
-}
-</style>
-
 <script setup>
 import { computed, ref, watch } from "vue";
 import moment from "moment";
@@ -190,3 +162,31 @@ function sendTimeRequest() {
     })
 }
 </script>
+
+<style scoped>
+.card--header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+pre {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+.bg-green {
+  background-color: #04fc43;
+}
+
+.bg-purple {
+  background-color: rgba(0, 120, 248, 0.57);
+}
+
+.bg-gray {
+  background-color: #ccc;
+}
+</style>

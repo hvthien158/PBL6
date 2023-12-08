@@ -20,6 +20,20 @@
   </div>
 </template>
 
+<script setup>
+import moment from "moment"
+import {onMounted} from "vue";
+
+function checkToday(n){
+  return '' + n === moment().format('D');
+}
+
+onMounted(() => {
+  let first_day = document.getElementsByClassName('day')
+  first_day[0].style.gridColumn = moment().startOf('month').day()
+})
+</script>
+
 <style scoped>
 @import url("https://fonts.googleapis.com/css?family=Questrial&display=swap");
 * {
@@ -118,17 +132,3 @@
   }
 }
 </style>
-
-<script setup>
-import moment from "moment"
-import {onMounted} from "vue";
-
-function checkToday(n){
-  return '' + n === moment().format('D');
-}
-
-onMounted(() => {
-  let first_day = document.getElementsByClassName('day')
-  first_day[0].style.gridColumn = moment().startOf('month').day()
-})
-</script>

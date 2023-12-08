@@ -36,6 +36,152 @@
     </div>
   </main>
 </template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import router from "../router";
+import { useUserStore } from "../stores/user";
+import moment from "moment";
+import Clock from "../components/Clock.vue";
+import HomeStatusCard from "../components/HomeStatusCard.vue";
+import HomeTimeKeepCard from "../components/HomeTimeKeepCard.vue";
+import { useStatusStore } from "../stores/status";
+import { useAlertStore } from "../stores/alert";
+import TimeKeepAPI from "../services/TimeKeepAPI";
+const user = useUserStore().user
+const status = useStatusStore()
+const alertStore = useAlertStore()
+if (user.token === '') {
+  router.push({ name: 'login' });
+}
+const checkin = ref(false)
+const checkout = ref(false)
+const responsive = ref(false)
+const currentDate = ref(getCurrentDate());
+const currentTime = ref(getCurrentTime());
+const today = ref({
+  status_AM: 0,
+  status_PM: 0,
+})
+onMounted(() => {
+  if (window.innerWidth <= 1280) {
+    responsive.value = true
+  } else {
+    responsive.value = false
+  }
+})
+window.addEventListener('resize', () => {
+  if (window.innerWidth <= 1280) {
+    responsive.value = true
+  } else {
+    responsive.value = false
+  }
+})
+function getCurrentDate() {
+  const now = new Date();
+  const options = {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  };
+  return now.toLocaleDateString("en-US", options);
+}
+
+function getCurrentTime() {
+  const now = new Date();
+  const options = {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: false,
+  };
+
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+  let seconds = now.getSeconds();
+
+  if (hours === 23 && minutes === 59 && seconds === 59) {
+    hours = 0;
+    minutes = 0;
+    seconds = 0;
+  }
+
+  const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+  return formattedTime;
+}
+onMounted(() => {
+  getTimeKeeping();
+});
+const getTimeKeeping = async () => {
+  try {
+    await TimeKeepAPI.getMyTodayTimeKeep(user.token)
+      .then(function (response) {
+        today.value.status_AM = response.data.status_AM
+        today.value.status_PM = response.data.status_PM
+        status.status_AM = today.value.status_AM
+        status.status_PM = today.value.status_PM
+        if (response.data.data) {
+          if (response.data.data.time_check_in && response.data.data.time_check_in !== '00:00:00') {
+            if (response.data.data.time_check_out && response.data.data.time_check_out !== '00:00:00') {
+              checkin.value = false;
+              checkout.value = false;
+            } else {
+              checkin.value = false;
+              checkout.value = true;
+            }
+          } else {
+            checkin.value = true;
+            checkout.value = false;
+          }
+        } else if (response.data.weekend){
+          checkin.value = false;
+          checkout.value = false;
+        } else {
+          checkin.value = true;
+          checkout.value = false;
+        }
+      });
+  } catch (e) {
+    console.log(e);
+  }
+  currentDate.value = getCurrentDate();
+}
+
+const handleCheckIn = async () => {
+  try {
+    await TimeKeepAPI.checkIn(user.token)
+      .then(function (response) {
+        getTimeKeeping();
+      });
+  } catch (e) {
+    messages('error', e.response.data.message)
+  }
+};
+
+const handleCheckOut = async () => {
+  try {
+    await TimeKeepAPI.checkOut(user.token)
+      .then(function (response) {
+        getTimeKeeping();
+      });
+  } catch (e) {
+    messages('error', e.response.data.message)
+  }
+}
+const messages = (type, msg) => {
+  alertStore.alert = true;
+  alertStore.type = type;
+  alertStore.msg = msg
+}
+setInterval(() => {
+  currentTime.value = getCurrentTime();
+  currentDate.value = getCurrentDate();
+}, 1000);
+</script>
+
 <style scoped>
 main {
   display: flex;
@@ -188,148 +334,3 @@ main {
 
 }
 </style>
-
-<script setup>
-import { ref, onMounted } from "vue";
-import router from "../router";
-import { useUserStore } from "../stores/user";
-import moment from "moment";
-import Clock from "../components/Clock.vue";
-import HomeStatusCard from "../components/HomeStatusCard.vue";
-import HomeTimeKeepCard from "../components/HomeTimeKeepCard.vue";
-import { useStatusStore } from "../stores/status";
-import { useAlertStore } from "../stores/alert";
-import TimeKeepAPI from "../services/TimeKeepAPI";
-const user = useUserStore().user
-const status = useStatusStore()
-const alertStore = useAlertStore()
-if (user.token === '') {
-  router.push({ name: 'login' });
-}
-const checkin = ref(false)
-const checkout = ref(false)
-const responsive = ref(false)
-const currentDate = ref(getCurrentDate());
-const currentTime = ref(getCurrentTime());
-const today = ref({
-  status_AM: 0,
-  status_PM: 0,
-})
-onMounted(() => {
-  if (window.innerWidth <= 1280) {
-    responsive.value = true
-  } else {
-    responsive.value = false
-  }
-})
-window.addEventListener('resize', () => {
-  if (window.innerWidth <= 1280) {
-    responsive.value = true
-  } else {
-    responsive.value = false
-  }
-})
-function getCurrentDate() {
-  const now = new Date();
-  const options = {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  };
-  return now.toLocaleDateString("en-US", options);
-}
-
-function getCurrentTime() {
-  const now = new Date();
-  const options = {
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-    hour12: false,
-  };
-
-  let hours = now.getHours();
-  let minutes = now.getMinutes();
-  let seconds = now.getSeconds();
-
-  if (hours === 23 && minutes === 59 && seconds === 59) {
-    hours = 0;
-    minutes = 0;
-    seconds = 0;
-  }
-
-  const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-
-  return formattedTime;
-}
-onMounted(() => {
-  getTimeKeeping();
-});
-const getTimeKeeping = async () => {
-  try {
-    await TimeKeepAPI.getMyTodayTimeKeep(user.token)
-      .then(function (response) {
-        today.value.status_AM = response.data.status_AM
-        today.value.status_PM = response.data.status_PM
-        status.status_AM = today.value.status_AM
-        status.status_PM = today.value.status_PM
-        if (response.data.data) {
-          if (response.data.data.time_check_in && response.data.data.time_check_in !== '00:00:00') {
-            if (response.data.data.time_check_out && response.data.data.time_check_out !== '00:00:00') {
-              checkin.value = false;
-              checkout.value = false;
-            } else {
-              checkin.value = false;
-              checkout.value = true;
-            }
-          } else {
-            checkin.value = true;
-            checkout.value = false;
-          }
-        } else if (response.data.weekend){
-          checkin.value = false;
-          checkout.value = false;
-        } else {
-          checkin.value = true;
-          checkout.value = false;
-        }
-      });
-  } catch (e) {
-    console.log(e);
-  }
-  currentDate.value = getCurrentDate();
-}
-
-const handleCheckIn = async () => {
-  try {
-    await TimeKeepAPI.checkIn(user.token)
-      .then(function (response) {
-        getTimeKeeping();
-      });
-  } catch (e) {
-    messages('error', e.response.data.message)
-  }
-};
-
-const handleCheckOut = async () => {
-  try {
-    await TimeKeepAPI.checkOut(user.token)
-      .then(function (response) {
-        getTimeKeeping();
-      });
-  } catch (e) {
-    messages('error', e.response.data.message)
-  }
-}
-const messages = (type, msg) => {
-  alertStore.alert = true;
-  alertStore.type = type;
-  alertStore.msg = msg
-}
-setInterval(() => {
-  currentTime.value = getCurrentTime();
-  currentDate.value = getCurrentDate();
-}, 1000);
-</script>

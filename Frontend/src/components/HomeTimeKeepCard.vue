@@ -18,43 +18,6 @@
   </div>
 </template>
 
-<style scoped>
-.edit-timekeep {
-  width: 320px;
-  position: sticky !important;
-  top: 10vh;
-}
-
-.card-header {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.status {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between
-}
-
-.card-content {
-  margin-top: 20px;
-}
-
-.unselectable {
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-@media screen and (max-width: 1280px) {
-  .status {
-    flex-direction: row
-  }
-}
-</style>
-
 <script setup>
 import {onBeforeUnmount, ref, watch} from "vue";
 import {useUserStore} from "../stores/user";
@@ -112,3 +75,40 @@ onBeforeUnmount(() => {
   updateTimeKeep()
 })
 </script>
+
+<style scoped>
+.edit-timekeep {
+  width: 320px;
+  position: sticky !important;
+  top: 10vh;
+}
+
+.card-header {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between
+}
+
+.card-content {
+  margin-top: 20px;
+}
+
+.unselectable {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+@media screen and (max-width: 1280px) {
+  .status {
+    flex-direction: row
+  }
+}
+</style>

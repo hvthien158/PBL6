@@ -40,59 +40,6 @@
   </div>
 </template>
 
-<style scoped>
-.box-card {
-  border-radius: 12px;
-}
-
-.card-content {
-  height: 50vh;
-  width: 100%;
-  overflow-y: scroll;
-}
-
-.card-content::-webkit-scrollbar {
-  width: 6px;
-  background-color: white;
-}
-
-.card-content:hover::-webkit-scrollbar-thumb {
-  width: 6px;
-  background-color: #ababab;
-  border-radius: 12px;
-}
-
-.user>div {
-  display: flex;
-  align-items: center;
-  margin-top: 12px;
-  padding-bottom: 8px;
-}
-
-.user>div:not(:last-child) {
-  border-bottom: 1px solid var(--el-border-color);
-}
-
-.pagination {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.bg-green {
-  background-color: #04fc43;
-}
-
-.bg-purple {
-  background-color: rgba(0, 120, 248, 0.57);
-}
-
-.bg-gray {
-  background-color: #ccc;
-}
-</style>
-
 <script setup>
 import { ref, watch } from "vue";
 import { useUserStore } from "../stores/user";
@@ -161,3 +108,56 @@ const previousPage = () => {
   }
 };
 </script>
+
+<style scoped>
+.box-card {
+  border-radius: 12px;
+}
+
+.card-content {
+  height: 50vh;
+  width: 100%;
+  overflow-y: scroll;
+}
+
+.card-content::-webkit-scrollbar {
+  width: 6px;
+  background-color: white;
+}
+
+.card-content:hover::-webkit-scrollbar-thumb {
+  width: 6px;
+  background-color: #ababab;
+  border-radius: 12px;
+}
+
+.user>div {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  padding-bottom: 8px;
+}
+
+.user>div:not(:last-child) {
+  border-bottom: 1px solid var(--el-border-color);
+}
+
+.pagination {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bg-green {
+  background-color: #04fc43;
+}
+
+.bg-purple {
+  background-color: rgba(0, 120, 248, 0.57);
+}
+
+.bg-gray {
+  background-color: #ccc;
+}
+</style>

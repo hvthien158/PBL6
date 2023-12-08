@@ -6,6 +6,34 @@
   </div>
 </template>
 
+<script setup>
+import {computed, ref, watch} from "vue";
+
+const prop = defineProps({
+  status_index: {
+    type: Number,
+    default: 0,
+  }
+})
+const emits = defineEmits(['changeStatus'])
+
+const option = ['Work', 'Remote', 'Not work']
+const index = ref(prop.status_index)
+
+watch(() => prop.status_index, () => {
+  index.value = prop.status_index
+})
+
+const quotes = computed(() => {
+  return option[index.value]
+})
+
+function changeStatus(){
+  index.value = (index.value === 2) ? 0 : index.value + 1
+  emits('changeStatus', index.value)
+}
+</script>
+
 <style scoped>
 .btn-status{
   width: 100%;
@@ -40,31 +68,3 @@
   user-select: none;
 }
 </style>
-
-<script setup>
-import {computed, ref, watch} from "vue";
-
-const prop = defineProps({
-  status_index: {
-    type: Number,
-    default: 0,
-  }
-})
-const emits = defineEmits(['changeStatus'])
-
-const option = ['Work', 'Remote', 'Not work']
-const index = ref(prop.status_index)
-
-watch(() => prop.status_index, () => {
-  index.value = prop.status_index
-})
-
-const quotes = computed(() => {
-  return option[index.value]
-})
-
-function changeStatus(){
-  index.value = (index.value === 2) ? 0 : index.value + 1
-  emits('changeStatus', index.value)
-}
-</script>

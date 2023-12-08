@@ -42,6 +42,74 @@
         </div> -->
   </main>
 </template>
+
+<script setup>
+import SlideBar from "../../../components/SlideBar.vue";
+import { ref, onMounted, watch} from "vue";
+import { useUserStore } from "../../../stores/user";
+import router from "../../../router";
+import { useAlertStore } from "../../../stores/alert";
+import { saveAs } from "file-saver";
+import { utils, write } from "xlsx";
+import ConfirmBox from "../../../components/ConfirmBox.vue";
+import Pagination from "../../../components/Pagination.vue";
+import ShiftAPI from "../../../services/ShiftAPI";
+let dataSearch = ref('');
+let currentPage = ref(1)
+const totalPage = ref(1)
+const debounceSearch = ref(null);
+const user = useUserStore().user;
+const alertStore = useAlertStore();
+const shift = ref();
+onMounted(() => {
+  if (user.role !== "admin") {
+    router.push({ path: "/" });
+  }
+  displayShift();
+});
+
+const displayShift = async () => {
+  try {
+    await ShiftAPI.getListShift(user.token, currentPage.value - 1, dataSearch.value)
+        .then(function (response) {
+          shift.value = response.data.shift;
+          totalPage.value = (response.data.totalPage === 0) ? 1 : response.data.totalPage
+        });
+  } catch (e) {
+    console.log(e);
+  }
+}
+watch(dataSearch, () => {
+  if (debounceSearch.value) {
+    clearTimeout(debounceSearch.value);
+  }
+  debounceSearch.value = setTimeout(() => {
+    currentPage.value = 1;
+    displayShift();
+  }, 500);
+});
+
+watch(() => currentPage.value, () => {
+  displayShift()
+})
+
+const nextPage = () => {
+  if (currentPage.value < totalPage.value) {
+    currentPage.value++;
+  }
+};
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+const messages = (type, msg) => {
+  alertStore.alert = true;
+  alertStore.type = type;
+  alertStore.msg = msg;
+};
+</script>
+
 <style scoped>
 main {
   box-sizing: border-box;
@@ -115,69 +183,3 @@ main {
   margin: 0 10px;
 }
 </style>
-<script setup>
-import SlideBar from "../../../components/SlideBar.vue";
-import { ref, onMounted, watch} from "vue";
-import { useUserStore } from "../../../stores/user";
-import router from "../../../router";
-import { useAlertStore } from "../../../stores/alert";
-import { saveAs } from "file-saver";
-import { utils, write } from "xlsx";
-import ConfirmBox from "../../../components/ConfirmBox.vue";
-import Pagination from "../../../components/Pagination.vue";
-import ShiftAPI from "../../../services/ShiftAPI";
-let dataSearch = ref('');
-let currentPage = ref(1)
-const totalPage = ref(1)
-const debounceSearch = ref(null);
-const user = useUserStore().user;
-const alertStore = useAlertStore();
-const shift = ref();
-onMounted(() => {
-  if (user.role !== "admin") {
-    router.push({ path: "/" });
-  }
-  displayShift();
-});
-
-const displayShift = async () => {
-  try {
-    await ShiftAPI.getListShift(user.token, currentPage.value - 1, dataSearch.value)
-        .then(function (response) {
-          shift.value = response.data.shift;
-          totalPage.value = (response.data.totalPage === 0) ? 1 : response.data.totalPage
-        });
-  } catch (e) {
-    console.log(e);
-  }
-}
-watch(dataSearch, () => {
-  if (debounceSearch.value) {
-    clearTimeout(debounceSearch.value);
-  }
-  debounceSearch.value = setTimeout(() => {
-    currentPage.value = 1;
-    displayShift();
-  }, 500);
-});
-
-watch(() => currentPage.value, () => {
-  displayShift()
-})
-
-const nextPage = () => {
-  if (currentPage.value < totalPage.value) {
-    currentPage.value++;
-  }
-};
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-  }
-};
-const messages = (type, msg) => {
-  alertStore.alert = true;
-  alertStore.type = type;
-  alertStore.msg = msg;
-};
-</script>

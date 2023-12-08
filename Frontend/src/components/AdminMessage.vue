@@ -77,59 +77,6 @@
   </el-dropdown>
 </template>
 
-<style scoped>
-.el-dropdown-link {
-  cursor: pointer;
-  border: none;
-  color: white;
-  outline: none;
-  margin-right: 2vw;
-}
-
-.el-dropdown-link:hover {
-  color: #f3952d;
-  outline: none;
-}
-
-.header-profile {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  width: 240px;
-  border-bottom: 1px solid #ccc;
-}
-
-#dropdown-name {
-  font-size: 15px;
-  color: #6A679E;
-  font-weight: 600;
-}
-
-#dropdown-name:hover {
-  text-decoration: underline;
-  color: #f3952d;
-  cursor: pointer;
-}
-
-.icon-warn {
-  position: absolute;
-  color: #ff3c00;
-  left: 0;
-  top: 1em;
-}
-
-pre {
-  white-space: pre-wrap;
-  /* css-3 */
-  white-space: -moz-pre-wrap;
-  /* Mozilla, since 1999 */
-  white-space: -o-pre-wrap;
-  /* Opera 7 */
-  word-wrap: break-word;
-  /* Internet Explorer 5.5+ */
-}
-</style>
-
 <script setup>
 import {ref, watch, reactive, onMounted} from "vue";
 import {useUserStore} from "../stores/user";
@@ -211,3 +158,56 @@ function markAsConfirmed(id) {
       })
 }
 </script>
+
+<style scoped>
+.el-dropdown-link {
+  cursor: pointer;
+  border: none;
+  color: white;
+  outline: none;
+  margin-right: 2vw;
+}
+
+.el-dropdown-link:hover {
+  color: #f3952d;
+  outline: none;
+}
+
+.header-profile {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  width: 240px;
+  border-bottom: 1px solid #ccc;
+}
+
+#dropdown-name {
+  font-size: 15px;
+  color: #6A679E;
+  font-weight: 600;
+}
+
+#dropdown-name:hover {
+  text-decoration: underline;
+  color: #f3952d;
+  cursor: pointer;
+}
+
+.icon-warn {
+  position: absolute;
+  color: #ff3c00;
+  left: 0;
+  top: 1em;
+}
+
+pre {
+  white-space: pre-wrap;
+  /* css-3 */
+  white-space: -moz-pre-wrap;
+  /* Mozilla, since 1999 */
+  white-space: -o-pre-wrap;
+  /* Opera 7 */
+  word-wrap: break-word;
+  /* Internet Explorer 5.5+ */
+}
+</style>

@@ -56,41 +56,6 @@
       @update="emitUpdate"></UserRequest>
 </template>
 
-<style scoped>
-.edit-timekeep {
-  display: flex;
-  flex-direction: column;
-  width: 30vw !important;
-  margin-right: 30px;
-  position: sticky !important;
-  top: 10vh;
-}
-
-.info-status {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 50%;
-}
-
-.card-header {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.card-content {
-  margin-top: 10px;
-}
-
-.bg-orange {
-  background-color: rgba(255, 153, 41, 0.36);
-}
-
-.bg-gray {
-  background-color: rgba(204, 204, 204, 0.43);
-}
-</style>
-
 <script setup>
 import ButtonLoading from "./ButtonLoading.vue";
 import {computed, ref, watch, watchEffect} from "vue";
@@ -199,3 +164,38 @@ function emitUpdate() {
   emit('update')
 }
 </script>
+
+<style scoped>
+.edit-timekeep {
+  display: flex;
+  flex-direction: column;
+  width: 30vw !important;
+  margin-right: 30px;
+  position: sticky !important;
+  top: 10vh;
+}
+
+.info-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+}
+
+.card-header {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.card-content {
+  margin-top: 10px;
+}
+
+.bg-orange {
+  background-color: rgba(255, 153, 41, 0.36);
+}
+
+.bg-gray {
+  background-color: rgba(204, 204, 204, 0.43);
+}
+</style>

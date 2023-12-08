@@ -7,6 +7,15 @@
 </div>
 </template>
 
+<script setup>
+import {CircleCheckFilled, CircleCloseFilled, WarningFilled} from "@element-plus/icons-vue";
+
+const props = defineProps({
+  type: String,
+  msg: String
+})
+</script>
+
 <style scoped>
 *{
   color: white;
@@ -34,12 +43,3 @@
   background-color: #ec4d2b;
 }
 </style>
-
-<script setup>
-import {CircleCheckFilled, CircleCloseFilled, WarningFilled} from "@element-plus/icons-vue";
-
-const props = defineProps({
-  type: String,
-  msg: String
-})
-</script>

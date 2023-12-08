@@ -113,99 +113,6 @@
   </div>
 </template>
 
-<style scoped>
-.timekeeping-management {
-  padding: 20px 4vw;
-  display: flex;
-  justify-content: center;
-}
-
-.el-form {
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-around;
-}
-
-.card-header {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.form-export {
-  position: absolute;
-  bottom: 7%;
-}
-
-.el-card {
-  width: 70vw;
-}
-
-.card-content {
-  margin-top: 20px;
-}
-
-.export {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 10px 0;
-}
-
-.el-form-item {
-  margin-bottom: 0;
-}
-
-.el-table {
-  --el-table-row-hover-bg-color: none;
-}
-
-.pagination span {
-  margin: 0 10px;
-}
-
-.responsive-menu {
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-@media screen and (max-width: 1440px) {
-  .edit-timekeeping {
-    display: none;
-  }
-
-  .el-card {
-    width: 90vw;
-  }
-}
-
-@media screen and (max-width: 608px) {
-  .el-form {
-    display: flex;
-    justify-content: center;
-  }
-
-  .el-form .responsive-menu {
-    width: auto;
-    display: block;
-  }
-
-  .export {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
-}
-</style>
-
 <script setup>
 import EditTimeKeep from "../components/EditTimeKeep.vue"
 import ExportData from "../components/ExportData.vue"
@@ -517,3 +424,96 @@ const handleExportCSV = () => {
   user_id.value = Number(router.currentRoute.value.params.userID)
 }
 </script>
+
+<style scoped>
+.timekeeping-management {
+  padding: 20px 4vw;
+  display: flex;
+  justify-content: center;
+}
+
+.el-form {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.card-header {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.form-export {
+  position: absolute;
+  bottom: 7%;
+}
+
+.el-card {
+  width: 70vw;
+}
+
+.card-content {
+  margin-top: 20px;
+}
+
+.export {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.el-form-item {
+  margin-bottom: 0;
+}
+
+.el-table {
+  --el-table-row-hover-bg-color: none;
+}
+
+.pagination span {
+  margin: 0 10px;
+}
+
+.responsive-menu {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+@media screen and (max-width: 1440px) {
+  .edit-timekeeping {
+    display: none;
+  }
+
+  .el-card {
+    width: 90vw;
+  }
+}
+
+@media screen and (max-width: 608px) {
+  .el-form {
+    display: flex;
+    justify-content: center;
+  }
+
+  .el-form .responsive-menu {
+    width: auto;
+    display: block;
+  }
+
+  .export {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+}
+</style>

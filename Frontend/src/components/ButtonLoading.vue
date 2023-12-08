@@ -14,15 +14,6 @@
   </el-button>
 </template>
 
-<style scoped>
-.icon-warn{
-  position: absolute;
-  top: -4px;
-  right: -2px;
-  color: #ff3c00;
-}
-</style>
-
 <script setup>
 import {ref, watch, watchEffect} from "vue";
 
@@ -48,3 +39,12 @@ watch(() => prop.loading,
       }
     })
 </script>
+
+<style scoped>
+.icon-warn{
+  position: absolute;
+  top: -4px;
+  right: -2px;
+  color: #ff3c00;
+}
+</style>

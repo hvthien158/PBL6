@@ -86,114 +86,7 @@
     </div>
   </main>
 </template>
-<style scoped>
-main {
-  box-sizing: border-box;
-  display: flex;
-}
 
-.form-department {
-  margin-top: 50px;
-  max-width: 1138px;
-  position: absolute;
-  bottom: 0%;
-}
-
-.el-select {
-  margin-right: 5px;
-}
-
-.el-form {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-}
-
-label {
-  margin-bottom: 0px;
-}
-
-.el-card {
-  min-width: 100%;
-}
-
-.el-date-picker {
-  margin-left: 10px;
-}
-
-.pagination {
-  margin-top: 20px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.pagination-month {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 10px 0;
-}
-
-.pagination-month span {
-  margin: 0 12px 4px 12px;
-}
-
-.timekeeping {
-  width: 80vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-left: 20px;
-  position: relative;
-}
-
-.title-table {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0 10px 0;
-}
-
-.title-table div {
-  display: flex;
-  align-items: end;
-  justify-content: center;
-  max-width: 50%;
-  margin-right: 5px;
-}
-
-.table td {
-  border: 1px solid #dee2e6;
-}
-
-.department h1 {
-  text-align: center;
-}
-
-a:hover {
-  cursor: pointer;
-  color: #f3952d !important;
-}
-
-.pagination span {
-  margin: 0 10px;
-}
-
-.export {
-  margin-top: 10px;
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.export .el-form-item {
-  margin-bottom: 0px;
-}
-</style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
 import { ref, onMounted, reactive, watch } from "vue";
@@ -362,3 +255,112 @@ const handleExportCSV = () => {
   operationMode.value = 'CSV'
 }
 </script>
+
+<style scoped>
+main {
+  box-sizing: border-box;
+  display: flex;
+}
+
+.form-department {
+  margin-top: 50px;
+  max-width: 1138px;
+  position: absolute;
+  bottom: 0%;
+}
+
+.el-select {
+  margin-right: 5px;
+}
+
+.el-form {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+label {
+  margin-bottom: 0px;
+}
+
+.el-card {
+  min-width: 100%;
+}
+
+.el-date-picker {
+  margin-left: 10px;
+}
+
+.pagination {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination-month {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.pagination-month span {
+  margin: 0 12px 4px 12px;
+}
+
+.timekeeping {
+  width: 80vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px;
+  position: relative;
+}
+
+.title-table {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0 10px 0;
+}
+
+.title-table div {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  max-width: 50%;
+  margin-right: 5px;
+}
+
+.table td {
+  border: 1px solid #dee2e6;
+}
+
+.department h1 {
+  text-align: center;
+}
+
+a:hover {
+  cursor: pointer;
+  color: #f3952d !important;
+}
+
+.pagination span {
+  margin: 0 10px;
+}
+
+.export {
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.export .el-form-item {
+  margin-bottom: 0px;
+}
+</style>

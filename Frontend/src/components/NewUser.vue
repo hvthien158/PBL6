@@ -79,60 +79,6 @@
   </el-dialog>
 </template>
 
-<style scoped>
-.my-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-small {
-  color: red;
-  font-size: 14px;
-  margin-left: 0;
-}
-
-.form-item {
-  display: flex;
-  align-items: center;
-  margin-right: 16px;
-}
-
-.form-label {
-  margin-right: 8px;
-}
-
-.el-button--text {
-  margin-right: 15px;
-}
-
-.el-input {
-  width: 100%;
-}
-
-.el-select {
-  width: 100%;
-}
-
-.dialog-footer {
-  margin-top: 16px;
-}
-
-.dialog-footer button:first-child {
-  margin-right: 10px;
-}
-
-.dialog-footer button {
-  margin-right: 8px;
-}
-
-span {
-  display: block;
-  color: red;
-  margin-top: 0.5rem;
-  margin-left: 16px;
-}
-</style>
-
 <script setup>
 import {reactive, ref, watch} from "vue";
 import {useUserStore} from "../stores/user";
@@ -350,3 +296,57 @@ const formatToPost = (time) => {
   return `${year}-${month}-${day}`;
 }
 </script>
+
+<style scoped>
+.my-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+small {
+  color: red;
+  font-size: 14px;
+  margin-left: 0;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+}
+
+.form-label {
+  margin-right: 8px;
+}
+
+.el-button--text {
+  margin-right: 15px;
+}
+
+.el-input {
+  width: 100%;
+}
+
+.el-select {
+  width: 100%;
+}
+
+.dialog-footer {
+  margin-top: 16px;
+}
+
+.dialog-footer button:first-child {
+  margin-right: 10px;
+}
+
+.dialog-footer button {
+  margin-right: 8px;
+}
+
+span {
+  display: block;
+  color: red;
+  margin-top: 0.5rem;
+  margin-left: 16px;
+}
+</style>

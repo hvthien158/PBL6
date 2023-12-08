@@ -9,16 +9,6 @@
   &emsp;
 </template>
 
-<style scoped>
-.current {
-  font-weight: bold;
-  color: #1cb966;
-}
-span > span:hover{
-  cursor: pointer;
-}
-</style>
-
 <script setup>
 import {onMounted, ref, watch} from "vue";
 
@@ -76,3 +66,13 @@ onMounted(() => {
   current_page.value = prop.current_page_prop
 })
 </script>
+
+<style scoped>
+.current {
+  font-weight: bold;
+  color: #1cb966;
+}
+span > span:hover{
+  cursor: pointer;
+}
+</style>

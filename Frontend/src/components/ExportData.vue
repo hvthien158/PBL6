@@ -42,49 +42,6 @@
   </el-dialog>
 </template>
 
-<style scoped>
-.my-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.user {
-  display: flex;
-  align-items: center;
-}
-
-.el-form-item label {
-  margin-bottom: 0
-}
-
-.dialog-footer {
-  margin-top: 16px;
-}
-
-.dialog-footer button:first-child {
-  margin-right: 10px;
-}
-
-.dialog-footer button {
-  margin-right: 8px;
-}
-
-small {
-  color: red;
-  margin-top: 0.1rem;
-  margin-left: 16px;
-  font-size: 14px;
-  color: red;
-  margin-top: 0.1rem;
-  margin-left: 0px;
-  font-size: 14px;
-}
-
-.el-input {
-  width: 100px
-}
-</style>
-
 <script setup>
 import { ref, defineProps, reactive, computed, onMounted, h } from "vue";
 import { ElMessageBox } from 'element-plus'
@@ -564,3 +521,46 @@ const messages = (type, message) => {
   alertStore.msg = message
 }
 </script>
+
+<style scoped>
+.my-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+}
+
+.el-form-item label {
+  margin-bottom: 0
+}
+
+.dialog-footer {
+  margin-top: 16px;
+}
+
+.dialog-footer button:first-child {
+  margin-right: 10px;
+}
+
+.dialog-footer button {
+  margin-right: 8px;
+}
+
+small {
+  color: red;
+  margin-top: 0.1rem;
+  margin-left: 16px;
+  font-size: 14px;
+  color: red;
+  margin-top: 0.1rem;
+  margin-left: 0px;
+  font-size: 14px;
+}
+
+.el-input {
+  width: 100px
+}
+</style>

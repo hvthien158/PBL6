@@ -44,98 +44,6 @@
   </main>
 </template>
 
-<style scoped>
-main {
-  max-width: 100vw;
-}
-
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
-  min-height: 80vh;
-}
-
-.form-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.form-container h3 {
-  color: #e06230;
-  margin-bottom: 20px
-}
-
-.form-input {
-  display: block;
-  padding: 50px;
-  background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  min-width: 25vw;
-}
-
-.login__field {
-  padding: 20px 0;
-  position: relative;
-}
-
-.login__icon {
-  position: absolute;
-  top: 30px;
-  color: #7875B5;
-}
-
-.login__input {
-  border: none;
-  border-bottom: 2px solid #D1D1D4;
-  background: none;
-  padding: 10px 10px 10px 24px;
-  width: 95%;
-  font-weight: 700;
-  transition: .2s;
-}
-
-.login__input:active,
-.login__input:focus,
-.login__input:hover {
-  outline: none;
-  border-bottom-color: #6A679E;
-}
-
-.login__forgot {
-  position: absolute;
-  right: 0;
-  bottom: 30px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.login__forgot:hover {
-  color: #7875B5;
-  cursor: pointer;
-}
-
-.error {
-  color: red;
-  font-size: small;
-  position: absolute;
-  left: 25px;
-  top: 66px;
-}
-
-.fail-login {
-  color: red;
-  font-size: 14px;
-  text-align: center;
-  position: absolute;
-  left: calc(50% - 80px);
-}
-</style>
-
 <script setup>
 import { reactive, computed } from "vue";
 import router from "../router";
@@ -255,3 +163,95 @@ function goToForgot() {
   })
 }
 </script>
+
+<style scoped>
+main {
+  max-width: 100vw;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  min-height: 80vh;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-container h3 {
+  color: #e06230;
+  margin-bottom: 20px
+}
+
+.form-input {
+  display: block;
+  padding: 50px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-width: 25vw;
+}
+
+.login__field {
+  padding: 20px 0;
+  position: relative;
+}
+
+.login__icon {
+  position: absolute;
+  top: 30px;
+  color: #7875B5;
+}
+
+.login__input {
+  border: none;
+  border-bottom: 2px solid #D1D1D4;
+  background: none;
+  padding: 10px 10px 10px 24px;
+  width: 95%;
+  font-weight: 700;
+  transition: .2s;
+}
+
+.login__input:active,
+.login__input:focus,
+.login__input:hover {
+  outline: none;
+  border-bottom-color: #6A679E;
+}
+
+.login__forgot {
+  position: absolute;
+  right: 0;
+  bottom: 30px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.login__forgot:hover {
+  color: #7875B5;
+  cursor: pointer;
+}
+
+.error {
+  color: red;
+  font-size: small;
+  position: absolute;
+  left: 25px;
+  top: 66px;
+}
+
+.fail-login {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+  position: absolute;
+  left: calc(50% - 80px);
+}
+</style>

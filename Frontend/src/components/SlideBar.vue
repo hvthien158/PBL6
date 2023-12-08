@@ -10,6 +10,13 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue';
+import router from '../router'
+const selectedOption = ref(null);
+</script>
+
 <style scoped>
 .container {
   display: flex;
@@ -83,8 +90,3 @@ button {
   margin-right: 10px;
 }
 </style>
-<script setup>
-import { ref } from 'vue';
-import router from '../router'
-const selectedOption = ref(null);
-</script>

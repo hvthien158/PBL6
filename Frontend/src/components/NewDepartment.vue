@@ -57,80 +57,6 @@
   </el-dialog>
 </template>
 
-<style scoped>
-.department-container {
-  width: 100%;
-  background-color: #ccc;
-  padding: 10px 0;
-  display: block;
-  align-items: center;
-  overflow-x: auto;
-  border-radius: 4px;
-}
-
-.my-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-small {
-  color: red;
-  font-size: 14px;
-  margin-left: 0;
-}
-
-.form-item {
-  display: flex;
-  align-items: center;
-  margin-right: 8px;
-}
-
-.form-label {
-  margin-right: 8px;
-}
-
-.el-button--text {
-  margin-right: 15px;
-}
-
-.el-input {
-  width: 100%;
-}
-
-.dialog-footer {
-  margin-top: 16px;
-}
-
-.dialog-footer button:first-child {
-  margin-right: 10px;
-}
-
-.dialog-footer button {
-  margin-right: 8px;
-}
-
-span {
-  display: block;
-  color: red;
-  margin-top: 0.5rem;
-  margin-left: 16px;
-}
-
-.department-container::-webkit-scrollbar {
-  height: 6px;
-  background-color: #f0f0f0;
-}
-
-.department-container::-webkit-scrollbar-thumb {
-  height: 6px;
-  background-color: #e0e0e0;
-}
-
-.el-select {
-  width: 50%;
-}
-</style>
-
 <script setup>
 import {reactive, ref, watch, defineProps} from "vue";
 import {useUserStore} from "../stores/user";
@@ -288,4 +214,77 @@ const messages = (type, msg) => {
   alertStore.msg = msg
 }
 </script>
-  
+
+<style scoped>
+.department-container {
+  width: 100%;
+  background-color: #ccc;
+  padding: 10px 0;
+  display: block;
+  align-items: center;
+  overflow-x: auto;
+  border-radius: 4px;
+}
+
+.my-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+small {
+  color: red;
+  font-size: 14px;
+  margin-left: 0;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+.form-label {
+  margin-right: 8px;
+}
+
+.el-button--text {
+  margin-right: 15px;
+}
+
+.el-input {
+  width: 100%;
+}
+
+.dialog-footer {
+  margin-top: 16px;
+}
+
+.dialog-footer button:first-child {
+  margin-right: 10px;
+}
+
+.dialog-footer button {
+  margin-right: 8px;
+}
+
+span {
+  display: block;
+  color: red;
+  margin-top: 0.5rem;
+  margin-left: 16px;
+}
+
+.department-container::-webkit-scrollbar {
+  height: 6px;
+  background-color: #f0f0f0;
+}
+
+.department-container::-webkit-scrollbar-thumb {
+  height: 6px;
+  background-color: #e0e0e0;
+}
+
+.el-select {
+  width: 50%;
+}
+</style>

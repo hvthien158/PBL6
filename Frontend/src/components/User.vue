@@ -32,35 +32,7 @@
         </template>
     </el-dialog>
 </template>
-  
-<style scoped>
-.my-header {
-    display: flex;
-    justify-content: space-between;
-}
 
-.user {
-    display: flex;
-    align-items: center;
-    min-width: 30%
-}
-.user .el-text {
-    font-size: 20px;
-    font-weight: 700;
-}
-.info-user {
-    cursor: default;
-}
-.info-user .el-text{
-    display: block;
-    margin-top: 15px;
-    font-size: 16px;
-    border: 1px solid #ebeef5;
-    padding: 8px;
-    box-sizing: border-box;
-}
-</style>
-  
 <script setup>
 import { ref, defineProps } from "vue";
 import { useUserStore } from "../stores/user";
@@ -95,4 +67,31 @@ const messages = (type, msg) => {
     alertStore.msg = msg
 }
 </script>
-  
+
+<style scoped>
+.my-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  min-width: 30%
+}
+.user .el-text {
+  font-size: 20px;
+  font-weight: 700;
+}
+.info-user {
+  cursor: default;
+}
+.info-user .el-text{
+  display: block;
+  margin-top: 15px;
+  font-size: 16px;
+  border: 1px solid #ebeef5;
+  padding: 8px;
+  box-sizing: border-box;
+}
+</style>

@@ -31,6 +31,55 @@
   </header>
 </template>
 
+<script setup>
+import logo from "../assets/image/logo.png";
+import router from "../router";
+import {useUserStore} from "../stores/user";
+import {useAlertStore} from "../stores/alert";
+import AdminMessage from "./AdminMessage.vue";
+import AuthAPI from "../services/AuthAPI";
+
+const props = defineProps({
+  notification: {
+    type: Object
+  }
+})
+const alertStore = useAlertStore()
+const user = useUserStore().user
+
+function myProfile() {
+  router.push({
+    name: 'my-profile',
+  })
+}
+
+function changePass() {
+  router.push({
+    name: 'change-password',
+  })
+}
+
+const logout = async () => {
+  try {
+    await AuthAPI.logout(user.token, user.deviceToken)
+        .then(function (response) {
+          if (response.status === 200) {
+            useUserStore().logout()
+
+            //alert success
+            alertStore.alert = true
+            alertStore.type = 'success'
+            alertStore.msg = 'Logged out'
+
+            router.push({path: "/login"});
+          }
+        });
+  } catch (e) {
+    console.log(e);
+  }
+};
+</script>
+
 <style scoped>
 * {
   margin: 0;
@@ -97,51 +146,3 @@ header {
   cursor: pointer;
 }
 </style>
-<script setup>
-import logo from "../assets/image/logo.png";
-import router from "../router";
-import {useUserStore} from "../stores/user";
-import {useAlertStore} from "../stores/alert";
-import AdminMessage from "./AdminMessage.vue";
-import AuthAPI from "../services/AuthAPI";
-
-const props = defineProps({
-  notification: {
-    type: Object
-  }
-})
-const alertStore = useAlertStore()
-const user = useUserStore().user
-
-function myProfile() {
-  router.push({
-    name: 'my-profile',
-  })
-}
-
-function changePass() {
-  router.push({
-    name: 'change-password',
-  })
-}
-
-const logout = async () => {
-  try {
-    await AuthAPI.logout(user.token, user.deviceToken)
-        .then(function (response) {
-          if (response.status === 200) {
-            useUserStore().logout()
-
-            //alert success
-            alertStore.alert = true
-            alertStore.type = 'success'
-            alertStore.msg = 'Logged out'
-
-            router.push({path: "/login"});
-          }
-        });
-  } catch (e) {
-    console.log(e);
-  }
-};
-</script>

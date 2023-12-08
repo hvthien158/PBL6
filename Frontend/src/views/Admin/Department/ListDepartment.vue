@@ -95,119 +95,7 @@
 
   </main>
 </template>
-<style scoped>
-main {
-  box-sizing: border-box;
-  display: flex;
-}
 
-.form-department {
-  margin-top: 50px;
-  max-width: 1138px;
-  position: absolute;
-  bottom: 0%;
-}
-
-.title-table .input-number {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.input-number {
-  width: 12%;
-  min-width: 170px;
-  border-right: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.input-number .el-input-number {
-  width: 40%;
-  background-color: #262727;
-}
-
-.input-number .el-text {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 0 10px;
-  white-space: nowrap;
-  border-radius: 4px 0 0 4px;
-  background-color: #262727;
-  color: #909399;
-  box-sizing: border-box;
-}
-
-.el-form {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-}
-
-label {
-  margin-bottom: 0px;
-}
-
-.el-card {
-  min-width: 100%;
-}
-
-.title-table .el-input {
-  margin-left: 10px;
-  width: 15%;
-}
-
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.department {
-  width: 80vw;
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-left: 20px;
-  position: relative;
-}
-
-.title-table {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0 10px 0;
-}
-
-.title-table div {
-  display: flex;
-  align-items: end;
-  justify-content: center;
-}
-
-.table td {
-  border: 1px solid #dee2e6;
-}
-
-.department h1 {
-  text-align: center;
-}
-
-a:hover {
-  cursor: pointer;
-  color: #f3952d !important;
-}
-
-.pagination span {
-  margin: 0 10px;
-}
-</style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
 import {ref, onMounted, watch, reactive} from "vue";
@@ -331,3 +219,117 @@ const handleViewManager = (id) => {
   userId.value = id
 }
 </script>
+
+<style scoped>
+main {
+  box-sizing: border-box;
+  display: flex;
+}
+
+.form-department {
+  margin-top: 50px;
+  max-width: 1138px;
+  position: absolute;
+  bottom: 0%;
+}
+
+.title-table .input-number {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.input-number {
+  width: 12%;
+  min-width: 170px;
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-number .el-input-number {
+  width: 40%;
+  background-color: #262727;
+}
+
+.input-number .el-text {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 10px;
+  white-space: nowrap;
+  border-radius: 4px 0 0 4px;
+  background-color: #262727;
+  color: #909399;
+  box-sizing: border-box;
+}
+
+.el-form {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+label {
+  margin-bottom: 0px;
+}
+
+.el-card {
+  min-width: 100%;
+}
+
+.title-table .el-input {
+  margin-left: 10px;
+  width: 15%;
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.department {
+  width: 80vw;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px;
+  position: relative;
+}
+
+.title-table {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0 10px 0;
+}
+
+.title-table div {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+}
+
+.table td {
+  border: 1px solid #dee2e6;
+}
+
+.department h1 {
+  text-align: center;
+}
+
+a:hover {
+  cursor: pointer;
+  color: #f3952d !important;
+}
+
+.pagination span {
+  margin: 0 10px;
+}
+</style>

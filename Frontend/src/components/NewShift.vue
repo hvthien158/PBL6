@@ -27,41 +27,6 @@
   </div>
 </template>
 
-<style scoped>
-.shift-container {
-  background-color: #ccc;
-  padding: 10px 0 10px 0;
-  display: flex;
-  align-items: center;
-  overflow-x: scroll;
-  padding-left: 8px;
-  border-radius: 4px;
-}
-
-.shift-container::-webkit-scrollbar {
-  height: 6px;
-  background-color: #f0f0f0;
-}
-
-.shift-container::-webkit-scrollbar-thumb {
-  height: 6px;
-  background-color: #e0e0e0;
-}
-
-.shift-container div input {
-  padding: 0 8px;
-}
-
-.shift-container div {
-  padding-right: 4px;
-}
-
-.operation {
-  display: flex;
-  padding: 12px;
-}
-</style>
-
 <script setup>
 import {reactive, ref, watch, defineProps, computed} from "vue";
 import {useUserStore} from "../stores/user";
@@ -189,3 +154,38 @@ const messages = (type, msg) => {
   alertStore.msg = msg
 }
 </script>
+
+<style scoped>
+.shift-container {
+  background-color: #ccc;
+  padding: 10px 0 10px 0;
+  display: flex;
+  align-items: center;
+  overflow-x: scroll;
+  padding-left: 8px;
+  border-radius: 4px;
+}
+
+.shift-container::-webkit-scrollbar {
+  height: 6px;
+  background-color: #f0f0f0;
+}
+
+.shift-container::-webkit-scrollbar-thumb {
+  height: 6px;
+  background-color: #e0e0e0;
+}
+
+.shift-container div input {
+  padding: 0 8px;
+}
+
+.shift-container div {
+  padding-right: 4px;
+}
+
+.operation {
+  display: flex;
+  padding: 12px;
+}
+</style>

@@ -89,73 +89,7 @@
     </ConfirmBox>
   </main>
 </template>
-<style scoped>
-@import "https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css";
 
-main {
-  box-sizing: border-box;
-  display: flex;
-}
-
-.user {
-  width: 80vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-left: 20px;
-}
-
-.user h1 {
-  text-align: center;
-  color: black !important;
-}
-
-.header-row {
-  background-color: #f3952d;
-}
-
-.title-table {
-  width: 80vw;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
-.title-table .el-input {
-  margin-left: 10px;
-  width: 20%;
-}
-
-.title-table div {
-  display: flex;
-  align-items: end;
-  justify-content: center;
-}
-
-.el-form-item {
-  min-width: 170px;
-  margin-left: 10px;
-  margin-bottom: 0;
-}
-
-.form-user {
-  position: absolute;
-  bottom: 7%;
-}
-
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.pagination span {
-  margin: 0 10px;
-}
-</style>
 <script setup>
 import SlideBar from "../../../components/SlideBar.vue";
 import NewUser from "../../../components/NewUser.vue"
@@ -311,3 +245,71 @@ function handleViewHistory(id) {
   router.push({ path: `/admin/schedule/${id}` })
 }
 </script>
+
+<style scoped>
+@import "https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css";
+
+main {
+  box-sizing: border-box;
+  display: flex;
+}
+
+.user {
+  width: 80vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px;
+}
+
+.user h1 {
+  text-align: center;
+  color: black !important;
+}
+
+.header-row {
+  background-color: #f3952d;
+}
+
+.title-table {
+  width: 80vw;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.title-table .el-input {
+  margin-left: 10px;
+  width: 20%;
+}
+
+.title-table div {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+}
+
+.el-form-item {
+  min-width: 170px;
+  margin-left: 10px;
+  margin-bottom: 0;
+}
+
+.form-user {
+  position: absolute;
+  bottom: 7%;
+}
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination span {
+  margin: 0 10px;
+}
+</style>
