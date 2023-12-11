@@ -1,7 +1,6 @@
 import axios from "axios";
-import {API_URL} from "../constants";
 
-const url = API_URL + '/user'
+const url = import.meta.env.VITE_BASE_URL + '/api/user'
 
 export default {
     getListUser(token, page, data) {

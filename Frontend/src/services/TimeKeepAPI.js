@@ -1,7 +1,6 @@
 import axios from "axios";
-import { API_URL } from "../constants";
 
-const url = API_URL + '/timekeeping'
+const url = import.meta.env.VITE_BASE_URL + '/api/timekeeping'
 
 export default {
     getListTimeKeep(from, to, token) {

@@ -2,26 +2,23 @@
   <main>
     <SlideBar></SlideBar>
     <div class="timekeeping">
-      <span style="font-size: 32px; font-weight: 700; text-align: center;">TimeKeeping Management</span>
-      <div class="export">
-        <el-form-item>
-          <el-button type="warning" @click="handleExportExcel">Export Excel</el-button>
-          <el-button type="warning" @click="handleExportCSV">Export CSV</el-button>
-        </el-form-item>
+      <div style="display: flex; justify-content: space-between; width: 100%">
+        <div class="pagination-month">
+          <el-button type="info" @click="previousMonth">
+            Prev
+          </el-button>
+          <span style="font-size: 32px; font-weight: bold">{{ monthDisplay + 1 }}/{{ yearDisplay }}</span>
+          <el-button type="info" @click="nextMonth">
+            Next
+          </el-button>
+        </div>
+        <span style="font-size: 32px; font-weight: 700; text-align: center;">TimeKeeping Management</span>
+        <div style="width: 20%"></div>
       </div>
       <div class="title-table">
         <div>
           <el-date-picker v-model="filter_value" type="daterange" start-placeholder="Start date"
             end-placeholder="End date" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
-        </div>
-        <div class="pagination-month">
-          <el-button type="info" @click="previousMonth">
-            Prev
-          </el-button>
-          <span>{{ monthDisplay + 1 }}/{{ yearDisplay }}</span>
-          <el-button type="info" @click="nextMonth">
-            Next
-          </el-button>
         </div>
         <div>
           <el-select v-model="dataSearch.department" placeholder="Select department">
@@ -31,7 +28,12 @@
           </el-select>
           <el-input v-model="dataSearch.name" placeholder="Search by username" />
         </div>
-
+        <div class="export">
+          <el-form-item>
+            <el-button type="warning" @click="handleExportExcel">Export Excel</el-button>
+            <el-button type="warning" @click="handleExportCSV">Export CSV</el-button>
+          </el-form-item>
+        </div>
       </div>
       <el-table :data="timekeeping" height="48vh" style="width: 100%;" border stripe>
         <el-table-column prop="id" label="ID" min-width="50"></el-table-column>
@@ -266,7 +268,7 @@ main {
   margin-top: 50px;
   max-width: 1138px;
   position: absolute;
-  bottom: 0%;
+  bottom: 0;
 }
 
 .el-select {
@@ -281,7 +283,7 @@ main {
 }
 
 label {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .el-card {
@@ -324,14 +326,13 @@ label {
 .title-table {
   width: 100%;
   display: flex;
-  justify-content: space-between;
   margin: 10px 0 10px 0;
 }
 
 .title-table div {
   display: flex;
   align-items: end;
-  justify-content: center;
+  justify-content: space-between;
   max-width: 50%;
   margin-right: 5px;
 }
@@ -355,12 +356,12 @@ a:hover {
 
 .export {
   margin-top: 10px;
-  width: 100%;
+  width: 40%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-end !important;
 }
 
 .export .el-form-item {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 </style>

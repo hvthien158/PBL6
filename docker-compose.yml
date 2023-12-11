@@ -28,6 +28,7 @@ services:
       - ./Frontend/index.html:/app/index.html
       - ./Frontend/package.json:/app/package.json
       - ./Frontend/src:/app/src
+      - ./Frontend/.env:/app/.env
       - ./Frontend/public/firebase-messaging-sw.js:/app/public/firebase-messaging-sw.js
     ports:
       - 5173:5173

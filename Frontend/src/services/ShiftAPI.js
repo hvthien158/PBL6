@@ -1,7 +1,6 @@
 import axios from "axios";
-import {API_URL} from "../constants";
 
-const url = API_URL + '/shift'
+const url = import.meta.env.VITE_BASE_URL + '/api/shift'
 
 export default {
     getListShift(token, page, name) {

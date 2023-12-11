@@ -1,16 +1,17 @@
 import axios from "axios";
-import {API_URL} from "../constants";
 
+const URL = import.meta.env.VITE_BASE_URL + '/api'
 export default {
     login(email, password, deviceToken) {
-        return axios.post(API_URL + '/login', {
+        console.log(URL)
+        return axios.post(URL + '/login', {
             email: email,
             password: password,
             deviceToken: deviceToken
         })
     },
     logout(token, deviceToken) {
-        return axios.post(API_URL + '/logout', {
+        return axios.post(URL + '/logout', {
             deviceToken: deviceToken
         }, {
             headers: {
@@ -19,7 +20,7 @@ export default {
         })
     },
     changePassword(token, old_password, new_password, new_password_confirm) {
-        return axios.post(API_URL + '/change-password', {
+        return axios.post(URL+ '/change-password', {
             old_password: old_password,
             new_password: new_password,
             new_password_confirmation: new_password_confirm,
@@ -30,17 +31,17 @@ export default {
         })
     },
     checkEmail(email) {
-        return axios.post(API_URL + '/check-email', {
+        return axios.post(URL+ '/check-email', {
             email: email
         })
     },
     forgotPassword(email) {
-        return axios.post(API_URL + '/forgot-password', {
+        return axios.post(URL+ '/forgot-password', {
             email: email,
         })
     },
     resetPassword(token, email, password, password_confirm) {
-        return axios.post(API_URL + '/reset-password', {
+        return axios.post(URL+ '/reset-password', {
             token: token,
             email: email,
             password: password,
@@ -48,7 +49,7 @@ export default {
         })
     },
     updateProfile(token, data) {
-        return axios.post(API_URL + '/update-profile', data, {
+        return axios.post(URL+ '/update-profile', data, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
