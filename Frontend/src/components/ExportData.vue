@@ -5,7 +5,7 @@
         <h4>Export {{ prop.mode }}</h4>
         <el-button type="danger" @click="$emit('invisible')">
           <el-icon class="el-icon--left">
-            <CircleCloseFilled />
+            <CircleCloseFilled/>
           </el-icon>
           Close
         </el-button>
@@ -15,15 +15,15 @@
       <el-form-item :label="fromMonth" :label-width="formLabelWidth" :rules="[{ required: true }]">
         <div class="block">
           <el-date-picker v-if="fromMonth == ''" class="date-picker" v-model="form.fromMonth" type="month"
-            placeholder="From Month" />
-          <el-date-picker v-else class="date-picker" v-model="form.fromMonth" type="month" placeholder="Pick a month" />
+                          placeholder="From Month"/>
+          <el-date-picker v-else class="date-picker" v-model="form.fromMonth" type="month" placeholder="Pick a month"/>
         </div>
       </el-form-item>
       <el-form-item :label="toMonth" :label-width="formLabelWidth" :rules="[{ required: true }]">
         <div class="block">
           <el-date-picker v-if="toMonth == ''" class="date-picker" v-model="form.toMonth" type="month"
-            placeholder="To Month" />
-          <el-date-picker v-else class="date-picker" v-model="form.toMonth" type="month" placeholder="Pick a month" />
+                          placeholder="To Month"/>
+          <el-date-picker v-else class="date-picker" v-model="form.toMonth" type="month" placeholder="Pick a month"/>
         </div>
       </el-form-item>
       <small>{{ checkDate }}</small>
@@ -43,14 +43,14 @@
 </template>
 
 <script setup>
-import { ref, defineProps, reactive, computed, onMounted, h } from "vue";
-import { ElMessageBox } from 'element-plus'
+import {ref, defineProps, reactive, computed, onMounted, h} from "vue";
+import {ElMessageBox} from 'element-plus'
 import * as XLSX from 'xlsx';
 import * as Papa from 'papaparse'
 import FileSaver from 'file-saver';
 import router from "../router";
-import { useUserStore } from "../stores/user";
-import { useAlertStore } from "../stores/alert";
+import {useUserStore} from "../stores/user";
+import {useAlertStore} from "../stores/alert";
 import TimeKeepAPI from "../services/TimeKeepAPI";
 
 const prop = defineProps({
@@ -156,15 +156,15 @@ const exportSchedule = async (type) => {
     if (formatToPost(form.fromMonth, 'start') < formatToPost(form.toMonth, 'end')) {
       try {
         await TimeKeepAPI.exportData(
-          user.token, formatToPost(form.fromMonth, 'start'),
-          formatToPost(form.toMonth, 'end'),
-          userID
+            user.token, formatToPost(form.fromMonth, 'start'),
+            formatToPost(form.toMonth, 'end'),
+            userID
         )
-          .then(function (response) {
-            data.value = response.data.data
-            username = response.data.data[0].user
-          })
-          type == 'Excel' ? exportExcelSchedule() : exportCSVSchedule()
+            .then(function (response) {
+              data.value = response.data.data
+              username = response.data.data[0].user
+            })
+        type == 'Excel' ? exportExcelSchedule() : exportCSVSchedule()
       } catch (e) {
         console.log(e);
         messages('error', e.response.data.message)
@@ -178,161 +178,161 @@ const exportSchedule = async (type) => {
   }
 }
 const exportCSVSchedule = async () => {
-            const fromDate = new Date(form.fromMonth);
-            const toDate = new Date(form.toMonth);
-            const currentDate = new Date(fromDate);
-            const csvData = [];
-            const headerRow = [
-              'Date',
-              'Day of week',
-              'Time check in',
-              'Time check out',
-              'Shift',
-              'Status AM',
-              'Status PM',
-              'Time work',
-              'User name',
-            ];
-            csvData.push(headerRow);
+  const fromDate = new Date(form.fromMonth);
+  const toDate = new Date(form.toMonth);
+  const currentDate = new Date(fromDate);
+  const csvData = [];
+  const headerRow = [
+    'Date',
+    'Day of week',
+    'Time check in',
+    'Time check out',
+    'Shift',
+    'Status AM',
+    'Status PM',
+    'Time work',
+    'User name',
+  ];
+  csvData.push(headerRow);
 
-            while (currentDate <= toDate) {
-              const currentMonth = currentDate.getMonth() + 1;
-              const currentYear = currentDate.getFullYear();
-              const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
-              const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  while (currentDate <= toDate) {
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const daysArray = Array.from({length: daysInMonth}, (_, i) => i + 1);
 
-              daysArray.forEach((day) => {
-                const dayOfWeek = getDayOfWeek(currentDate, day);
-                if (dayOfWeek !== 'Sat' && dayOfWeek !== 'Sun') {
-                  const dataForDay = data.value.find((item) => {
-                    const itemDate = new Date(item.date);
-                    return (
-                      itemDate.getMonth() + 1 === currentMonth &&
-                      itemDate.getDate() === day
-                    );
-                  });
-                  const rowData = [
-                    `${currentYear}-${currentMonth}-${day}`,
-                    getDayOfWeek(currentDate, day),
-                  ];
+    daysArray.forEach((day) => {
+      const dayOfWeek = getDayOfWeek(currentDate, day);
+      if (dayOfWeek !== 'Sat' && dayOfWeek !== 'Sun') {
+        const dataForDay = data.value.find((item) => {
+          const itemDate = new Date(item.date);
+          return (
+              itemDate.getMonth() + 1 === currentMonth &&
+              itemDate.getDate() === day
+          );
+        });
+        const rowData = [
+          `${currentYear}-${currentMonth}-${day}`,
+          getDayOfWeek(currentDate, day),
+        ];
 
-                  if (dataForDay) {
-                    if (dataForDay[['timeCheckIn']] != '') {
-                      rowData.push(
-                        dataForDay['timeCheckIn'].slice(7, 12),
-                        dataForDay['timeCheckOut'].slice(7, 12),
-                        dataForDay['shift'],
-                        statusWork(dataForDay['status_AM']),
-                        statusWork(dataForDay['status_PM']),
-                        dataForDay['timeWork'],
-                        username
-                      );
-                    } else {
-                      rowData.push(
-                        '00:00',
-                        '00:00',
-                        'OFF',
-                        'OFF',
-                        'OFF',
-                        '00:00',
-                        username
-                      );
-                    }
-                  } else {
-                    rowData.push(
-                      '00:00',
-                      '00:00',
-                      'OFF',
-                      'OFF',
-                      'OFF',
-                      '00:00',
-                      username
-                    );
-                  }
-                  csvData.push(rowData);
-                }
-              });
-              currentDate.setMonth(currentDate.getMonth() + 1);
-            }
-            const csvContent = Papa.unparse(csvData);
-            const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const fileName = `data_${prop.mode}_${formatToPost(form.fromMonth)}-${formatToPost(form.toMonth)}.csv`;
-            FileSaver.saveAs(csvBlob, fileName);
-            messages('success', 'Export complete');
-            emits('invisible');
-            []
+        if (dataForDay) {
+          if (dataForDay[['timeCheckIn']] != '') {
+            rowData.push(
+                dataForDay['timeCheckIn'].slice(7, 12),
+                dataForDay['timeCheckOut'].slice(7, 12),
+                dataForDay['shift'],
+                statusWork(dataForDay['status_AM']),
+                statusWork(dataForDay['status_PM']),
+                dataForDay['timeWork'],
+                username
+            );
+          } else {
+            rowData.push(
+                '00:00',
+                '00:00',
+                'OFF',
+                'OFF',
+                'OFF',
+                '00:00',
+                username
+            );
           }
+        } else {
+          rowData.push(
+              '00:00',
+              '00:00',
+              'OFF',
+              'OFF',
+              'OFF',
+              '00:00',
+              username
+          );
+        }
+        csvData.push(rowData);
+      }
+    });
+    currentDate.setMonth(currentDate.getMonth() + 1);
+  }
+  const csvContent = Papa.unparse(csvData);
+  const csvBlob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+  const fileName = `data_${prop.mode}_${formatToPost(form.fromMonth)}-${formatToPost(form.toMonth)}.csv`;
+  FileSaver.saveAs(csvBlob, fileName);
+  messages('success', 'Export complete');
+  emits('invisible');
+  []
+}
 const exportExcelSchedule = () => {
   const wb = XLSX.utils.book_new();
-        const fromDate = new Date(form.fromMonth);
-        const toDate = new Date(form.toMonth);
-        const currentDate = new Date(fromDate);
+  const fromDate = new Date(form.fromMonth);
+  const toDate = new Date(form.toMonth);
+  const currentDate = new Date(fromDate);
 
-        while (currentDate <= toDate) {
-          const currentMonth = currentDate.getMonth() + 1;
-          const currentYear = currentDate.getFullYear();
-          const ws = XLSX.utils.aoa_to_sheet([]);
-          const daysInMonth = new Date(currentDate.getFullYear(), currentMonth, 0).getDate();
-          const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-          const headerRow = ['Date', 'Day of week', 'Time check in', 'Time check out', 'Shift', 'Status AM', 'Status PM', 'Time work', 'User name'];
-          const rows = daysArray.map(day => {
-            if (getDayOfWeek(currentDate, day) != 'Sat' && getDayOfWeek(currentDate, day) != 'Sun') {
-              const dataForDay = data.value.find(item => {
-                const itemDate = new Date(item.date);
-                return itemDate.getMonth() + 1 === currentMonth && itemDate.getDate() === day;
-              });
+  while (currentDate <= toDate) {
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+    const ws = XLSX.utils.aoa_to_sheet([]);
+    const daysInMonth = new Date(currentDate.getFullYear(), currentMonth, 0).getDate();
+    const daysArray = Array.from({length: daysInMonth}, (_, i) => i + 1);
+    const headerRow = ['Date', 'Day of week', 'Time check in', 'Time check out', 'Shift', 'Status AM', 'Status PM', 'Time work', 'User name'];
+    const rows = daysArray.map(day => {
+      if (getDayOfWeek(currentDate, day) != 'Sat' && getDayOfWeek(currentDate, day) != 'Sun') {
+        const dataForDay = data.value.find(item => {
+          const itemDate = new Date(item.date);
+          return itemDate.getMonth() + 1 === currentMonth && itemDate.getDate() === day;
+        });
 
-              const rowData = [day, getDayOfWeek(currentDate, day)];
-              if (dataForDay) {
-                if (dataForDay[['timeCheckIn']] != '') {
-                  rowData.push(
-                    dataForDay['timeCheckIn'].slice(7, 12),
-                    dataForDay['timeCheckOut'].slice(7, 12),
-                    dataForDay['shift'],
-                    statusWork(dataForDay['status_AM']),
-                    statusWork(dataForDay['status_PM']),
-                    dataForDay['timeWork'],
-                    username
-                  );
-                } else {
-                  rowData.push('00:00', '00:00', 'OFF', 'OFF', 'OFF', '00:00', username);
-                }
-              } else {
-                rowData.push('00:00', '00:00', 'OFF', 'OFF', 'OFF', '00:00', username);
-              }
-              return rowData;
-            }
-          });
-          const filteredRows = rows.filter(row => row !== undefined);
-          filteredRows.unshift(headerRow);
-          if (prop.mode === 'Excel') {
-            if (!ws['!cols']) {
-              ws['!cols'] = [];
-            }
-            ws['!cols'][0] = { wch: 5 };
-            ws['!cols'][1] = { wch: 10 };
-            ws['!cols'][2] = { wch: 15 };
-            ws['!cols'][3] = { wch: 15 };
-            ws['!cols'][4] = { wch: 5 };
-            ws['!cols'][5] = { wch: 10 };
-            ws['!cols'][6] = { wch: 10 };
-            ws['!cols'][7] = { wch: 10 };
-            ws['!cols'][8] = { wch: 15 };
-            XLSX.utils.sheet_add_aoa(ws, filteredRows, { origin: 'A1' });
-            XLSX.utils.book_append_sheet(wb, ws, `${currentMonth} - ${currentYear}`);
-            currentDate.setMonth(currentDate.getMonth() + 1);
+        const rowData = [day, getDayOfWeek(currentDate, day)];
+        if (dataForDay) {
+          if (dataForDay[['timeCheckIn']] != '') {
+            rowData.push(
+                dataForDay['timeCheckIn'].slice(7, 12),
+                dataForDay['timeCheckOut'].slice(7, 12),
+                dataForDay['shift'],
+                statusWork(dataForDay['status_AM']),
+                statusWork(dataForDay['status_PM']),
+                dataForDay['timeWork'],
+                username
+            );
+          } else {
+            rowData.push('00:00', '00:00', 'OFF', 'OFF', 'OFF', '00:00', username);
           }
+        } else {
+          rowData.push('00:00', '00:00', 'OFF', 'OFF', 'OFF', '00:00', username);
         }
-        XLSX.writeFile(wb, 'data.xlsx');
-        messages('success', 'Export complete')
-        emits('invisible');
+        return rowData;
+      }
+    });
+    const filteredRows = rows.filter(row => row !== undefined);
+    filteredRows.unshift(headerRow);
+    if (prop.mode === 'Excel') {
+      if (!ws['!cols']) {
+        ws['!cols'] = [];
+      }
+      ws['!cols'][0] = {wch: 5};
+      ws['!cols'][1] = {wch: 10};
+      ws['!cols'][2] = {wch: 15};
+      ws['!cols'][3] = {wch: 15};
+      ws['!cols'][4] = {wch: 5};
+      ws['!cols'][5] = {wch: 10};
+      ws['!cols'][6] = {wch: 10};
+      ws['!cols'][7] = {wch: 10};
+      ws['!cols'][8] = {wch: 15};
+      XLSX.utils.sheet_add_aoa(ws, filteredRows, {origin: 'A1'});
+      XLSX.utils.book_append_sheet(wb, ws, `${currentMonth} - ${currentYear}`);
+      currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+  }
+  XLSX.writeFile(wb, 'data.xlsx');
+  messages('success', 'Export complete')
+  emits('invisible');
 }
 const exportTimekeeping = async (type) => {
   if (form.fromMonth !== '' && form.toMonth !== '') {
     if (formatToPost(form.fromMonth, 'start') < formatToPost(form.toMonth, 'end')) {
       try {
         const response = await TimeKeepAPI.exportTimeKeeping(
-          user.token, formatToPost(form.fromMonth, 'start'), formatToPost(form.toMonth, 'end')
+            user.token, formatToPost(form.fromMonth, 'start'), formatToPost(form.toMonth, 'end')
         )
         timekeeping.value = response.data.data
         if (response.data.userWaitingAccept.length != 0) {
@@ -378,7 +378,71 @@ const exportExcelTimekeeping = () => {
   const wb = XLSX.utils.book_new();
   timekeeping.value.map(value => {
     const headerRow =
+        [
+          'ID',
+          'Name',
+          'Department name',
+          'The number of days specified',
+          'Total day', 'Remote day',
+          'Not work day', 'Late day',
+          'Predetermined time',
+          'Total time',
+          'Schedule time',
+          'Over time',
+          'Average'
+        ];
+    const ws = XLSX.utils.aoa_to_sheet([]);
+    const rows = value.data.map(item => {
+      const rowData = []
+      rowData.push(
+          item.id,
+          item.name,
+          item.department,
+          item.regularWorkingDays,
+          item.sumWorkingDays,
+          item.remoteDays,
+          item.leaveDays,
+          item.lateDays,
+          item.regularWorkingTime,
+          item.sumWorkingTime,
+          item.scheduledWorkingTime,
+          item.overtimeWorkingTime,
+          item.averageWorkingHours
+      );
+      return rowData
+    })
+    const filteredRows = rows.filter(row => row !== undefined);
+    filteredRows.unshift(headerRow);
+    if (prop.mode === 'Excel') {
+      if (!ws['!cols']) {
+        ws['!cols'] = [];
+      }
+      ws['!cols'][0] = {wch: 5};
+      ws['!cols'][1] = {wch: 20};
+      ws['!cols'][2] = {wch: 20};
+      ws['!cols'][3] = {wch: 20};
+      ws['!cols'][4] = {wch: 25};
+      ws['!cols'][5] = {wch: 20};
+      ws['!cols'][6] = {wch: 20};
+      ws['!cols'][7] = {wch: 20};
+      ws['!cols'][8] = {wch: 20};
+      ws['!cols'][9] = {wch: 20};
+      ws['!cols'][10] = {wch: 20};
+      ws['!cols'][11] = {wch: 20};
+      ws['!cols'][12] = {wch: 20};
+      XLSX.utils.sheet_add_aoa(ws, filteredRows, {origin: 'A1'});
+      XLSX.utils.book_append_sheet(wb, ws, `${value.month}`);
+    }
+  })
+  XLSX.writeFile(wb, 'timekeeping.xlsx');
+  messages('success', 'Export complete')
+  emits('invisible');
+}
+const exportCSVTimekeeping = () => {
+  const csvData = [];
+  const headerRow =
       [
+        'Month',
         'ID',
         'Name',
         'Department name',
@@ -391,95 +455,31 @@ const exportExcelTimekeeping = () => {
         'Over time',
         'Average'
       ];
-    const ws = XLSX.utils.aoa_to_sheet([]);
-    const rows = value.data.map(item => {
-      const rowData = []
-      rowData.push(
-        item.id,
-        item.name,
-        item.department,
-        item.regularWorkingDays,
-        item.sumWorkingDays,
-        item.remoteDays,
-        item.leaveDays,
-        item.lateDays,
-        item.regularWorkingTime,
-        item.sumWorkingTime,
-        item.scheduledWorkingTime,
-        item.overtimeWorkingTime,
-        item.averageWorkingHours
-      );
-      return rowData
-    })
-    const filteredRows = rows.filter(row => row !== undefined);
-    filteredRows.unshift(headerRow);
-    if (prop.mode === 'Excel') {
-      if (!ws['!cols']) {
-        ws['!cols'] = [];
-      }
-      ws['!cols'][0] = { wch: 5 };
-      ws['!cols'][1] = { wch: 20 };
-      ws['!cols'][2] = { wch: 20 };
-      ws['!cols'][3] = { wch: 20 };
-      ws['!cols'][4] = { wch: 25 };
-      ws['!cols'][5] = { wch: 20 };
-      ws['!cols'][6] = { wch: 20 };
-      ws['!cols'][7] = { wch: 20 };
-      ws['!cols'][8] = { wch: 20 };
-      ws['!cols'][9] = { wch: 20 };
-      ws['!cols'][10] = { wch: 20 };
-      ws['!cols'][11] = { wch: 20 };
-      ws['!cols'][12] = { wch: 20 };
-      XLSX.utils.sheet_add_aoa(ws, filteredRows, { origin: 'A1' });
-      XLSX.utils.book_append_sheet(wb, ws, `${value.month}`);
-    }
-  })
-  XLSX.writeFile(wb, 'timekeeping.xlsx');
-  messages('success', 'Export complete')
-  emits('invisible');
-}
-const exportCSVTimekeeping = () => {
-  const csvData = [];
-  const headerRow =
-    [
-      'Month',
-      'ID',
-      'Name',
-      'Department name',
-      'The number of days specified',
-      'Total day', 'Remote day',
-      'Not work day', 'Late day',
-      'Predetermined time',
-      'Total time',
-      'Schedule time',
-      'Over time',
-      'Average'
-    ];
   csvData.push(headerRow);
   timekeeping.value.map(value => {
     const rowData = []
     value.data.map(item => {
       rowData.push(
-        value.month,
-        item.id,
-        item.name,
-        item.department,
-        item.regularWorkingDays,
-        item.sumWorkingDays,
-        item.remoteDays,
-        item.leaveDays,
-        item.lateDays,
-        item.regularWorkingTime,
-        item.sumWorkingTime,
-        item.scheduledWorkingTime,
-        item.overtimeWorkingTime,
-        item.averageWorkingHours
+          value.month,
+          item.id,
+          item.name,
+          item.department,
+          item.regularWorkingDays,
+          item.sumWorkingDays,
+          item.remoteDays,
+          item.leaveDays,
+          item.lateDays,
+          item.regularWorkingTime,
+          item.sumWorkingTime,
+          item.scheduledWorkingTime,
+          item.overtimeWorkingTime,
+          item.averageWorkingHours
       )
     })
     csvData.push(rowData)
   })
   const csvContent = Papa.unparse(csvData);
-  const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const csvBlob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
   const fileName = `timekeeping.csv`;
   FileSaver.saveAs(csvBlob, fileName);
   messages('success', 'Export complete');

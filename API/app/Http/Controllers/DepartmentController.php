@@ -6,6 +6,7 @@ use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
 use App\Repositories\Department\DepartmentRepository;
 use App\Repositories\Department\DepartmentRepositoryInterface;
+use App\Services\Department\DepartmentServiceInterface;
 use Illuminate\Http\Request;
 
 /**
@@ -14,7 +15,7 @@ use Illuminate\Http\Request;
 class DepartmentController extends Controller
 {
 
-    public function __construct(protected DepartmentRepositoryInterface $departmentRepo)
+    public function __construct(protected DepartmentServiceInterface $departmentService)
     {
     }
 
@@ -26,8 +27,8 @@ class DepartmentController extends Controller
     public function index($id = null)
     {
         if($id == null){
-            return DepartmentResource::collection($this->departmentRepo->getAll());
+            return DepartmentResource::collection($this->departmentService->getAll());
         }
-        return new DepartmentResource($this->departmentRepo->find($id));
+        return new DepartmentResource($this->departmentService->find($id));
     }
 }

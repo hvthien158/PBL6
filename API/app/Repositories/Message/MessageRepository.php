@@ -6,6 +6,7 @@ use App\Models\Message;
 use App\Models\Department;
 use App\Repositories\BaseRepository;
 use App\Repositories\RepositoryInterface;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class MessageRepository extends BaseRepository implements MessageRepositoryInterface
@@ -19,59 +20,32 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
     /**
      * @return \Illuminate\Support\Collection
      */
-    public function getLimit5Message()
+    public function getLimit5Message($userInDepartment)
     {
-        $userDepartment = Department::where('department_manager_id', auth()->id())->first()->users()->get()->pluck('id')->toArray();
-        if ($userDepartment) {
-            return Message::whereIn('user_id', $userDepartment)->orderBy('id', 'desc')->take(5)->get();
-        }
-        // return DB::table('messages')
-        //     ->orderBy('id', 'desc')
-        //     ->take(5)->get();
+        return Message::whereIn('user_id', $userInDepartment)->orderBy('id', 'desc')->take(5)->get();
     }
     /**
      * @return \Illuminate\Support\Collection
      */
-    public function getLimitUnreadMessage()
+    public function getLimitUnreadMessage($userInDepartment)
     {
-        $userDepartment = Department::where('department_manager_id', auth()->id())->first()->users()->get()->pluck('id')->toArray();
-        return Message::whereIn('user_id', $userDepartment)->where('is_read', 0)->orderBy('id', 'desc')->take(5)->get();
-        // return DB::table('messages')
-        //     ->where('is_read', '=', 0)
-        //     ->orderBy('id', 'desc')
-        //     ->take(5)->get();
+        return Message::whereIn('user_id', $userInDepartment)->where('is_read', 0)->orderBy('id', 'desc')->take(5)->get();
     }
 
     /**
-     * @param $request
+     * @param $title
+     * @param $content
+     * @param $timekeepingID
      * @param $userID
-     * @return bool|\Illuminate\Http\JsonResponse
+     * @return bool
      */
-    public function customCreate($request, $userID)
+    public function createWithTimestamp($title, $content, $timekeepingID, $userID)
     {
-        $timekeeping = DB::table('time_keepings')
-            ->where('_date', '=', $request->time_keeping_date)
-            ->where('user_id', '=', $userID);
-
-        if ($timekeeping->first()->user_id != $userID) {
-            return response()->json(['error' => 'Not allow'], 405);
-        }
-
-        if ($request->input('title') == 'Leave/remote work request') {
-            $timekeeping->update([
-                'admin_accept_status' => 1
-            ]);
-        } else if ($request->input('title') == 'Checkin/checkout request') {
-            $timekeeping->update([
-                'admin_accept_time' => 1
-            ]);
-        }
-
         $message = new Message();
-        $message->title = $request->input('title');
-        $message->content = $request->input('content');
+        $message->title = $title;
+        $message->content = $content;
         $message->user_id = $userID;
-        $message->time_keeping_id = $timekeeping->first()->id;
+        $message->time_keeping_id = $timekeepingID;
         return $message->save();
     }
 
@@ -79,39 +53,9 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
      * @param $id
      * @return void
      */
-    public function markAsReadMessage($id)
+    public function updateRead($id)
     {
-        DB::table('messages')
-            ->where('id', '=', $id)
+        return $this->model->where('id', '=', $id)
             ->update(['is_read' => 1]);
-    }
-
-    /**
-     * @param $id
-     * @return \Illuminate\Http\JsonResponse|void
-     */
-    public function markAsConfirmedMessage($id)
-    {
-        $messages = DB::table('messages')
-            ->where('id', '=', $id);
-
-        $message = $messages->first();
-        $timekeeping = DB::table('time_keepings')
-            ->where('id', '=', $message->time_keeping_id);
-        if ($message->title == 'Leave/remote work request') {
-            $timekeeping->update(['admin_accept_status' => 2]);
-        } else if ($message->title === 'Checkin/checkout request') {
-            $timekeeping->update(['admin_accept_time' => 2]);
-            DB::table('systemtimes')
-                ->where('id', '=', $message->time_keeping_id)
-                ->update([
-                    'time_check_in' => $timekeeping->first()->time_check_in,
-                    'time_check_out' => $timekeeping->first()->time_check_out,
-                ]);
-        } else {
-            return response()->json(['error' => 'Title incorrect'], 400);
-        }
-
-        $messages->update(['is_check' => 1, 'is_read' => 1]);
     }
 }

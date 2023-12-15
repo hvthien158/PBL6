@@ -14,19 +14,23 @@ class ShiftRepository extends BaseRepository implements ShiftRepositoryInterface
         return Shift::class;
     }
 
-    public function getAllFiltered($skip, $request)
+    public function countByNameLike($name)
     {
-        $itemsPerPage = 10;
-        if ($request->name != '') {
-            $shift = Shift::whereRaw('LOWER(name) like ?', ['%' . $request->name . '%'])->skip($skip * 10)->take($itemsPerPage)->get();
-            $totalPage = floor(Shift::whereRaw('LOWER(name) like ?', ['%' . $request->name . '%'])->count() / $itemsPerPage) + 1;
-        } else {
-            $totalPage = floor(Shift::count() / $itemsPerPage) + 1;
-            $shift = Shift::skip($skip * $itemsPerPage)->take($itemsPerPage)->get();
-        }
-        return [
-            'totalPage' => $totalPage,
-            'shift' => ShiftResource::collection($shift),
-        ];
+        return $this->model->whereRaw('LOWER(name) like ?', ['%' . $name . '%'])->count();
+    }
+
+    public function findByNameLikeAndSkip($name, $skip, $take)
+    {
+        return $this->model->whereRaw('LOWER(name) like ?', ['%' . $name . '%'])->skip($skip * 10)->take($take)->get();
+    }
+
+    public function getLimit($skip, $take)
+    {
+        return $this->model->skip($skip * $take)->take($take)->get();
+    }
+
+    public function countAll()
+    {
+        return $this->model->count();
     }
 }

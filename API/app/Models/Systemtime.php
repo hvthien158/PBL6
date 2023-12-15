@@ -12,6 +12,7 @@ class Systemtime extends Model
     protected $guarded = [];
     protected $fillable = [
         'id',
+        '_date',
         'time_check_in',
         'time_check_out',
     ];

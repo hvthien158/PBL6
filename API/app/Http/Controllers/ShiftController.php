@@ -6,13 +6,14 @@ use App\Http\Resources\ShiftResource;
 use App\Models\Shift;
 use App\Repositories\Shift\ShiftRepository;
 use App\Repositories\Shift\ShiftRepositoryInterface;
+use App\Services\Shift\ShiftServiceInterface;
 use Illuminate\Http\Request;
 
 
 class ShiftController extends Controller
 {
 
-    public function __construct(protected ShiftRepositoryInterface $shiftRepo)
+    public function __construct(protected ShiftServiceInterface $shiftService)
     {
     }
 
@@ -24,8 +25,8 @@ class ShiftController extends Controller
     public function index($id = null)
     {
         if($id == null){
-            return ShiftResource::collection($this->shiftRepo->getAll());
+            return ShiftResource::collection($this->shiftService->getAll());
         }
-        return new ShiftResource($this->shiftRepo->find($id));
+        return new ShiftResource($this->shiftService->findShift($id));
     }
 }

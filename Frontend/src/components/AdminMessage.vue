@@ -100,6 +100,7 @@ watch(props, () => {
     loadRequest()
 })
 function loadRequest() {
+  request_data.value = ''
   if (only_unread.value) {
     MessageAPI.get5UnreadMessage(user.token)
         .then((response) => {
@@ -117,6 +118,7 @@ function loadRequest() {
   } else {
     MessageAPI.get5Message(user.token)
         .then((response) => {
+          console.log(response.data.data)
           request_data.value = response.data.data
           new_message.value = 0
           request_data.value.forEach((data) => {

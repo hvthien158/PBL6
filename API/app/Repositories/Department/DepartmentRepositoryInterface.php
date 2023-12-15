@@ -6,7 +6,7 @@ use App\Repositories\RepositoryInterface;
 
 interface DepartmentRepositoryInterface extends RepositoryInterface
 {
-    public function getAllFiltered($skip, $request);
+    public function getOrderAscWithUserAndManager($modelParam = null);
 
-    public function checkManager($id);
+    public function getAllUserInDepartmentOfManager();
 }

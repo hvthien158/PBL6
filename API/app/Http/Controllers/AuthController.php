@@ -6,6 +6,8 @@ use App\Common\ResponseMessage;
 use App\Models\User;
 use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
+use App\Services\User\UserServiceInterface;
+use App\Services\UserDeviceToken\UserDeviceTokenServiceInterface;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
@@ -24,10 +26,11 @@ use App\Repositories\UserDeviceToken\UserDeviceTokenRepositoryInterface;
 
 class AuthController extends Controller
 {
-
-    public function __construct(protected UserRepositoryInterface $userRepo, protected UserDeviceTokenRepositoryInterface $userDeviceTokenRepo)
-    {
-    }
+    public function __construct(
+        protected UserServiceInterface $userService,
+        protected UserDeviceTokenServiceInterface $userDeviceTokenService
+    )
+    {}
 
     /**
      * @param LoginRequest $request
@@ -47,13 +50,13 @@ class AuthController extends Controller
             return response()->json(['verify_quest' => 'Please verify email'], 200);
         }
         if($request->deviceToken){
-            if ($this->userDeviceTokenRepo->deleteToken($request->deviceToken)) {
-                $this->userDeviceTokenRepo->create([
+            if ($this->userDeviceTokenService->deleteToken($request->deviceToken)) {
+                $this->userDeviceTokenService->createToken([
                     'user_id' => auth()->id(),
                     'device_token' => $request->deviceToken,
                     'device' => 'web'
                 ]);
-            } 
+            }
         }
         return $this->createNewToken($token);
     }
@@ -63,7 +66,7 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $logout = $this->userDeviceTokenRepo->deleteToken($request->device_token);
+        $logout = $this->userDeviceTokenService->deleteToken($request->device_token);
         if($logout){
             auth()->logout();
             return response()->json(['message' => ResponseMessage::DELETE_SUCCESS]);
@@ -86,7 +89,7 @@ class AuthController extends Controller
      */
     protected function createNewToken($token)
     {
-        $user = $this->userRepo->find(auth()->id());
+        $user = $this->userService->findUser(auth()->id());
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
@@ -108,7 +111,7 @@ class AuthController extends Controller
 
         $userId = auth()->id();
 
-        $check = $this->userRepo->updateByID($userId, [
+        $check = $this->userService->updateByID($userId, [
             'password' => bcrypt($request->new_password)]
         );
 
@@ -129,8 +132,8 @@ class AuthController extends Controller
      */
     public function updateProfile(UpdateProfileRequest $request)
     {
-        $user = $this->userRepo->find(auth()->id());
-        $this->userRepo->updateProfile($user, $request);
+        $user = $this->userService->findUser(auth()->id());
+        $this->userService->updateProfile($user, $request);
         return response()->json([
             'message' => ResponseMessage::UPDATE_SUCCESS,
             'user' => new UserResource($user)
@@ -159,8 +162,8 @@ class AuthController extends Controller
      */
     public function checkEmail(EmailRequest $request)
     {
-        $email = $this->userRepo->checkEmail($request->input('email'));
-        if ($email) {
+        $email = $this->userService->checkEmail($request->input('email'));
+        if (count($email)) {
             return response()->json(['message' => ResponseMessage::OK], 200);
         } else {
             return response()->json(['error' => ResponseMessage::NOT_FOUND_ERROR], 404);

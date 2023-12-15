@@ -6,15 +6,11 @@ use App\Repositories\RepositoryInterface;
 
 interface MessageRepositoryInterface extends RepositoryInterface
 {
-    public function getLimit5Message();
+    public function getLimit5Message($userInDepartment);
 
-    public function getLimitUnreadMessage();
+    public function getLimitUnreadMessage($userInDepartment);
 
-    public function customCreate($request, $userID);
+    public function createWithTimestamp($title, $content, $timekeepingID, $userID);
 
-    //Change status after admin read request
-    public function markAsReadMessage($id);
-
-    //Change status after admin confirm request
-    public function markAsConfirmedMessage($id);
+    public function updateRead($id);
 }

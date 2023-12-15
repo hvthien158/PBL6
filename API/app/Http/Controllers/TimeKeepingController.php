@@ -13,6 +13,7 @@ use App\Models\TimeKeeping;
 use App\Models\User;
 use App\Repositories\TimeKeeping\TimeKeepingRepository;
 use App\Repositories\TimeKeeping\TimeKeepingRepositoryInterface;
+use App\Services\TimeKeeping\TimekeepingServiceInterface;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -24,7 +25,7 @@ use League\CommonMark\Parser\Block\ParagraphParser;
 class TimeKeepingController extends Controller
 {
 
-    public function __construct(protected TimeKeepingRepositoryInterface $timeKeepRepo)
+    public function __construct(protected TimekeepingServiceInterface $timekeepingService)
     {
     }
 
@@ -34,7 +35,7 @@ class TimeKeepingController extends Controller
     public function checkIn()
     {
         try {
-            $this->timeKeepRepo->checkIn(auth()->id());
+            $this->timekeepingService->checkIn(auth()->id());
             return response()->json(['message' => ResponseMessage::OK]);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -47,7 +48,7 @@ class TimeKeepingController extends Controller
     public function checkOut()
     {
         try {
-            $result = $this->timeKeepRepo->checkOut(auth()->id());
+            $result = $this->timekeepingService->checkOut(auth()->id());
             if($result){
                 return response()->json(['message' => ResponseMessage::OK]);
             } else {
@@ -63,7 +64,7 @@ class TimeKeepingController extends Controller
      */
     public function getTimeKeeping()
     {
-        return response()->json($this->timeKeepRepo->getTimeKeepingToday());
+        return response()->json($this->timekeepingService->getToday());
     }
     /**
      * @return object
@@ -80,7 +81,7 @@ class TimeKeepingController extends Controller
         }
 
         return TimeKeepingResource::collection(
-            $this->timeKeepRepo->getListTimeKeepingFiltered($from, $to, auth()->user()->role, $user_id)
+            $this->timekeepingService->search($from, $to, auth()->user()->role, $user_id)
         );
     }
 
@@ -95,7 +96,7 @@ class TimeKeepingController extends Controller
     {
         if ($userId && $fromMonth && $toMonth) {
             try {
-                $timekeeping = $this->timeKeepRepo->getListTimeKeepingBetween($userId, $fromMonth, $toMonth);
+                $timekeeping = $this->timekeepingService->getBetweenMonth($fromMonth, $toMonth, $userId);
                 if (count($timekeeping) != 0) {
                     return TimeKeepingResource::collection($timekeeping);
                 } else {
@@ -114,7 +115,7 @@ class TimeKeepingController extends Controller
      */
     public function searchByAroundTime(TimeRequest $request)
     {
-        return TimeKeepingResource::collection($this->timeKeepRepo->getListTimeKeepingAround($request));
+        return TimeKeepingResource::collection($this->timekeepingService->getBetweenDate($request));
     }
 
     /**
@@ -124,12 +125,12 @@ class TimeKeepingController extends Controller
      */
     public function searchByMonth(MonthYearRequest $request)
     {
-        return $this->timeKeepRepo->getListTimeKeepingInMonth($request);
+        return $this->timekeepingService->getInMonth($request);
     }
 
     public function updateTimeKeeping(UpdateTimeKeepingRequest $request)
     {
-        $this->timeKeepRepo->customUpdate($request);
+        $this->timekeepingService->customUpdate($request);
 
         return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
     }

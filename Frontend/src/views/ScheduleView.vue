@@ -151,6 +151,7 @@ const visibleMode = ref(false)
 const operationMode = ref('Excel')
 const index = ref(0)
 const getListTimeKeeping = async (from, to) => {
+  data.value = [];
   if (router.currentRoute.value.fullPath === '/schedule') {
     try {
       await TimeKeepAPI.getListTimeKeep(from, to, user.token)
@@ -330,10 +331,10 @@ function loadToday() {
   })
   if (check) {
     today.value = check
-    today.value.dayOfWeek = moment().format('dddd') + ' (Today)'
+    today.value.dayOfWeek = moment().format('dddd')
   } else {
     today.value.date = moment().format('YYYY-MM-DD')
-    today.value.dayOfWeek = moment().format('dddd') + ' (Today)'
+    today.value.dayOfWeek = moment().format('dddd')
   }
 }
 

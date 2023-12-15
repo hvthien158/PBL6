@@ -6,12 +6,13 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
+use App\Services\User\UserServiceInterface;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
 
-    public function __construct(protected UserRepositoryInterface $userRepo)
+    public function __construct(protected UserServiceInterface $userService)
     {
     }
 
@@ -23,10 +24,10 @@ class UserController extends Controller
     public function user(int $id = null)
     {
         if ($id) {
-            return new UserResource($this->userRepo->find($id));
+            return new UserResource($this->userService->findUser($id));
         } else {
             $this->authorize('adminView', User::class);
-            return UserResource::collection($this->userRepo->getAll());
+            return UserResource::collection($this->userService->getAll());
         }
     }
 }

@@ -14,6 +14,11 @@ use App\Repositories\Department\DepartmentRepositoryInterface;
 use App\Repositories\Department\DepartmentRepository;
 use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
+use App\Services\Department\DepartmentServiceInterface;
+use App\Services\Message\MessageServiceInterface;
+use App\Services\TimeKeeping\TimekeepingServiceInterface;
+use App\Services\User\UserServiceInterface;
+use App\Services\UserDeviceToken\UserDeviceTokenServiceInterface;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,11 +30,11 @@ class MessageController extends Controller
 {
 
     public function __construct(
-        protected MessageRepositoryInterface $messageRepo,
-        protected TimeKeepingRepositoryInterface $timeKeepingRepository,
-        protected DepartmentRepositoryInterface $departmentRepo,
-        protected UserRepositoryInterface $userRepo,
-        protected UserDeviceTokenRepositoryInterface $userDeviceTokenRepo
+        protected MessageServiceInterface $messageService,
+        protected TimekeepingServiceInterface $timekeepingService,
+        protected DepartmentServiceInterface $departmentService,
+        protected UserServiceInterface $userService,
+        protected UserDeviceTokenServiceInterface $userDeviceTokenService
     ) {
     }
 
@@ -38,14 +43,14 @@ class MessageController extends Controller
      */
     public function getAllMessage()
     {
-        return MessageResource::collection($this->messageRepo->getAll());
+        return MessageResource::collection($this->messageService->getAll());
     }
 
     public function getLimitMessage()
     {
         try {
-            if ($this->departmentRepo->checkManager(auth()->id())) {
-                return MessageResource::collection($this->messageRepo->getLimit5Message());
+            if ($this->departmentService->checkManager()) {
+                return MessageResource::collection($this->messageService->getLimit5Message());
             }
             return response()->json(['message' => ResponseMessage::AUTHORIZATION_ERROR], 400);
         } catch (\Exception $e) {
@@ -59,8 +64,8 @@ class MessageController extends Controller
     public function getLimitUnreadMessage()
     {
         try {
-            if ($this->departmentRepo->checkManager(auth()->id())) {
-                return MessageResource::collection($this->messageRepo->getLimitUnreadMessage());
+            if ($this->departmentService->checkManager()) {
+                return MessageResource::collection($this->messageService->getLimitUnreadMessage());
             }
             return response()->json(['message' => ResponseMessage::AUTHORIZATION_ERROR], 400);
         } catch (\Exception $e) {
@@ -75,8 +80,13 @@ class MessageController extends Controller
     public function createRequest(CreateMessageRequest $request)
     {
         try {
-            if ($this->messageRepo->customCreate($request, auth()->id())) {
-                $notification = new NotificationSendController($this->departmentRepo, $this->userRepo, $this->userDeviceTokenRepo, $this->messageRepo);
+            if ($this->messageService->customCreate($request)) {
+                $notification = new NotificationSendController(
+                    $this->departmentService,
+                    $this->userService,
+                    $this->userDeviceTokenService,
+                    $this->messageService
+                );
                 $notification->sendNotification(array_merge($request->toArray(), ['type' => 1]));
                 return response()->json(['message' => ResponseMessage::OK]);
             }
@@ -96,7 +106,7 @@ class MessageController extends Controller
             return response()->json(['message' => ResponseMessage::VALIDATION_ERROR], 422);
         }
         try {
-            $this->messageRepo->markAsReadMessage($request->input('id'));
+            $this->messageService->markAsReadMessage($request->input('id'));
             return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
@@ -114,8 +124,13 @@ class MessageController extends Controller
             return response()->json(['message' => ResponseMessage::VALIDATION_ERROR], 422);
         }
         try {
-            $this->messageRepo->markAsConfirmedMessage($request->input('id'));
-            $notification = new NotificationSendController($this->departmentRepo, $this->userRepo, $this->userDeviceTokenRepo, $this->messageRepo);
+            $this->messageService->markAsConfirmedMessage($request->input('id'));
+            $notification = new NotificationSendController(
+                $this->departmentService,
+                $this->userService,
+                $this->userDeviceTokenService,
+                $this->messageService
+            );
             $notification->sendNotification(array_merge($request->toArray(),
                 [
                     'type' => 0,

@@ -28,6 +28,10 @@ use App\Repositories\Shift\ShiftRepositoryInterface;
 use App\Repositories\TimeKeeping\TimeKeepingRepositoryInterface;
 use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
+use App\Services\Department\DepartmentServiceInterface;
+use App\Services\Shift\ShiftServiceInterface;
+use App\Services\TimeKeeping\TimekeepingServiceInterface;
+use App\Services\User\UserServiceInterface;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
@@ -38,10 +42,10 @@ use Illuminate\Support\Facades\Validator;
 class AdminController extends Controller
 {
     public function __construct(
-        protected UserRepositoryInterface $userRepo,
-        protected DepartmentRepositoryInterface $departmentRepo,
-        protected ShiftRepositoryInterface $shiftRepo,
-        protected TimeKeepingRepositoryInterface $timeKeepRepo,
+        protected UserServiceInterface $userService,
+        protected DepartmentServiceInterface $departmentService,
+        protected ShiftServiceInterface $shiftService,
+        protected TimekeepingServiceInterface $timeKeepService,
     ) {
     }
 
@@ -52,7 +56,7 @@ class AdminController extends Controller
     {
         $this->authorize('adminView', User::class);
         try {
-            $result = $this->userRepo->getAllFiltered($request, $id);
+            $result = $this->userService->search($id, $request);
             $response = [
                 'totalUser' => $result['total'],
                 'user' => UserResource::collection($result['user'])
@@ -72,7 +76,7 @@ class AdminController extends Controller
     {
         $this->authorize('create', User::class);
         try {
-            $this->userRepo->create([
+            $this->userService->createNewUser([
                 'name' => $request->name,
                 'email' => strtolower($request->email),
                 'password' => bcrypt($request->password),
@@ -100,7 +104,7 @@ class AdminController extends Controller
     {
         $this->authorize('update', User::class);
         try {
-            $this->userRepo->update($user, [
+            $this->userService->updateUser($user, [
                 'name' => $request->name,
                 'email' => $request->email,
                 'department_id' => $request->department_id,
@@ -141,7 +145,7 @@ class AdminController extends Controller
     {
         $this->authorize('viewDepartment', Department::class);
         try {
-            return response()->json($this->departmentRepo->getAllFiltered($id, $request));
+            return response()->json($this->departmentService->search($id, $request));
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -155,7 +159,7 @@ class AdminController extends Controller
     {
         $this->authorize('create', Department::class);
         try {
-            $this->departmentRepo->create([
+            $this->departmentService->create([
                 'department_name' => $request->departmentName,
                 'address' => $request->address,
                 'email' => $request->email,
@@ -178,7 +182,7 @@ class AdminController extends Controller
     {
         $this->authorize('update', Department::class);
         try {
-            $this->departmentRepo->update($department, [
+            $this->departmentService->update($department, [
                 'department_name' => $request->departmentName,
                 'address' => $request->address,
                 'email' => $request->email,
@@ -234,7 +238,7 @@ class AdminController extends Controller
     public function listShift($id, Request $request)
     {
         try {
-            return response()->json($this->shiftRepo->getAllFiltered($id, $request));
+            return response()->json($this->shiftService->search($id, $request));
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -247,7 +251,7 @@ class AdminController extends Controller
     public function createShift(CreateShiftRequest $request)
     {
         try {
-            $this->shiftRepo->create([
+            $this->shiftService->createNewShift([
                 'name' => $request->name,
                 'time_valid_check_in' => $request->timeValidCheckIn,
                 'time_valid_check_out' => $request->timeValidCheckOut,
@@ -267,7 +271,7 @@ class AdminController extends Controller
     public function updateShift(UpdateShiftRequest $request, Shift $shift)
     {
         try {
-            $this->shiftRepo->update($shift, [
+            $this->shiftService->updateShift($shift, [
                 'name' => $request->name,
                 'time_valid_check_in' => $request->timeValidCheckIn,
                 'time_valid_check_out' => $request->timeValidCheckOut,
@@ -303,7 +307,7 @@ class AdminController extends Controller
     {
         try {
             $this->authorize('viewAny', TimeKeeping::class);
-            $result = $this->timeKeepRepo->timeKeepingStatistic($skip, $request);
+            $result = $this->timeKeepService->timeKeepingStatistic($skip, $request);
             return response()->json([
                 'quantity' => $result['count_user'],
                 'data' => $result['result']
@@ -323,7 +327,7 @@ class AdminController extends Controller
             $this->authorize('viewAny', TimeKeeping::class);
             $fromMonth = Carbon::parse($request->from)->startOfMonth();
             $toMonth = Carbon::parse($request->to)->endOfMonth();
-            $timekeeping = $this->timeKeepRepo->findTimeKeepingWaitingAccept($fromMonth, $toMonth);
+            $timekeeping = $this->timeKeepService->getByWaitingAccept($fromMonth, $toMonth);
             $userWaitingAccept = array_unique($timekeeping->pluck('user_id')->toArray());
             $month = [];
 
@@ -339,7 +343,7 @@ class AdminController extends Controller
             $data = [];
             foreach ($month as $months) {
                 $dataRequest = array_merge($months, ['limit' => 0, 'name' => null, 'department' => null]);
-                $result = $this->timeKeepRepo->timeKeepingStatistic(0, json_decode(json_encode($dataRequest)));
+                $result = $this->timeKeepService->timeKeepingStatistic(0, json_decode(json_encode($dataRequest)));
                 $filteredResult = array_filter($result['result'], function ($item) use ($userWaitingAccept) {
                     return !in_array($item['id'], $userWaitingAccept);
                 });

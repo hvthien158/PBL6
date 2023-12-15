@@ -169,7 +169,8 @@ const forgot = async () => {
               .catch((e) => {
                 console.log(e)
               })
-        }).catch(() => {
+        }).catch((e) => {
+          console.log(e)
           email_not_signed.value = true
           loading.value = false
         })

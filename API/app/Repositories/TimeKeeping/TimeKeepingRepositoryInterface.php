@@ -6,24 +6,11 @@ use App\Repositories\RepositoryInterface;
 
 interface TimeKeepingRepositoryInterface extends RepositoryInterface
 {
-    public function checkIn($userID);
+    public function insertGetId($attribute = []);
 
-    public function checkOut($userID);
+    public function getByDateBetweenAndOrderByDesc($from, $to, $userID);
 
-    public function getTimeKeepingToday();
+    public function getInMonthYear($month, $year, $userID);
 
-    public function getListTimeKeepingFiltered($from, $to, $role, $user_id = null);
-
-    public function getListTimeKeepingBetween($userID, $fromMonth, $toMonth);
-
-    public function getListTimeKeepingAround($request);
-
-    public function getListTimeKeepingInMonth($request);
-
-    public function customUpdate($request);
-
-    public function timeKeepingStatistic($skip, $request);
-
-    public function findTimeKeepingWaitingAccept($fromMonth, $toMonth);
-
+    public function updateByDateAndUserID($date, $userID, $attribute = []);
 }
