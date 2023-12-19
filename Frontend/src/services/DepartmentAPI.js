@@ -16,6 +16,11 @@ export default {
             headers: {Authorization: `Bearer ${token}`}
         })
     },
+    getAllUser(token, department_id){
+        return axios.get(url + '/all-user/' + department_id, {
+            headers: {Authorization: `Bearer ${token}`}
+        });
+    },
     getAllDepartment() {
         return axios.get(url)
     },

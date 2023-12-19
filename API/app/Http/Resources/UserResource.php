@@ -28,7 +28,7 @@ class UserResource extends JsonResource
         if($this->avatar){
             $avatar = $this->avatar;
         } else {
-            $avatar = 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg';
+            $avatar = 'https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg';
         }
 
         $timezone = 'Asia/Ho_Chi_Minh';
@@ -56,10 +56,12 @@ class UserResource extends JsonResource
         }
 
         $isManger = false;
-        if(Department::where('department_manager_id', $this->id)->get()){
+        $ownerDepartmentID = 0;
+        $department = Department::where('department_manager_id', $this->id)->get();
+        if(count($department) > 0){
             $isManger = true;
+            $ownerDepartmentID = $department[0]->id;
         }
-
         return [
             'id' => $this->id,
             'name'=> $this->name,
@@ -75,6 +77,7 @@ class UserResource extends JsonResource
             'status_AM' => $status_AM,
             'status_PM' => $status_PM,
             'manager' => $isManger,
+            'owner_department_id' => $ownerDepartmentID,
         ];
     }
 }

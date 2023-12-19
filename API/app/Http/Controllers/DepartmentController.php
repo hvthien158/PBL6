@@ -31,4 +31,9 @@ class DepartmentController extends Controller
         }
         return new DepartmentResource($this->departmentService->find($id));
     }
+
+    public function getAllUserInDepartment($department_id)
+    {
+        return $this->departmentService->getAllUserInDepartment($department_id);
+    }
 }

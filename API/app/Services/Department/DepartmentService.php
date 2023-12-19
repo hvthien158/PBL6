@@ -5,10 +5,14 @@ namespace App\Services\Department;
 use App\Common\SQLOperator;
 use App\Http\Resources\DepartmentResource;
 use App\Repositories\Department\DepartmentRepositoryInterface;
+use App\Repositories\User\UserRepositoryInterface;
 
 class DepartmentService implements DepartmentServiceInterface
 {
-    public function __construct(protected DepartmentRepositoryInterface $departmentRepository)
+    public function __construct(
+        protected DepartmentRepositoryInterface $departmentRepository,
+        protected UserRepositoryInterface $userRepository,
+    )
     {}
 
     public function getAll()
@@ -48,6 +52,14 @@ class DepartmentService implements DepartmentServiceInterface
     public function find($user_id)
     {
         return $this->departmentRepository->find($user_id);
+    }
+
+    public function getAllUserInDepartment($departmentID)
+    {
+        $user = $this->userRepository->selectByMultiKeys([
+            ['department_id', SQLOperator::EQUAL, $departmentID]
+        ]);
+        return $user;
     }
 
     public function create($attribute = [])

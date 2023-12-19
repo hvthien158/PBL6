@@ -26,6 +26,13 @@ interface DepartmentServiceInterface
     public function find($user_id);
 
     /**
+     * Get all user in 1 department
+     * @param $departmentID
+     * @return mixed
+     */
+    public function getAllUserInDepartment($departmentID);
+
+    /**
      * Create a new department
      * @param $attribute
      * @return mixed

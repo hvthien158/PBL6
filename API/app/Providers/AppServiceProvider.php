@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use App\Repositories\Department\DepartmentRepository;
 use App\Repositories\Department\DepartmentRepositoryInterface;
+use App\Repositories\Meeting\MeetingRepository;
+use App\Repositories\Meeting\MeetingRepositoryInterface;
+use App\Repositories\MeetingAttendee\MeetingAttendeeRepository;
+use App\Repositories\MeetingAttendee\MeetingAttendeeRepositoryInterface;
 use App\Repositories\Message\MessageRepository;
 use App\Repositories\Message\MessageRepositoryInterface;
 use App\Repositories\Shift\ShiftRepository;
@@ -18,6 +22,9 @@ use App\Repositories\UserDeviceToken\UserDeviceTokenRepository;
 use App\Repositories\UserDeviceToken\UserDeviceTokenRepositoryInterface;
 use App\Services\Department\DepartmentService;
 use App\Services\Department\DepartmentServiceInterface;
+use App\Services\Meeting\MeetingService;
+use App\Services\Meeting\MeetingServiceInterface;
+use App\Services\MeetingAttendee\MeetingAttendeeService;
 use App\Services\Message\MessageService;
 use App\Services\Message\MessageServiceInterface;
 use App\Services\Shift\ShiftService;
@@ -47,6 +54,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(UserRepositoryInterface::class, UserRepository::class);
         $this->app->singleton(UserDeviceTokenRepositoryInterface::class, UserDeviceTokenRepository::class);
         $this->app->singleton(SystemtimeRepositoryInterface::class, SystemtimeRepository::class);
+        $this->app->singleton(MeetingRepositoryInterface::class, MeetingRepository::class);
+        $this->app->singleton(MeetingAttendeeRepositoryInterface::class, MeetingAttendeeRepository::class);
 
         //Service
         $this->app->singleton(DepartmentServiceInterface::class, DepartmentService::class);
@@ -56,6 +65,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(UserServiceInterface::class, UserService::class);
         $this->app->singleton(UserDeviceTokenServiceInterface::class, UserDeviceTokenService::class);
         $this->app->singleton(SystemtimeServiceInterface::class, SystemtimeService::class);
+        $this->app->singleton(MeetingServiceInterface::class, MeetingService::class);
+        $this->app->singleton(MeetingServiceInterface::class, MeetingAttendeeService::class);
     }
 
     /**

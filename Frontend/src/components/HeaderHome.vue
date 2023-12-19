@@ -6,6 +6,12 @@
       </router-link>
     </div>
     <span v-if="user.token" style="font-weight: bold; margin-right: 20px; display: flex; align-items: center">
+      <div v-if="user.manager" class="new-meeting" title="Schedule a meeting" @click="new_meeting = true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-calendar-plus" viewBox="0 0 16 16">
+          <path d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7"/>
+          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+        </svg>
+      </div>
       <AdminMessage v-if="user.manager" :notification = props.notification></AdminMessage>
       <el-dropdown>
         <span class="el-dropdown-link">
@@ -29,16 +35,22 @@
       </el-dropdown>
     </span>
   </header>
+  <div class="new-meeting-form">
+    <NewMeeting @invisible="new_meeting = false" :visible="new_meeting"></NewMeeting>
+  </div>
 </template>
 
 <script setup>
-import logo from "../assets/image/logo.png";
+import logo from "../assets/logo.png";
 import router from "../router";
 import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
 import AdminMessage from "./AdminMessage.vue";
 import AuthAPI from "../services/AuthAPI";
+import NewMeeting from "./NewMeeting.vue";
+import {ref} from "vue";
 
+const new_meeting = ref(false)
 const props = defineProps({
   notification: {
     type: Object
@@ -144,5 +156,16 @@ header {
   text-decoration: underline;
   color: #f3952d;
   cursor: pointer;
+}
+
+.new-meeting{
+  margin-right: 20px;
+  margin-bottom: 4px;
+  color: white;
+}
+
+.new-meeting:hover{
+  cursor: pointer;
+  color: #f3952d;
 }
 </style>

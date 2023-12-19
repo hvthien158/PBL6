@@ -52,7 +52,7 @@ class AdminController extends Controller
     /**
      * @return JsonResponse
      */
-    public function listUser(Request $request, $id)
+    public function listUserInDepartment(Request $request, $id)
     {
         $this->authorize('adminView', User::class);
         try {

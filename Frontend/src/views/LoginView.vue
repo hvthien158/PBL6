@@ -142,6 +142,7 @@ const login = async () => {
             user.role = response.data.user.role
             user.deviceToken = deviceToken.value
             user.manager = response.data.user.manager
+            user.owner_department_id = response.data.user.owner_department_id
             //alert success
             alertStore.alert = true
             alertStore.type = 'success'

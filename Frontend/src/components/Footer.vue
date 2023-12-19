@@ -1,6 +1,6 @@
 <template>
   <footer>
-    <p>Copyright © Kiaisoft Co.,Ltd</p>
+    <p>Copyright © PBL6.Group2</p>
   </footer>
 </template>
 

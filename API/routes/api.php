@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\TimeKeepingController;
@@ -60,7 +61,7 @@ Route::middleware('auth:api')->group(function () {
     //Admin
     Route::group(['middleware' => ['admin']], function () {
         Route::group(['prefix' => '/user'], function () {
-            Route::post('/list/{id}', [AdminController::class, 'listUser']);
+            Route::post('/list/{id}', [AdminController::class, 'listUserInDepartment']);
             Route::post('/create', [AdminController::class, 'createUser']);
             Route::put('/update/{user}', [AdminController::class, 'updateUser']);
             Route::delete('/delete/{id}', [AdminController::class, 'deleteUser']);
@@ -118,10 +119,19 @@ Route::get('email/resend', [VerificationController::class, 'resend'])->name('ver
 Route::group(['prefix' => '/department'], function () {
     Route::get('/', [DepartmentController::class, 'index']);
     Route::get('/{id}', [DepartmentController::class, 'index']);
+    Route::get('/all-user/{department_id}', [DepartmentController::class, 'getAllUserInDepartment']);
 });
 
 //Shift
 Route::group(['prefix' => '/shift'], function () {
     Route::get('/', [ShiftController::class, 'index']);
     Route::get('/{id}', [ShiftController::class, 'index']);
+});
+
+//Meeting
+Route::group(['prefix' => '/meeting'], function () {
+    Route::get('/me', [MeetingController::class, 'getMyScheduleMeeting']);
+    Route::post('/create', [MeetingController::class, 'createNewScheduleMeeting']);
+    Route::post('/delete', [MeetingController::class, 'deleteScheduleMeeting']);
+    Route::post('/read', [MeetingController::class, 'markAsRead']);
 });
