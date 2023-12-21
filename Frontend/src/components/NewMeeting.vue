@@ -32,19 +32,19 @@
         </el-select>
       </el-form-item>
       <el-form-item label="Start" :label-width="formLabelWidth">
-        <el-date-picker placeholder="YYYY-MM-DD" v-model="form.startDate">
+        <el-date-picker placeholder="YYYY-MM-DD" v-model="form.startDate" value-format="YYYY-MM-DD">
         </el-date-picker>
-        <el-time-picker placeholder="HH:mm" v-model="form.startTime">
+        <el-time-picker placeholder="HH:mm" v-model="form.startTime" value-format="HH:mm:ss">
         </el-time-picker>
       </el-form-item>
       <el-form-item label="End" :label-width="formLabelWidth">
-        <el-date-picker placeholder="YYYY-MM-DD" v-model="form.endDate">
+        <el-date-picker placeholder="YYYY-MM-DD" v-model="form.endDate" value-format="YYYY-MM-DD">
         </el-date-picker>
-        <el-time-picker placeholder="HH:mm" v-model="form.endTime">
+        <el-time-picker placeholder="HH:mm" v-model="form.endTime" value-format="HH:mm:ss">
         </el-time-picker>
       </el-form-item>
       <el-form-item label="Detail" :label-width="formLabelWidth">
-        <el-input type="textarea" v-model="form.address" autocomplete="off"/>
+        <el-input type="textarea" v-model="form.detail" autocomplete="off"/>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -64,10 +64,12 @@ import {useUserStore} from "../stores/user";
 import {useAlertStore} from "../stores/alert";
 import DepartmentAPI from "../services/DepartmentAPI";
 import UserAPI from "../services/UserAPI";
+import MeetingAPI from "../services/MeetingAPI";
 
 const formLabelWidth = "100px";
 const user = useUserStore().user
 const alertStore = useAlertStore()
+const emits = defineEmits(['invisible'])
 
 const prop = defineProps({
   visible: {
@@ -93,15 +95,32 @@ const list_user_available = ref([
   }
 ])
 
-const emits = defineEmits(['invisible'])
-
 watch(() => prop.visible, () => {
+  form.title = ''
+  form.attendees = []
+  form.startDate = ''
+  form.startTime = ''
+  form.endDate = ''
+  form.endTime = ''
+  form.detail = ''
   getListUser()
 })
 
 function createSchedule() {
+  emits('invisible')
   try {
-    //Call API
+    MeetingAPI.createNewScheduleMeeeting(
+        user.token,
+        form.title,
+        form.startDate + ' ' + form.startTime,
+        form.endDate + ' ' + form.endTime,
+        form.attendees,
+        form.detail
+    ).then(() => {
+      alertStore.alert = true
+      alertStore.type = 'success'
+      alertStore.msg = 'Success'
+    })
   } catch (e) {
     alertStore.alert = true
     alertStore.type = 'error'
@@ -114,7 +133,6 @@ const getListUser = async () => {
   try {
     await DepartmentAPI.getAllUser(user.token, user.owner_department_id)
         .then(function (response) {
-          console.log(response.data)
           list_user_available.value = response.data
         });
   } catch (e) {

@@ -30,8 +30,8 @@ class MeetingService implements MeetingServiceInterface
             'title' => $request->title,
             'start' => $request->start,
             'end' => $request->end,
-            'detail' => $request->detail,
-            'user_id' => $request->userID
+            'detail' => $request->detail ?: 'None',
+            'user_id' => auth()->id()
         ]);
 
         foreach ($request->attendees as $attendee){

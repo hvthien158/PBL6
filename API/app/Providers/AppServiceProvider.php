@@ -25,6 +25,7 @@ use App\Services\Department\DepartmentServiceInterface;
 use App\Services\Meeting\MeetingService;
 use App\Services\Meeting\MeetingServiceInterface;
 use App\Services\MeetingAttendee\MeetingAttendeeService;
+use App\Services\MeetingAttendee\MeetingAttendeeServiceInterface;
 use App\Services\Message\MessageService;
 use App\Services\Message\MessageServiceInterface;
 use App\Services\Shift\ShiftService;
@@ -66,7 +67,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(UserDeviceTokenServiceInterface::class, UserDeviceTokenService::class);
         $this->app->singleton(SystemtimeServiceInterface::class, SystemtimeService::class);
         $this->app->singleton(MeetingServiceInterface::class, MeetingService::class);
-        $this->app->singleton(MeetingServiceInterface::class, MeetingAttendeeService::class);
+        $this->app->singleton(MeetingAttendeeServiceInterface::class, MeetingAttendeeService::class);
     }
 
     /**

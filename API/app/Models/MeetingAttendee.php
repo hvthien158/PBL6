@@ -10,8 +10,8 @@ class MeetingAttendee extends Model
     use HasFactory;
 
     protected $fillable = [
-        'meetingID',
-        'attendeeID',
+        'meeting_id',
+        'attendee_id',
         'is_read'
     ];
 }
