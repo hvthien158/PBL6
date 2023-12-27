@@ -215,7 +215,7 @@ class TimekeepingService implements TimekeepingServiceInterface
         $userID
     )
     {
-        $shifts = $shiftRepository->getAll();
+        $shifts = $shiftRepository->selectAll();
         foreach ($shifts as $shift) {
             if (
                 $checkin->isBetween($shift->time_valid_check_in, $shift->time_valid_check_out) &&

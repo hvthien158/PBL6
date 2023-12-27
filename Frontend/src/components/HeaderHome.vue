@@ -12,6 +12,12 @@
           <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
         </svg>
       </div>
+      <div v-if="user.manager" class="new-meeting" title="Start a meeting" @click="router.push({name: 'record'})">
+        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-record-circle" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+          <path d="M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+        </svg>
+      </div>
       <AdminMessage v-if="user.manager" :notification = props.notification></AdminMessage>
       <el-dropdown>
         <span class="el-dropdown-link">

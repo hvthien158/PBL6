@@ -13,6 +13,7 @@ import ResetPassword from "../views/User/ResetPassword.vue";
 import ChangePassword from "../views/User/ChangePassword.vue";
 import ListShift from '../views/Admin/Shift/ListShift.vue';
 import ListMeeting from "../views/Admin/Meeting/ListMeeting.vue";
+import Recorder from "../views/Admin/Meeting/Recorder.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -50,6 +51,11 @@ const router = createRouter({
       path: '/admin/list-user',
       name: 'listUser',
       component: ListUser,
+    },
+    {
+      path: '/admin/record',
+      name: 'record',
+      component: Recorder,
     },
     {
       path: '/admin/list-timekeeping',
