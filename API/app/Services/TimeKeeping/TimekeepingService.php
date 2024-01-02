@@ -80,7 +80,7 @@ class TimekeepingService implements TimekeepingServiceInterface
                 'time_check_out' => $now->format('H:i:s')
             ]);
 
-            $shifts = $this->shiftRepository->getAll();
+            $shifts = $this->shiftRepository->selectAll();
             $timeCheckIn = Carbon::createFromFormat('H:i:s', $checkTimeKeeping->time_check_in, TimeZone::ASIA_HO_CHI_MINH);
             $timeCheckOut = Carbon::createFromFormat('H:i:s', $checkTimeKeeping->time_check_out, TimeZone::ASIA_HO_CHI_MINH);
             foreach ($shifts as $shift) {

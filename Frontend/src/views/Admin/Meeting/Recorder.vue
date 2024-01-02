@@ -1,28 +1,30 @@
 <template>
   <div class="audio-app">
     <div class="audio-container">
-      <h2>Ghi âm</h2>
+      <h2>Recorder:</h2>
       <audio id="audio" controls></audio>
       <div class="record-controls">
-        <button @click="startRecording" v-if="!isRecording" class="record-btn start-btn">Bắt đầu ghi âm</button>
-        <button @click="stopRecording" v-if="isRecording" class="record-btn stop-btn">Dừng ghi âm</button>
-        <button @click="uploadAudio" :disabled="!audioBlob" class="upload-btn">Tải lên</button>
+        <button @click="startRecording" v-if="!isRecording" class="record-btn start-btn">Start Recording</button>
+        <button @click="stopRecording" v-if="isRecording" class="record-btn stop-btn">Stop Recording</button>
+        <button @click="uploadAudio" :disabled="!audioBlob" class="upload-btn">Upload</button>
       </div>
     </div>
 
     <div class="result-container">
-      <h2>Kết quả</h2>
-      <div v-if="result.length === 0" class="empty-result">Không có kết quả</div>
+      <h2>Result:</h2>
+      <div v-if="result.length === 0 && !waiting" class="empty-result">No result</div>
+      <div v-else-if="result.length === 0 && waiting" class="empty-result">Waiting...</div>
       <p v-for="item in result" :key="item" class="result-item">
         {{ item.replace('\"', '') }}
       </p>
+      <button :disabled="waiting" @click="resetResult" class="reset-btn">Reset</button>
     </div>
   </div>
 </template>
 
 <script setup>
 import axios from 'axios';
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {getWaveBlob} from "webm-to-wav-converter";
 
 let device = navigator.mediaDevices.getUserMedia({ audio: true });
@@ -32,6 +34,7 @@ const isRecording = ref(false);
 const audioBlob = ref(null);
 const wavBlob = ref(null);
 const result = ref('');
+const waiting = ref(false)
 
 const startRecording = () => {
   device.then((stream) => {
@@ -62,21 +65,34 @@ const stopRecording = () => {
 };
 
 const uploadAudio = () => {
-  console.log(wavBlob.value)
+  waiting.value = true
   if (wavBlob.value) {
     const formData = new FormData();
     formData.append('file', wavBlob.value, new Date().getMilliseconds() + '_audio.wav');
 
     axios
         .post('http://127.0.0.1:8001/upload/', formData)
-        .then((response) => {
-          result.value = ''
-          result.value = response.data;
-        })
-        .catch((e) => {
-          console.error(e);
-        });
   }
+};
+
+onMounted(() => {
+  waiting.value = true
+  axios
+      .get('http://127.0.0.1:8001/old/')
+      .then((response) => {
+        waiting.value = false
+        result.value = ''
+        result.value = response.data;
+      })
+      .catch((e) => {
+        waiting.value = false
+        console.error(e);
+      });
+})
+
+const resetResult = () => {
+  result.value = '';
+  axios.post('http://127.0.0.1:8001/reset/')
 };
 </script>
 
@@ -145,5 +161,15 @@ const uploadAudio = () => {
 
 .stop-btn:hover {
   background-color: #e74c3c;
+}
+
+.reset-btn {
+  background-color: #e67e22;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 </style>

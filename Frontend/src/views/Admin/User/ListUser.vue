@@ -74,7 +74,7 @@
           Prev
         </el-button>
 <!--        <span>{{ currentPage }} / {{ totalPage }}</span>-->
-        <Pagination :current_page_prop="currentPage" :total_page_prop="100" @change-page="(page) => {currentPage = page}"></Pagination>
+        <Pagination :current_page_prop="currentPage" :total_page_prop="totalPage" @change-page="(page) => {currentPage = page}"></Pagination>
         <el-button @click="nextPage" :disabled="currentPage === totalPage">
           Next
         </el-button>

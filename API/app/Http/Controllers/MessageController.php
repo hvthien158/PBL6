@@ -81,13 +81,13 @@ class MessageController extends Controller
     {
         try {
             if ($this->messageService->customCreate($request)) {
-                $notification = new NotificationSendController(
-                    $this->departmentService,
-                    $this->userService,
-                    $this->userDeviceTokenService,
-                    $this->messageService
-                );
-                $notification->sendNotification(array_merge($request->toArray(), ['type' => 1]));
+//                $notification = new NotificationSendController(
+//                    $this->departmentService,
+//                    $this->userService,
+//                    $this->userDeviceTokenService,
+//                    $this->messageService
+//                );
+//                $notification->sendNotification(array_merge($request->toArray(), ['type' => 1]));
                 return response()->json(['message' => ResponseMessage::OK]);
             }
             return response()->json([], 400);
@@ -125,18 +125,18 @@ class MessageController extends Controller
         }
         try {
             $this->messageService->markAsConfirmedMessage($request->input('id'));
-            $notification = new NotificationSendController(
-                $this->departmentService,
-                $this->userService,
-                $this->userDeviceTokenService,
-                $this->messageService
-            );
-            $notification->sendNotification(array_merge($request->toArray(),
-                [
-                    'type' => 0,
-                    'title' => 'Manager department confirm your request',
-                    'content' => '...'
-                ]));
+//            $notification = new NotificationSendController(
+//                $this->departmentService,
+//                $this->userService,
+//                $this->userDeviceTokenService,
+//                $this->messageService
+//            );
+//            $notification->sendNotification(array_merge($request->toArray(),
+//                [
+//                    'type' => 0,
+//                    'title' => 'Manager department confirm your request',
+//                    'content' => '...'
+//                ]));
             return response()->json(['message' => ResponseMessage::UPDATE_SUCCESS]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

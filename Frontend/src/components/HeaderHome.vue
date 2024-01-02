@@ -19,6 +19,7 @@
         </svg>
       </div>
       <AdminMessage v-if="user.manager" :notification = props.notification></AdminMessage>
+      <CalendarMeeting style="margin-left: -10px"></CalendarMeeting>
       <el-dropdown>
         <span class="el-dropdown-link">
           <span style="line-height: 44px; font-size: larger">{{ user.name }}</span>
@@ -55,6 +56,7 @@ import AdminMessage from "./AdminMessage.vue";
 import AuthAPI from "../services/AuthAPI";
 import NewMeeting from "./NewMeeting.vue";
 import {ref} from "vue";
+import CalendarMeeting from "./CalendarMeeting.vue";
 
 const new_meeting = ref(false)
 const props = defineProps({
